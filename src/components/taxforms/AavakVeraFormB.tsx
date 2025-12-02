@@ -13,369 +13,333 @@ interface AavakVeraFormBProps {
 const AavakVeraFormB = ({ client, formData, onChange, readOnly = false }: AavakVeraFormBProps) => {
   const taxB = formData.taxCalculationB;
 
-  const updateField = (field: keyof typeof formData.taxCalculationB, value: number) => {
+  const updateField = (field: keyof typeof formData.taxCalculationB, value: number | string) => {
     onChange({
       ...formData,
       taxCalculationB: { ...formData.taxCalculationB, [field]: value },
     });
   };
 
+  const InputField = ({ field, value }: { field: keyof typeof taxB; value: number }) => (
+    readOnly ? (
+      <span>{value || 0}</span>
+    ) : (
+      <Input
+        type="number"
+        value={value || ''}
+        onChange={(e) => updateField(field, Number(e.target.value) || 0)}
+        className="w-20 h-5 text-xs text-right p-1 border-0 bg-transparent inline-block"
+      />
+    )
+  );
+
   return (
     <div className="tax-form-container tax-form-print page-break" id="aavak-vera-form-b">
-      <div className="form-title gujarati-text">આવક વેરા ગણતરી ફોર્મ (ભાગ-B)</div>
+      <div className="text-center font-bold text-lg mb-3 border-b-2 border-black pb-1">
+        આવક વેરા ગણતરી ફોર્મ
+      </div>
 
-      {/* Section D - Deductions */}
-      <div className="section-title gujarati-text">વિભાગ (D) સમગ્ર કુલ આવક માંથી કલમ મુજબ બાદ મળતર વિભાગ</div>
+      {/* Section D - Deductions under 80C */}
+      <div className="font-bold text-[11px] mb-2 bg-gray-800 text-white p-1">
+        વિભાગ (D) સમગ્ર કુલ આવક માંથી કલમ મુજબ બાદ મળતર વિભાગ
+      </div>
       
-      <table>
+      <table style={{ fontSize: '10px' }}>
         <tbody>
           <tr className="header-row">
-            <td>1</td>
-            <td colSpan={3}>Under section 80-C</td>
+            <td className="w-6">1</td>
+            <td colSpan={2}>Under section 80-C</td>
             <td></td>
             <td></td>
           </tr>
           <tr>
             <td></td>
-            <td>(i)</td>
-            <td className="gujarati-text">જી.પી.એફ</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell font-bold">{taxB.gpf}</td>
-            <td></td>
+            <td className="w-8">(i)</td>
+            <td>જી.પી.એફ</td>
+            <td className="text-right w-10">Rs.</td>
+            <td className="amount-cell w-20">{taxB.gpf || 0}</td>
           </tr>
           <tr>
             <td></td>
             <td>(ii)</td>
-            <td className="gujarati-text">સી.પી.એફ</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxB.cpf}</td>
-            <td></td>
+            <td>સી.પી.એફ</td>
+            <td className="text-right">Rs.</td>
+            <td className="amount-cell">{taxB.cpf || 0}</td>
           </tr>
           <tr>
             <td></td>
             <td>(iii)</td>
-            <td className="gujarati-text">એલ.આઈ.સી. પ્રીમિયમ</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxB.licPremium}</td>
-            <td></td>
+            <td>એલ.આઈ.સી. પ્રીમિયમ</td>
+            <td className="text-right">Rs.</td>
+            <td className="amount-cell">{taxB.licPremium || 0}</td>
           </tr>
           <tr>
             <td></td>
             <td>(iv)</td>
-            <td className="gujarati-text">પી.એલ.ઈ/આઈ.પ્રીમિયમ</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxB.pliPremium}</td>
-            <td></td>
+            <td>પી.એલ.ઈ/આઈ.પ્રીમિયમ</td>
+            <td className="text-right">Rs.</td>
+            <td className="amount-cell">{taxB.pliPremium || 0}</td>
           </tr>
           <tr>
             <td></td>
             <td>(v)</td>
-            <td className="gujarati-text">જૂથ વીમો</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxB.groupInsurance}</td>
-            <td></td>
+            <td>જૂથ વીમો</td>
+            <td className="text-right">Rs.</td>
+            <td className="amount-cell">{taxB.groupInsurance || 0}</td>
           </tr>
           <tr>
             <td></td>
             <td>(vi)</td>
-            <td className="gujarati-text">પી.પી.એફ</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxB.ppf}</td>
-            <td></td>
+            <td>પી.પી.એફ</td>
+            <td className="text-right">Rs.</td>
+            <td className="amount-cell">{taxB.ppf || 0}</td>
           </tr>
           <tr>
             <td></td>
             <td>(vii)</td>
-            <td className="gujarati-text">એન.એસ.સી.માં કરેલ રોકાણ</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxB.nscInvestment}</td>
-            <td></td>
+            <td>એન.એસ.સી.માં કરેલ રોકાણ</td>
+            <td className="text-right">Rs.</td>
+            <td className="amount-cell">{taxB.nscInvestment || 0}</td>
           </tr>
           <tr>
             <td></td>
             <td>(viii)</td>
-            <td className="gujarati-text">મકાન લોનના હપ્તાની રકમ (મુદ્દલ)</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxB.housingLoanPrincipal}</td>
-            <td></td>
+            <td>મકાન લોનના હપ્તાની રકમ (મુદ્દલ)</td>
+            <td className="text-right">Rs.</td>
+            <td className="amount-cell">{taxB.housingLoanPrincipal || 0}</td>
           </tr>
           <tr>
             <td></td>
             <td>(ix)</td>
-            <td className="gujarati-text">બાળકોની શિક્ષણ ફિ ચુકવેલ</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxB.educationFee}</td>
-            <td></td>
+            <td>બાળકોની શિક્ષણ ફી ચુકવેલ</td>
+            <td className="text-right">Rs.</td>
+            <td className="amount-cell">{taxB.educationFee || 0}</td>
           </tr>
           <tr>
             <td></td>
             <td>(x)</td>
-            <td className="gujarati-text">અન્ય રોકાણ ૮૦ સી મુજબ (SSY, FD, etc.)</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxB.otherInvestment80C}</td>
-            <td></td>
+            <td>અન્ય રોકાણ ૮૦ સી મુજબ (SSY, FD, etc.)</td>
+            <td className="text-right">Rs.</td>
+            <td className="amount-cell">{taxB.otherInvestment80C || 0}</td>
           </tr>
           <tr className="total-row">
             <td></td>
             <td></td>
-            <td className="gujarati-text font-bold">કુલ રોકાણ</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell font-bold">{taxB.total80C}</td>
-            <td></td>
+            <td className="font-bold">કુલ રોકાણ</td>
+            <td className="text-right">Rs.</td>
+            <td className="amount-cell font-bold">{taxB.total80C || 0}</td>
           </tr>
           <tr className="total-row">
             <td></td>
             <td></td>
-            <td className="gujarati-text font-bold">૧૫૦૦૦૦ની મર્યાદામાં</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell font-bold">{taxB.max80C}</td>
-            <td></td>
+            <td className="font-bold">૧૫૦૦૦૦ની મર્યાદામાં</td>
+            <td className="text-right">Rs.</td>
+            <td className="amount-cell font-bold">{taxB.max80C || 0}</td>
           </tr>
           
           {/* Other Sections */}
           <tr>
             <td>2</td>
-            <td colSpan={2} className="gujarati-text">મેડીકલેઇમ 80-D (Upto Rs.25000)</td>
-            <td className="amount-cell">RS.</td>
+            <td colSpan={2}>મેડીકલેઇમ 80-D (Upto Rs.25000)</td>
+            <td className="text-right">Rs.</td>
             <td className="amount-cell">
-              <Input
-                type="number"
-                value={taxB.medicalInsurance80D || ''}
-                onChange={(e) => updateField('medicalInsurance80D', Number(e.target.value) || 0)}
-                className="w-full h-6 text-xs text-right p-1 border-0 bg-transparent"
-                disabled={readOnly}
-              />
+              <InputField field="medicalInsurance80D" value={taxB.medicalInsurance80D} />
             </td>
-            <td></td>
           </tr>
           <tr>
             <td>3</td>
-            <td colSpan={2} className="gujarati-text">વિકલાંગ આશ્રિત 80-DD (Upto Rs.50000)</td>
-            <td className="amount-cell">RS.</td>
+            <td colSpan={2}>વિકલાંગ આશ્રિત 80-DD (Upto Rs.50000)</td>
+            <td className="text-right">Rs.</td>
             <td className="amount-cell">
-              <Input
-                type="number"
-                value={taxB.disabledDependent80DD || ''}
-                onChange={(e) => updateField('disabledDependent80DD', Number(e.target.value) || 0)}
-                className="w-full h-6 text-xs text-right p-1 border-0 bg-transparent"
-                disabled={readOnly}
-              />
+              <InputField field="disabledDependent80DD" value={taxB.disabledDependent80DD} />
             </td>
-            <td></td>
           </tr>
           <tr>
             <td>4</td>
-            <td colSpan={2} className="gujarati-text">ગંભીર રોગ 80-DDB (Upto Rs.40000)</td>
-            <td className="amount-cell">RS.</td>
+            <td colSpan={2}>ગંભીર રોગ 80-DDB (Upto Rs.40000)</td>
+            <td className="text-right">Rs.</td>
             <td className="amount-cell">
-              <Input
-                type="number"
-                value={taxB.seriousDisease80DDB || ''}
-                onChange={(e) => updateField('seriousDisease80DDB', Number(e.target.value) || 0)}
-                className="w-full h-6 text-xs text-right p-1 border-0 bg-transparent"
-                disabled={readOnly}
-              />
+              <InputField field="seriousDisease80DDB" value={taxB.seriousDisease80DDB} />
             </td>
-            <td></td>
           </tr>
           <tr>
             <td>5</td>
-            <td colSpan={2} className="gujarati-text">અંધ/અપંગ 80-U (75000-125000)</td>
-            <td className="amount-cell">RS.</td>
+            <td colSpan={2}>અંધ/અપંગ 80-U (75000-125000)</td>
+            <td className="text-right">Rs.</td>
             <td className="amount-cell">
-              <Input
-                type="number"
-                value={taxB.disability80U || ''}
-                onChange={(e) => updateField('disability80U', Number(e.target.value) || 0)}
-                className="w-full h-6 text-xs text-right p-1 border-0 bg-transparent"
-                disabled={readOnly}
-              />
+              <InputField field="disability80U" value={taxB.disability80U} />
             </td>
-            <td></td>
           </tr>
           <tr>
             <td>6</td>
-            <td colSpan={2} className="gujarati-text">દાન 80-G (50%)</td>
-            <td className="amount-cell">RS.</td>
+            <td colSpan={2}>દાન 80-G (50%)</td>
+            <td className="text-right">Rs.</td>
             <td className="amount-cell">
-              <Input
-                type="number"
-                value={taxB.donation80G || ''}
-                onChange={(e) => updateField('donation80G', Number(e.target.value) || 0)}
-                className="w-full h-6 text-xs text-right p-1 border-0 bg-transparent"
-                disabled={readOnly}
-              />
+              <InputField field="donation80G" value={taxB.donation80G} />
             </td>
-            <td></td>
           </tr>
           <tr>
             <td>7</td>
-            <td colSpan={2} className="gujarati-text">સવિંગ બેંક વ્યાજ 80TTA (Rs.10000 મર્યાદા)</td>
-            <td className="amount-cell">RS.</td>
+            <td colSpan={2}>સેવિંગ બેંક વ્યાજ 80TTA (Rs.10000 મર્યાદા)</td>
+            <td className="text-right">Rs.</td>
             <td className="amount-cell">
-              <Input
-                type="number"
-                value={taxB.savingsBankInterest80TTA || ''}
-                onChange={(e) => updateField('savingsBankInterest80TTA', Number(e.target.value) || 0)}
-                className="w-full h-6 text-xs text-right p-1 border-0 bg-transparent"
-                disabled={readOnly}
-              />
+              <InputField field="savingsBankInterest80TTA" value={taxB.savingsBankInterest80TTA} />
             </td>
-            <td></td>
           </tr>
           <tr className="total-row">
             <td>8</td>
-            <td colSpan={2} className="gujarati-text font-bold">રોકાણ બાદ મળવા પાત્ર રકમનો સરવાળો</td>
-            <td className="amount-cell">RS.</td>
-            <td></td>
-            <td className="amount-cell font-bold">{taxB.totalDeductions}</td>
+            <td colSpan={2} className="font-bold">રોકાણ બાદ મળવા પાત્ર રકમનો સરવાળો</td>
+            <td className="text-right">Rs.</td>
+            <td className="amount-cell font-bold">{taxB.totalDeductions || 0}</td>
           </tr>
           <tr className="total-row">
             <td>9</td>
-            <td colSpan={2} className="gujarati-text font-bold">બાકિ મળવા પાત્ર આવક</td>
-            <td className="amount-cell">RS.</td>
-            <td></td>
-            <td className="amount-cell font-bold">{taxB.taxableIncome}</td>
+            <td colSpan={2} className="font-bold">બાકી મળવા પાત્ર આવક</td>
+            <td className="text-right">Rs.</td>
+            <td className="amount-cell font-bold">{taxB.taxableIncome || 0}</td>
           </tr>
           <tr className="total-row">
             <td>10</td>
-            <td colSpan={2} className="gujarati-text font-bold">દશનાં રાઉન્ડમાં કરપાત્ર રકમ</td>
-            <td className="amount-cell">RS.</td>
-            <td></td>
-            <td className="amount-cell font-bold">{taxB.roundedTaxableIncome}</td>
+            <td colSpan={2} className="font-bold">દશનાં રાઉન્ડમાં કરપાત્ર રકમ</td>
+            <td className="text-right">Rs.</td>
+            <td className="amount-cell font-bold">{taxB.roundedTaxableIncome || 0}</td>
           </tr>
         </tbody>
       </table>
 
       {/* Tax Slabs */}
-      <div className="section-title">TAX CALCULATION</div>
-      <table>
+      <div className="font-bold text-[11px] mt-3 mb-1 bg-gray-200 p-1">TAX CALCULATION</div>
+      <table style={{ fontSize: '10px' }}>
         <tbody>
           <tr>
-            <td>1</td>
+            <td className="w-6">1</td>
             <td>Upto Rs.2,50,000 (Male & Female)</td>
-            <td className="text-center">0%</td>
-            <td className="amount-cell">250000</td>
-            <td className="amount-cell">{taxB.taxSlab1}</td>
+            <td className="text-center w-12">0%</td>
+            <td className="amount-cell w-20">250000</td>
+            <td className="amount-cell w-20">{taxB.taxSlab1 || 0}</td>
           </tr>
           <tr>
             <td>2</td>
             <td>Rs.2,50,001 To 5,00,000</td>
             <td className="text-center">5%</td>
             <td className="amount-cell">250000</td>
-            <td className="amount-cell">{taxB.taxSlab2}</td>
+            <td className="amount-cell">{taxB.taxSlab2 || 0}</td>
           </tr>
           <tr>
             <td>3</td>
             <td>Rs.5,00,001 To 10,00,000</td>
             <td className="text-center">20%</td>
-            <td className="amount-cell">{Math.max(0, taxB.roundedTaxableIncome - 500000)}</td>
-            <td className="amount-cell">{taxB.taxSlab3}</td>
+            <td className="amount-cell">{Math.max(0, (taxB.roundedTaxableIncome || 0) - 500000)}</td>
+            <td className="amount-cell">{taxB.taxSlab3 || 0}</td>
           </tr>
         </tbody>
       </table>
 
       {/* Tax Summary */}
-      <div className="section-title gujarati-text">ઇન્કમટેક્ષ ગણતરી</div>
-      <table>
+      <div className="font-bold text-[11px] mt-3 mb-1 bg-gray-800 text-white p-1">ઇન્કમટેક્ષ ગણતરી</div>
+      <table style={{ fontSize: '10px' }}>
         <tbody>
           <tr>
-            <td colSpan={2} className="gujarati-text">ભરવાપાત્ર ઇન્કમટેક્ષ</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell font-bold">{taxB.totalTax}</td>
+            <td colSpan={2}>ભરવાપાત્ર ઇન્કમટેક્ષ</td>
+            <td className="text-right w-10">RS.</td>
+            <td className="amount-cell font-bold w-20">{taxB.totalTax || 0}</td>
           </tr>
           <tr>
-            <td colSpan={2}>Tax Rebate Section 87A (Up To Rs.2500)</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxB.taxRebate87A}</td>
+            <td colSpan={2}>Tax Rebate Section 87A (Up To Rs.12500)</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{taxB.taxRebate87A || 0}</td>
           </tr>
           <tr>
-            <td colSpan={2} className="gujarati-text">ટેક્ષ રિબેટ બાદ ભરવા પાત્ર ઇન્કમટેક્ષ</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxB.taxAfterRebate}</td>
+            <td colSpan={2}>ટેક્ષ રિબેટ બાદ ભરવા પાત્ર ઇન્કમટેક્ષ</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{taxB.taxAfterRebate || 0}</td>
           </tr>
           <tr>
             <td colSpan={2}>Education Cess 4%</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxB.educationCess}</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{taxB.educationCess || 0}</td>
           </tr>
           <tr className="total-row">
-            <td colSpan={2} className="gujarati-text font-bold">કુલ ભરવા પાત્ર ઈન્કમટેક્ષ</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell font-bold">{taxB.totalTaxPayable}</td>
+            <td colSpan={2} className="font-bold">કુલ ભરવા પાત્ર ઈન્કમટેક્ષ</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell font-bold">{taxB.totalTaxPayable || 0}</td>
           </tr>
           <tr>
             <td colSpan={2}>RELIEF UNDER SECTION 89</td>
-            <td className="amount-cell">RS.</td>
+            <td className="text-right">RS.</td>
             <td className="amount-cell">
-              <Input
-                type="number"
-                value={taxB.relief89 || ''}
-                onChange={(e) => updateField('relief89', Number(e.target.value) || 0)}
-                className="w-full h-6 text-xs text-right p-1 border-0 bg-transparent"
-                disabled={readOnly}
-              />
+              <InputField field="relief89" value={taxB.relief89} />
             </td>
           </tr>
           <tr className="total-row">
-            <td colSpan={2} className="gujarati-text font-bold">કુલ ભરવાપાત્ર ઇન્કમટેક્સ Net Amount</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell font-bold">{taxB.netTaxPayable}</td>
+            <td colSpan={2} className="font-bold">કુલ ભરવાપાત્ર ઇન્કમટેક્સ Net Amount</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell font-bold">{taxB.netTaxPayable || 0}</td>
           </tr>
         </tbody>
       </table>
 
       {/* Tax Payment Summary */}
-      <div className="section-title gujarati-text">ઇન્કમટેક્ષની વિગત (પગારમાંથી ભરેલ તથા ભરવા પાત્ર)</div>
-      <table>
+      <div className="font-bold text-[11px] mt-3 mb-1 bg-gray-200 p-1">
+        ઇન્કમટેક્ષની વિગત (પગારમાંથી ભરેલ તથા ભરવા પાત્ર)
+      </div>
+      <table style={{ fontSize: '10px' }}>
         <tbody>
           <tr>
-            <td>1</td>
-            <td className="gujarati-text">ભરપાઈ કરેલ ઇન્કમટેક્ષ</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxB.taxPaid}</td>
+            <td className="w-6">1</td>
+            <td>ભરપાઈ કરેલ ઇન્કમટેક્ષ</td>
+            <td className="text-right w-10">RS.</td>
+            <td className="amount-cell w-20">{taxB.taxPaid || 0}</td>
           </tr>
           <tr>
             <td>2</td>
-            <td className="gujarati-text">ભરવાપાત્ર બાકિ રહેલ ટેક્ષની રકમ</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxB.balanceTax}</td>
+            <td>ભરવાપાત્ર બાકી રહેલ ટેક્ષની રકમ</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{taxB.balanceTax || 0}</td>
           </tr>
           <tr>
             <td>3</td>
-            <td>Recovered from pay of {taxB.recoveredMonth || "___________"}</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxB.balanceTax}</td>
+            <td>
+              Recovered from pay of{' '}
+              {readOnly ? (
+                taxB.recoveredMonth || '___________'
+              ) : (
+                <Input
+                  type="text"
+                  value={taxB.recoveredMonth || ''}
+                  onChange={(e) => updateField('recoveredMonth', e.target.value)}
+                  className="w-24 h-5 text-xs p-1 border-0 bg-transparent inline-block"
+                  placeholder="Month"
+                />
+              )}
+            </td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{taxB.balanceTax || 0}</td>
           </tr>
           <tr className="total-row">
             <td>4</td>
-            <td className="gujarati-text font-bold">કુલ ભરપાઈ કરેલ ઇન્કમટેક્ષની રકમ</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell font-bold">{taxB.totalTaxPaid}</td>
+            <td className="font-bold">કુલ ભરપાઈ કરેલ ઇન્કમટેક્ષની રકમ</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell font-bold">{taxB.totalTaxPaid || 0}</td>
           </tr>
         </tbody>
       </table>
 
-      {/* Certificate */}
-      <div className="mt-4 p-3 border border-gray-400">
-        <p className="font-bold gujarati-text">કર્મચારી (શિક્ષક) બાહેંધરી</p>
-        <p className="text-sm gujarati-text">
-          આ પત્રકમાં ભરેલ તમામ વિગતો સાચી અને દોષ રહિત છે. જેની આથી હું ખાત્રી આપું છું.
-        </p>
-        <div className="text-right mt-2 gujarati-text">સહી: _______________</div>
+      {/* Certificates */}
+      <div className="mt-3 p-2 border border-black text-[10px]">
+        <p className="font-bold">કર્મચારી (શિક્ષક) બાંહેધરી</p>
+        <p>આ પત્રકમાં ભરેલ તમામ વિગતો સાચી અને દોષ રહિત છે. જેની આથી હું ખાત્રી આપું છું.</p>
+        <p className="text-right mt-2">સહી: _______________</p>
       </div>
 
-      <div className="mt-4 p-3 border border-gray-400">
-        <p className="font-bold gujarati-text">સંસ્થાના વડાનું પ્રમાણપત્ર</p>
-        <p className="text-sm gujarati-text">
-          આ પત્રકમાં ભરેલ તમામ પગારદાર વિગતો સંસ્થાના હિસાબી દફતરે પ્રમાણે અને રોકાણોના આધારો અત્રેની ઓફિસમાં કર્મચારીએ રાખેલ છે.
-          જેની આથી હું ખાત્રી આપું છું.
-        </p>
-        <div className="text-right mt-2">Signature and seal of Head of office</div>
+      <div className="mt-2 p-2 border border-black text-[10px]">
+        <p className="font-bold">સંસ્થાના વડાનું પ્રમાણપત્ર</p>
+        <p>આ પત્રકમાં ભરેલ તમામ પગારદાર વિગતો સંસ્થાના હિસાબી દફતરે પ્રમાણે અને રોકાણોના આધારો અત્રેની ઓફિસમાં કર્મચારીએ રાખેલ છે.</p>
+        <p className="text-right mt-2">Signature and seal of Head of office</p>
       </div>
 
-      <div className="footer-note">
-        Created By: Smart Computer Vinchhiya - Rupsangbhai Jamod-9924640689
+      <div className="text-center text-[8px] mt-4 pt-2 border-t border-dashed border-gray-400">
+        Created By: Smart Computer Vinchhiya - Rupsangbhai Jamod - 9924640689
       </div>
     </div>
   );
