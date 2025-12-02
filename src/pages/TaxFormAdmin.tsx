@@ -17,6 +17,8 @@ import Form16A from "@/components/taxforms/Form16A";
 import Form16B from "@/components/taxforms/Form16B";
 import { Search, Printer, FileText, FileSpreadsheet, Save, ArrowLeft, Calculator } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import TaxChatbot from "@/components/TaxChatbot";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 const TaxFormAdmin = () => {
   const navigate = useNavigate();
@@ -347,6 +349,9 @@ const TaxFormAdmin = () => {
       <div className="no-print">
         <Footer />
       </div>
+      
+      <TaxChatbot />
+      <WhatsAppButton />
     </div>
   );
 };
