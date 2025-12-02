@@ -79,26 +79,26 @@ const Form16A = ({ client, formData }: Form16AProps) => {
           <tr>
             <td>Quarter-1</td>
             <td>{form16.quarters.q1.acknowledgementNo}</td>
-            <td>Apr-22</td>
-            <td>Jun-22</td>
+            <td>{form16.quarters.q1.from}</td>
+            <td>{form16.quarters.q1.to}</td>
           </tr>
           <tr>
             <td>Quarter-2</td>
             <td>{form16.quarters.q2.acknowledgementNo}</td>
-            <td>Jul-22</td>
-            <td>Sep-22</td>
+            <td>{form16.quarters.q2.from}</td>
+            <td>{form16.quarters.q2.to}</td>
           </tr>
           <tr>
             <td>Quarter-3</td>
             <td>{form16.quarters.q3.acknowledgementNo}</td>
-            <td>Oct-22</td>
-            <td>Dec-22</td>
+            <td>{form16.quarters.q3.from}</td>
+            <td>{form16.quarters.q3.to}</td>
           </tr>
           <tr>
             <td>Quarter-4</td>
             <td>{form16.quarters.q4.acknowledgementNo}</td>
-            <td>Jan-23</td>
-            <td>Mar-23</td>
+            <td>{form16.quarters.q4.from}</td>
+            <td>{form16.quarters.q4.to}</td>
           </tr>
         </tbody>
       </table>

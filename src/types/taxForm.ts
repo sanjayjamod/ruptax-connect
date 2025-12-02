@@ -198,8 +198,8 @@ export const emptyMonthlySalary: MonthlySalary = {
 export const getEmptyTaxFormData = (clientId: string): TaxFormData => ({
   clientId,
   salaryData: {
-    financialYear: "2022-2023",
-    accountingYear: "01-04-2022 TO 31-03-2023",
+    financialYear: "2025-2026",
+    accountingYear: "01-04-2025 TO 31-03-2026",
     months: {
       apr: { ...emptyMonthlySalary },
       may: { ...emptyMonthlySalary },
@@ -302,10 +302,10 @@ export const getEmptyTaxFormData = (clientId: string): TaxFormData => ({
     employerTan: "RKTT01474E",
     tdsCircle: "",
     quarters: {
-      q1: { acknowledgementNo: "", from: "Apr-22", to: "Jun-22" },
-      q2: { acknowledgementNo: "", from: "Jul-22", to: "Sep-22" },
-      q3: { acknowledgementNo: "", from: "Oct-22", to: "Dec-22" },
-      q4: { acknowledgementNo: "", from: "Jan-23", to: "Mar-23" },
+      q1: { acknowledgementNo: "", from: "Apr-25", to: "Jun-25" },
+      q2: { acknowledgementNo: "", from: "Jul-25", to: "Sep-25" },
+      q3: { acknowledgementNo: "", from: "Oct-25", to: "Dec-25" },
+      q4: { acknowledgementNo: "", from: "Jan-26", to: "Mar-26" },
     },
     monthlyTds: {
       apr: { tds: 0, surcharge: 0, cess: 0, total: 0 },
