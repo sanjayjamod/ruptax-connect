@@ -1,0 +1,184 @@
+/* Print Styles for Tax Forms - A4 Size */
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .tax-form-print {
+    width: 100%;
+    max-width: 210mm;
+    margin: 0 auto;
+    font-size: 10pt;
+    line-height: 1.2;
+    color: #000 !important;
+    background: #fff !important;
+  }
+
+  .tax-form-print table {
+    width: 100%;
+    border-collapse: collapse;
+    page-break-inside: avoid;
+  }
+
+  .tax-form-print th,
+  .tax-form-print td {
+    border: 1px solid #000;
+    padding: 4px 6px;
+    font-size: 9pt;
+    vertical-align: middle;
+  }
+
+  .tax-form-print th {
+    background-color: #f0f0f0 !important;
+    font-weight: bold;
+  }
+
+  .tax-form-print .text-right {
+    text-align: right;
+  }
+
+  .tax-form-print .text-center {
+    text-align: center;
+  }
+
+  .tax-form-print .font-bold {
+    font-weight: bold;
+  }
+
+  .tax-form-print .border-none {
+    border: none !important;
+  }
+
+  .tax-form-print .border-bottom-only {
+    border-left: none !important;
+    border-right: none !important;
+    border-top: none !important;
+  }
+
+  .tax-form-print h1 {
+    font-size: 14pt;
+    margin-bottom: 8px;
+  }
+
+  .tax-form-print h2 {
+    font-size: 12pt;
+    margin-bottom: 6px;
+  }
+
+  .tax-form-print .signature-area {
+    margin-top: 20px;
+    page-break-inside: avoid;
+  }
+
+  .tax-form-print .page-break {
+    page-break-before: always;
+  }
+}
+
+/* Screen Styles for Tax Form Preview */
+.tax-form-container {
+  background: #fff;
+  color: #000;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.tax-form-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+}
+
+.tax-form-container th,
+.tax-form-container td {
+  border: 1px solid #333;
+  padding: 6px 8px;
+  font-size: 11px;
+}
+
+.tax-form-container th {
+  background-color: #e8e8e8;
+  font-weight: bold;
+}
+
+.tax-form-container .header-row {
+  background-color: #d0d0d0;
+  font-weight: bold;
+}
+
+.tax-form-container .total-row {
+  background-color: #f5f5f5;
+  font-weight: bold;
+}
+
+.tax-form-container .amount-cell {
+  text-align: right;
+  font-family: 'Courier New', monospace;
+}
+
+.tax-form-container .label-cell {
+  background-color: #f8f8f8;
+}
+
+.tax-form-container .form-title {
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #000;
+  padding-bottom: 8px;
+}
+
+.tax-form-container .section-title {
+  font-size: 13px;
+  font-weight: bold;
+  margin: 12px 0 8px;
+  background: #333;
+  color: #fff;
+  padding: 4px 8px;
+}
+
+.tax-form-container .gujarati-text {
+  font-family: 'Noto Sans Gujarati', 'Shruti', sans-serif;
+}
+
+.tax-form-container .signature-box {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+  padding-top: 20px;
+}
+
+.tax-form-container .signature-item {
+  text-align: center;
+  min-width: 150px;
+}
+
+.tax-form-container .signature-line {
+  border-top: 1px solid #000;
+  margin-top: 40px;
+  padding-top: 4px;
+}
+
+.tax-form-container .footer-note {
+  font-size: 9px;
+  text-align: center;
+  margin-top: 20px;
+  color: #666;
+}
