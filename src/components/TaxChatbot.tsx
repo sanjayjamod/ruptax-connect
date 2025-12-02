@@ -24,7 +24,7 @@ const TaxChatbot = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "नमस्ते! 🙏 मैं आपका Income Tax सहायक हूं। आप मुझसे ITR फाइलिंग, टैक्स कटौती, फॉर्म 16, TDS, या किसी भी कर संबंधी प्रश्न पूछ सकते हैं।\n\nHello! I'm your Income Tax assistant. Ask me about ITR filing, tax deductions, Form 16, TDS, or any tax-related questions."
+      content: "નમસ્તે! 🙏 હું તમારો આવકવેરા સહાયક છું.\n\nતમે મને પૂછી શકો છો:\n• ITR ફાઇલિંગ\n• ટેક્સ કપાત (80C, 80D)\n• ફોર્મ 16 વિશે\n• TDS ગણતરી\n• GPF/CPF/LIC રોકાણો\n• પગાર ફોર્મ ભરવા વિશે\n\nતમારો પ્રશ્ન ગુજરાતીમાં પૂછો!"
     }
   ]);
   const [input, setInput] = useState("");
@@ -113,7 +113,7 @@ const TaxChatbot = () => {
       });
       setMessages(prev => [
         ...prev,
-        { role: "assistant", content: "क्षमा करें, कुछ गड़बड़ हुई। कृपया फिर से प्रयास करें।" }
+        { role: "assistant", content: "માફ કરશો, કંઈક ખોટું થયું. કૃપા કરીને ફરીથી પ્રયાસ કરો." }
       ]);
     } finally {
       setIsLoading(false);
@@ -148,7 +148,7 @@ const TaxChatbot = () => {
         <SheetHeader className="p-4 border-b border-border">
           <SheetTitle className="flex items-center gap-2">
             <Bot className="h-5 w-5 text-primary" />
-            Income Tax Assistant
+            આવકવેરા સહાયક
           </SheetTitle>
         </SheetHeader>
 
@@ -199,7 +199,7 @@ const TaxChatbot = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="टैक्स संबंधी प्रश्न पूछें..."
+              placeholder="તમારો પ્રશ્ન અહીં લખો..."
               disabled={isLoading}
             />
             <Button onClick={handleSend} disabled={isLoading || !input.trim()}>
@@ -207,7 +207,7 @@ const TaxChatbot = () => {
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-2 text-center">
-            AI Tax Assistant • ITR • TDS • Form 16
+            AI આવકવેરા સહાયક • ITR • TDS • ફોર્મ 16
           </p>
         </div>
       </SheetContent>
