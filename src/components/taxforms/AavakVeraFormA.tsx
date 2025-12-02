@@ -1,6 +1,5 @@
 import { Client } from "@/types/client";
 import { TaxFormData } from "@/types/taxForm";
-import { Input } from "@/components/ui/input";
 import "./PrintStyles.css";
 
 interface AavakVeraFormAProps {
@@ -20,15 +19,17 @@ const AavakVeraFormA = ({ client, formData, onChange, readOnly = false }: AavakV
     });
   };
 
-  const InputField = ({ field, value }: { field: keyof typeof taxA; value: number }) => (
+  const renderInputField = (field: keyof typeof taxA, value: number) => (
     readOnly ? (
       <span>{value || 0}</span>
     ) : (
-      <Input
-        type="number"
-        value={value || ''}
-        onChange={(e) => updateField(field, Number(e.target.value) || 0)}
-        className="w-20 h-5 text-xs text-right p-1 border-0 bg-transparent inline-block"
+      <input
+        type="text"
+        inputMode="numeric"
+        pattern="[0-9]*"
+        defaultValue={value || ''}
+        onBlur={(e) => updateField(field, Number(e.target.value) || 0)}
+        className="w-20 h-5 text-xs text-right p-1 border-0 bg-transparent inline-block focus:outline-none focus:bg-yellow-50"
       />
     )
   );
@@ -174,7 +175,7 @@ const AavakVeraFormA = ({ client, formData, onChange, readOnly = false }: AavakV
             <td>બેંક વ્યાજ આવક SAVING</td>
             <td className="text-right w-10">RS.</td>
             <td className="amount-cell w-20">
-              <InputField field="bankInterest" value={taxA.bankInterest} />
+              {renderInputField("bankInterest", taxA.bankInterest)}
             </td>
           </tr>
           <tr>
@@ -183,7 +184,7 @@ const AavakVeraFormA = ({ client, formData, onChange, readOnly = false }: AavakV
             <td>એન.એસ.સી. વ્યાજ</td>
             <td className="text-right">RS.</td>
             <td className="amount-cell">
-              <InputField field="nscInterest" value={taxA.nscInterest} />
+              {renderInputField("nscInterest", taxA.nscInterest)}
             </td>
           </tr>
           <tr>
@@ -192,7 +193,7 @@ const AavakVeraFormA = ({ client, formData, onChange, readOnly = false }: AavakV
             <td>ફિકસ ડિપૉઝીટ વ્યાજ</td>
             <td className="text-right">RS.</td>
             <td className="amount-cell">
-              <InputField field="fdInterest" value={taxA.fdInterest} />
+              {renderInputField("fdInterest", taxA.fdInterest)}
             </td>
           </tr>
           <tr>
@@ -212,7 +213,7 @@ const AavakVeraFormA = ({ client, formData, onChange, readOnly = false }: AavakV
             <td>પરીક્ષાનું મહેનતાણું</td>
             <td className="text-right">RS.</td>
             <td className="amount-cell">
-              <InputField field="examIncome" value={taxA.examIncome} />
+              {renderInputField("examIncome", taxA.examIncome)}
             </td>
           </tr>
           <tr>

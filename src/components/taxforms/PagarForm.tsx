@@ -1,6 +1,5 @@
 import { Client } from "@/types/client";
 import { TaxFormData, MonthlySalary } from "@/types/taxForm";
-import { Input } from "@/components/ui/input";
 import "./PrintStyles.css";
 
 interface PagarFormProps {
@@ -36,16 +35,18 @@ const PagarForm = ({ client, formData, onChange, readOnly = false }: PagarFormPr
     return months.reduce((sum, month) => sum + (Number(formData.salaryData.months[month][field]) || 0), 0);
   };
 
-  const InputCell = ({ month, field }: { month: typeof months[number]; field: keyof MonthlySalary }) => (
-    <td className="amount-cell">
+  const renderInputCell = (month: typeof months[number], field: keyof MonthlySalary) => (
+    <td key={`${month}-${field}`} className="amount-cell">
       {readOnly ? (
         <span>{formData.salaryData.months[month][field] || ''}</span>
       ) : (
-        <Input
-          type="number"
-          value={formData.salaryData.months[month][field] || ''}
-          onChange={(e) => updateMonthField(month, field, Number(e.target.value) || 0)}
-          className="w-full h-5 text-[9px] text-right p-0.5 border-0 bg-transparent"
+        <input
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          defaultValue={formData.salaryData.months[month][field] || ''}
+          onBlur={(e) => updateMonthField(month, field, Number(e.target.value) || 0)}
+          className="w-full h-5 text-[9px] text-right p-0.5 border-0 bg-transparent focus:outline-none focus:bg-yellow-50"
         />
       )}
     </td>
@@ -104,63 +105,63 @@ const PagarForm = ({ client, formData, onChange, readOnly = false }: PagarFormPr
           <tr>
             <td className="text-center">1</td>
             <td>બેઝિક પગાર</td>
-            {months.map(month => <InputCell key={month} month={month} field="basic" />)}
+            {months.map(month => renderInputCell(month, "basic"))}
             <td className="amount-cell font-bold">{calculateColumnTotal('basic')}</td>
             <td></td>
           </tr>
           <tr>
             <td className="text-center">2</td>
             <td>ગ્રેડ પે</td>
-            {months.map(month => <InputCell key={month} month={month} field="gradePay" />)}
+            {months.map(month => renderInputCell(month, "gradePay"))}
             <td className="amount-cell font-bold">{calculateColumnTotal('gradePay')}</td>
             <td></td>
           </tr>
           <tr>
             <td className="text-center">3</td>
             <td>મોંઘવારી ભથ્થું</td>
-            {months.map(month => <InputCell key={month} month={month} field="da" />)}
+            {months.map(month => renderInputCell(month, "da"))}
             <td className="amount-cell font-bold">{calculateColumnTotal('da')}</td>
             <td></td>
           </tr>
           <tr>
             <td className="text-center">4</td>
             <td>ઘરભાડા ભથ્થું</td>
-            {months.map(month => <InputCell key={month} month={month} field="hra" />)}
+            {months.map(month => renderInputCell(month, "hra"))}
             <td className="amount-cell font-bold">{calculateColumnTotal('hra')}</td>
             <td></td>
           </tr>
           <tr>
             <td className="text-center">6</td>
             <td>મેડીકલ ભથ્થું</td>
-            {months.map(month => <InputCell key={month} month={month} field="medical" />)}
+            {months.map(month => renderInputCell(month, "medical"))}
             <td className="amount-cell font-bold">{calculateColumnTotal('medical')}</td>
             <td></td>
           </tr>
           <tr>
             <td className="text-center">7</td>
             <td>અપંગ એલાઉન્સ</td>
-            {months.map(month => <InputCell key={month} month={month} field="disabilityAllowance" />)}
+            {months.map(month => renderInputCell(month, "disabilityAllowance"))}
             <td className="amount-cell font-bold">{calculateColumnTotal('disabilityAllowance')}</td>
             <td></td>
           </tr>
           <tr>
             <td className="text-center">8</td>
             <td>આચાર્ય એલાઉન્સ</td>
-            {months.map(month => <InputCell key={month} month={month} field="principalAllowance" />)}
+            {months.map(month => renderInputCell(month, "principalAllowance"))}
             <td className="amount-cell font-bold">{calculateColumnTotal('principalAllowance')}</td>
             <td></td>
           </tr>
           <tr>
             <td className="text-center">9</td>
             <td>મોંઘવારી એરિયર્સ</td>
-            {months.map(month => <InputCell key={month} month={month} field="daArrears" />)}
+            {months.map(month => renderInputCell(month, "daArrears"))}
             <td className="amount-cell font-bold">{calculateColumnTotal('daArrears')}</td>
             <td></td>
           </tr>
           <tr>
             <td className="text-center">10</td>
             <td>પગાર એરિયર્સ</td>
-            {months.map(month => <InputCell key={month} month={month} field="salaryArrears" />)}
+            {months.map(month => renderInputCell(month, "salaryArrears"))}
             <td className="amount-cell font-bold">{calculateColumnTotal('salaryArrears')}</td>
             <td></td>
           </tr>
@@ -185,42 +186,42 @@ const PagarForm = ({ client, formData, onChange, readOnly = false }: PagarFormPr
           <tr>
             <td className="text-center">14</td>
             <td>G.P.F.</td>
-            {months.map(month => <InputCell key={month} month={month} field="gpf" />)}
+            {months.map(month => renderInputCell(month, "gpf"))}
             <td className="amount-cell font-bold">{calculateColumnTotal('gpf')}</td>
             <td></td>
           </tr>
           <tr>
             <td className="text-center">15</td>
             <td>C.P.F.</td>
-            {months.map(month => <InputCell key={month} month={month} field="cpf" />)}
+            {months.map(month => renderInputCell(month, "cpf"))}
             <td className="amount-cell font-bold">{calculateColumnTotal('cpf')}</td>
             <td></td>
           </tr>
           <tr>
             <td className="text-center">16</td>
             <td>વ્યવસાય વેરો</td>
-            {months.map(month => <InputCell key={month} month={month} field="professionTax" />)}
+            {months.map(month => renderInputCell(month, "professionTax"))}
             <td className="amount-cell font-bold">{calculateColumnTotal('professionTax')}</td>
             <td></td>
           </tr>
           <tr>
             <td className="text-center">17</td>
             <td>મંડળી</td>
-            {months.map(month => <InputCell key={month} month={month} field="society" />)}
+            {months.map(month => renderInputCell(month, "society"))}
             <td className="amount-cell font-bold">{calculateColumnTotal('society')}</td>
             <td></td>
           </tr>
           <tr>
             <td className="text-center">18</td>
             <td>જૂથ વિમા પ્રિમિયમ</td>
-            {months.map(month => <InputCell key={month} month={month} field="groupInsurance" />)}
+            {months.map(month => renderInputCell(month, "groupInsurance"))}
             <td className="amount-cell font-bold">{calculateColumnTotal('groupInsurance')}</td>
             <td></td>
           </tr>
           <tr>
             <td className="text-center">19</td>
             <td>ઇન્કમટેક્ષ કપાત</td>
-            {months.map(month => <InputCell key={month} month={month} field="incomeTax" />)}
+            {months.map(month => renderInputCell(month, "incomeTax"))}
             <td className="amount-cell font-bold">{calculateColumnTotal('incomeTax')}</td>
             <td></td>
           </tr>

@@ -1,6 +1,5 @@
 import { Client } from "@/types/client";
 import { TaxFormData } from "@/types/taxForm";
-import { Input } from "@/components/ui/input";
 import "./PrintStyles.css";
 
 interface DeclarationFormProps {
@@ -26,16 +25,18 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false }: Decla
     onChange({ ...formData, declarationData: newData });
   };
 
-  const InputCell = ({ field }: { field: keyof typeof formData.declarationData }) => (
+  const renderInputCell = (field: keyof typeof formData.declarationData) => (
     <td className="amount-cell">
       {readOnly ? (
         <span>{formData.declarationData[field] || 0}</span>
       ) : (
-        <Input
-          type="number"
-          value={formData.declarationData[field] || ''}
-          onChange={(e) => updateField(field, Number(e.target.value) || 0)}
-          className="w-full h-6 text-xs text-right p-1 border-0 bg-transparent"
+        <input
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          defaultValue={formData.declarationData[field] || ''}
+          onBlur={(e) => updateField(field, Number(e.target.value) || 0)}
+          className="w-full h-6 text-xs text-right p-1 border-0 bg-transparent focus:outline-none focus:bg-yellow-50"
         />
       )}
     </td>
@@ -80,34 +81,34 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false }: Decla
           <tr>
             <td className="text-center">1</td>
             <td>બેંક વ્યાજ (સેવિંગ્સ)</td>
-            <InputCell field="bankInterest" />
+            {renderInputCell("bankInterest")}
             <td className="text-center">1</td>
             <td>જીવન વિમાનું પ્રિમિયમ</td>
-            <InputCell field="licPremium" />
+            {renderInputCell("licPremium")}
           </tr>
           <tr>
             <td className="text-center">2</td>
             <td>N.S.C. શ્રેણીનું વ્યાજ</td>
-            <InputCell field="nscInterest" />
+            {renderInputCell("nscInterest")}
             <td className="text-center">2</td>
             <td>પોસ્ટ વિમાનું પ્રિમિયમ</td>
-            <InputCell field="postInsurance" />
+            {renderInputCell("postInsurance")}
           </tr>
           <tr>
             <td className="text-center">3</td>
             <td>પરીક્ષાનું મહેનતાણું</td>
-            <InputCell field="examIncome" />
+            {renderInputCell("examIncome")}
             <td className="text-center">3</td>
             <td>P.P.F</td>
-            <InputCell field="ppf" />
+            {renderInputCell("ppf")}
           </tr>
           <tr>
             <td className="text-center">4</td>
             <td>ફિકસ ડિપૉઝીટ વ્યાજ</td>
-            <InputCell field="fdInterest" />
+            {renderInputCell("fdInterest")}
             <td className="text-center">4</td>
             <td>N.S.C ભરેલ રકમ</td>
-            <InputCell field="nscInvestment" />
+            {renderInputCell("nscInvestment")}
           </tr>
           <tr>
             <td className="text-center">5</td>
@@ -115,7 +116,7 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false }: Decla
             <td></td>
             <td className="text-center">5</td>
             <td>હાઉસીંગ બિલ્ડીંગ લોનનું વ્યાજ</td>
-            <InputCell field="housingLoanInterest" />
+            {renderInputCell("housingLoanInterest")}
           </tr>
           <tr>
             <td className="text-center">6</td>
@@ -123,7 +124,7 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false }: Decla
             <td></td>
             <td className="text-center">6</td>
             <td>હાઉસીંગ બિલ્ડીંગ લોનના હપ્તાની રકમ</td>
-            <InputCell field="housingLoanPrincipal" />
+            {renderInputCell("housingLoanPrincipal")}
           </tr>
           <tr>
             <td className="text-center">7</td>
@@ -131,7 +132,7 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false }: Decla
             <td></td>
             <td className="text-center">7</td>
             <td>શિક્ષણ ખર્ચ ટ્યુશન ફી</td>
-            <InputCell field="educationFee" />
+            {renderInputCell("educationFee")}
           </tr>
           <tr>
             <td className="text-center">8</td>
@@ -139,7 +140,7 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false }: Decla
             <td></td>
             <td className="text-center">8</td>
             <td>S.B.I.</td>
-            <InputCell field="sbiLife" />
+            {renderInputCell("sbiLife")}
           </tr>
           <tr>
             <td className="text-center">9</td>
@@ -147,7 +148,7 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false }: Decla
             <td></td>
             <td className="text-center">9</td>
             <td>સુકન્યા સમૃદ્ધિ યોજના</td>
-            <InputCell field="sukanyaSamridhi" />
+            {renderInputCell("sukanyaSamridhi")}
           </tr>
           <tr>
             <td className="text-center">10</td>
@@ -155,7 +156,7 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false }: Decla
             <td></td>
             <td className="text-center">10</td>
             <td>મેડીકલેઇમમાં ભરેલ પ્રિમિયમ</td>
-            <InputCell field="medicalInsurance" />
+            {renderInputCell("medicalInsurance")}
           </tr>
           <tr>
             <td className="text-center">11</td>
@@ -163,7 +164,7 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false }: Decla
             <td></td>
             <td className="text-center">11</td>
             <td>પંચ વર્ષીય ટાઇમમાં રોકાણ</td>
-            <InputCell field="fiveYearFD" />
+            {renderInputCell("fiveYearFD")}
           </tr>
           <tr>
             <td className="text-center">12</td>
@@ -171,7 +172,7 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false }: Decla
             <td></td>
             <td className="text-center">12</td>
             <td>અન્ય</td>
-            <InputCell field="otherDeduction" />
+            {renderInputCell("otherDeduction")}
           </tr>
           <tr className="total-row">
             <td className="text-center">21</td>
