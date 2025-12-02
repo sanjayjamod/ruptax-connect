@@ -171,15 +171,21 @@
 
 /* Screen Styles for Tax Form Preview */
 /* Hide number input spinners globally in tax forms */
-.tax-form-container input[type="number"] {
-  -moz-appearance: textfield;
-  appearance: textfield;
+.tax-form-container input[type="number"],
+.tax-form-container input {
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
+  -webkit-appearance: textfield !important;
 }
 
 .tax-form-container input[type="number"]::-webkit-outer-spin-button,
-.tax-form-container input[type="number"]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+.tax-form-container input[type="number"]::-webkit-inner-spin-button,
+.tax-form-container input::-webkit-outer-spin-button,
+.tax-form-container input::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  margin: 0 !important;
+  display: none !important;
 }
 
 .tax-form-container {
