@@ -170,6 +170,18 @@
 }
 
 /* Screen Styles for Tax Form Preview */
+/* Hide number input spinners globally in tax forms */
+.tax-form-container input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.tax-form-container input[type="number"]::-webkit-outer-spin-button,
+.tax-form-container input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .tax-form-container {
   background: #fff;
   color: #000;
