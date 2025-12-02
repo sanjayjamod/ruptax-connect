@@ -15,102 +15,106 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false }: Decla
     const newData = { ...formData.declarationData, [field]: value };
     
     // Calculate totals
-    newData.totalIncome = newData.bankInterest + newData.nscInterest + newData.examIncome + newData.fdInterest + newData.otherIncome;
-    newData.totalDeduction = newData.licPremium + newData.postInsurance + newData.ppf + newData.nscInvestment + 
-      newData.housingLoanInterest + newData.housingLoanPrincipal + newData.educationFee + newData.sbiLife + 
-      newData.sukanyaSamridhi + newData.medicalInsurance + newData.fiveYearFD + newData.otherDeduction;
+    newData.totalIncome = (newData.bankInterest || 0) + (newData.nscInterest || 0) + 
+                          (newData.examIncome || 0) + (newData.fdInterest || 0) + (newData.otherIncome || 0);
+    newData.totalDeduction = (newData.licPremium || 0) + (newData.postInsurance || 0) + (newData.ppf || 0) + 
+                             (newData.nscInvestment || 0) + (newData.housingLoanInterest || 0) + 
+                             (newData.housingLoanPrincipal || 0) + (newData.educationFee || 0) + 
+                             (newData.sbiLife || 0) + (newData.sukanyaSamridhi || 0) + 
+                             (newData.medicalInsurance || 0) + (newData.fiveYearFD || 0) + (newData.otherDeduction || 0);
 
     onChange({ ...formData, declarationData: newData });
   };
 
   const InputCell = ({ field }: { field: keyof typeof formData.declarationData }) => (
     <td className="amount-cell">
-      <Input
-        type="number"
-        value={formData.declarationData[field] || ''}
-        onChange={(e) => updateField(field, Number(e.target.value) || 0)}
-        className="w-full h-6 text-xs text-right p-1 border-0 bg-transparent"
-        disabled={readOnly}
-      />
+      {readOnly ? (
+        <span>{formData.declarationData[field] || 0}</span>
+      ) : (
+        <Input
+          type="number"
+          value={formData.declarationData[field] || ''}
+          onChange={(e) => updateField(field, Number(e.target.value) || 0)}
+          className="w-full h-6 text-xs text-right p-1 border-0 bg-transparent"
+        />
+      )}
     </td>
   );
 
   return (
     <div className="tax-form-container tax-form-print" id="declaration-form">
-      <div className="form-title gujarati-text">ડેકલેરેશન ફોર્મ</div>
-      <p className="text-center text-sm mb-4 gujarati-text">ઈન્કમટેક્ષ પરિશિષ્ટ મુજબ</p>
+      <div className="text-center font-bold text-lg mb-1">ડેકલેરેશન ફોર્મ</div>
+      <div className="text-center text-sm mb-3 font-bold">ઈન્કમટેક્ષ પરિશિષ્ટ મુજબ</div>
 
       {/* Declaration Text */}
-      <div className="border border-gray-400 p-3 mb-4 text-sm gujarati-text">
-        <p>
+      <div className="border border-black p-3 mb-4 text-[11px] leading-relaxed">
+        <p className="mb-2">
           આથી હું <strong>{client.nameGujarati || client.name}</strong> પ્રતિજ્ઞાપૂર્વક જાહેર કરું છું
         </p>
-        <p>
-          વર્ષ: <strong>{formData.salaryData.financialYear}</strong> (તારીખ {formData.salaryData.accountingYear}) સુધીમા
+        <p className="mb-2">
+          વર્ષ: <strong>{formData.salaryData.financialYear}</strong> (તારીખ {formData.salaryData.accountingYear}) સુધીમાં
+        </p>
+        <p className="mb-2">
+          દરમ્યાન મારી પગારદારી આવક સિવાયના અને પગાર બીલ કપાત કરાવેલ રકમ સિવાય મેં બારોબાર કપાત કરાવેલ કે કરાવવા માગું છું. 
+          તે રકમની વિગત નીચે મુજબ છે. જે મારી જાણ અને સમજ મુજબ સાચી અને દોષરહિત છે.
         </p>
         <p>
-          દરમ્યાન મારી પગારદારી આવક સિવાયના અને પગાર બીલ કપાત કરાવેલ રકમ સિવાય મેં
-          બારોબાર કપાત કરાવેલ કે કરાવવા માગું છું. તે રકમની વિગત નીચે મુજબ છે. જે મારી જાણ
-          અને સમજ મુજબ સાચી અને દોષરહિત છે.
-        </p>
-        <p>
-          વધુમા કપાત અંગેના જરૂરી આધારો હું ચાલુ નાણાકીય વર્ષની આખર તારીખ સુધીમાં શાળા કાર્યાલય
-          માં રજુ કરીશ અને તેમ કરવામાં જો હું નિષ્ફળ જાઉં તો તે અંગેની સંપુર્ણ જવાબદારી મારી રહેશે જેની
-          હું ખાત્રી આપું છું.
+          વધુમાં કપાત અંગેના જરૂરી આધારો હું ચાલુ નાણાકીય વર્ષની આખર તારીખ સુધીમાં શાળા કાર્યાલયમાં રજુ કરીશ અને 
+          તેમ કરવામાં જો હું નિષ્ફળ જાઉં તો તે અંગેની સંપૂર્ણ જવાબદારી મારી રહેશે જેની હું ખાત્રી આપું છું.
         </p>
       </div>
 
       {/* Income and Deduction Table */}
-      <table>
+      <table style={{ fontSize: '11px' }}>
         <thead>
           <tr className="header-row">
-            <th className="w-10 gujarati-text">ક્રમ</th>
-            <th className="gujarati-text">આવક</th>
-            <th className="w-24 gujarati-text">રકમ રૂ.</th>
-            <th className="w-10 gujarati-text">ક્રમ</th>
-            <th className="gujarati-text">કપાત</th>
-            <th className="w-24 gujarati-text">રકમ રૂ.</th>
+            <th className="w-8">ક્રમ</th>
+            <th>આવક</th>
+            <th className="w-20">રકમ રૂ.</th>
+            <th className="w-8">ક્રમ</th>
+            <th>કપાત</th>
+            <th className="w-20">રકમ રૂ.</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td className="text-center">1</td>
-            <td className="gujarati-text">બેન્ક વ્યાજ (સેવિગ્સ)</td>
+            <td>બેંક વ્યાજ (સેવિંગ્સ)</td>
             <InputCell field="bankInterest" />
             <td className="text-center">1</td>
-            <td className="gujarati-text">જીવન વિમાનું પ્રિમિયમ</td>
+            <td>જીવન વિમાનું પ્રિમિયમ</td>
             <InputCell field="licPremium" />
           </tr>
           <tr>
             <td className="text-center">2</td>
-            <td className="gujarati-text">N.S.C. શ્રેણીનું વ્યાજ</td>
+            <td>N.S.C. શ્રેણીનું વ્યાજ</td>
             <InputCell field="nscInterest" />
             <td className="text-center">2</td>
-            <td className="gujarati-text">પોસ્ટ વિમાનું પ્રિમિયમ</td>
+            <td>પોસ્ટ વિમાનું પ્રિમિયમ</td>
             <InputCell field="postInsurance" />
           </tr>
           <tr>
             <td className="text-center">3</td>
-            <td className="gujarati-text">પરીક્ષાનું મહેનતાણું</td>
+            <td>પરીક્ષાનું મહેનતાણું</td>
             <InputCell field="examIncome" />
             <td className="text-center">3</td>
-            <td className="gujarati-text">P.P.F</td>
+            <td>P.P.F</td>
             <InputCell field="ppf" />
           </tr>
           <tr>
             <td className="text-center">4</td>
-            <td className="gujarati-text">ફિકસ ડિપૉજીટ વ્યાજ</td>
+            <td>ફિકસ ડિપૉઝીટ વ્યાજ</td>
             <InputCell field="fdInterest" />
             <td className="text-center">4</td>
-            <td className="gujarati-text">N.S.C ભરેલ રકમ</td>
+            <td>N.S.C ભરેલ રકમ</td>
             <InputCell field="nscInvestment" />
           </tr>
           <tr>
             <td className="text-center">5</td>
-            <td className="gujarati-text">અન્ય આવક</td>
-            <InputCell field="otherIncome" />
+            <td></td>
+            <td></td>
             <td className="text-center">5</td>
-            <td className="gujarati-text">હાઉસીગ બિલ્ડીંગ લોનનુ વ્યાજ</td>
+            <td>હાઉસીંગ બિલ્ડીંગ લોનનું વ્યાજ</td>
             <InputCell field="housingLoanInterest" />
           </tr>
           <tr>
@@ -118,7 +122,7 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false }: Decla
             <td></td>
             <td></td>
             <td className="text-center">6</td>
-            <td className="gujarati-text">હાઉસીંગ બિલ્ડીગ લોનના હપતાની રકમ</td>
+            <td>હાઉસીંગ બિલ્ડીંગ લોનના હપ્તાની રકમ</td>
             <InputCell field="housingLoanPrincipal" />
           </tr>
           <tr>
@@ -126,7 +130,7 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false }: Decla
             <td></td>
             <td></td>
             <td className="text-center">7</td>
-            <td className="gujarati-text">શિક્ષણ ખર્ચ ટ્યુશન ફી</td>
+            <td>શિક્ષણ ખર્ચ ટ્યુશન ફી</td>
             <InputCell field="educationFee" />
           </tr>
           <tr>
@@ -134,7 +138,7 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false }: Decla
             <td></td>
             <td></td>
             <td className="text-center">8</td>
-            <td className="gujarati-text">S.B.I. Life / FD</td>
+            <td>S.B.I.</td>
             <InputCell field="sbiLife" />
           </tr>
           <tr>
@@ -142,7 +146,7 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false }: Decla
             <td></td>
             <td></td>
             <td className="text-center">9</td>
-            <td className="gujarati-text">સુકન્યા સમૃધિ યોજના</td>
+            <td>સુકન્યા સમૃદ્ધિ યોજના</td>
             <InputCell field="sukanyaSamridhi" />
           </tr>
           <tr>
@@ -150,7 +154,7 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false }: Decla
             <td></td>
             <td></td>
             <td className="text-center">10</td>
-            <td className="gujarati-text">મેડીકલેઇમમાં ભરેલ પ્રિમિયમ</td>
+            <td>મેડીકલેઇમમાં ભરેલ પ્રિમિયમ</td>
             <InputCell field="medicalInsurance" />
           </tr>
           <tr>
@@ -158,7 +162,7 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false }: Decla
             <td></td>
             <td></td>
             <td className="text-center">11</td>
-            <td className="gujarati-text">પંચ વર્ષીય ટાઇમમાં રોકાણ</td>
+            <td>પંચ વર્ષીય ટાઇમમાં રોકાણ</td>
             <InputCell field="fiveYearFD" />
           </tr>
           <tr>
@@ -166,37 +170,37 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false }: Decla
             <td></td>
             <td></td>
             <td className="text-center">12</td>
-            <td className="gujarati-text">અન્ય</td>
+            <td>અન્ય</td>
             <InputCell field="otherDeduction" />
           </tr>
           <tr className="total-row">
             <td className="text-center">21</td>
-            <td className="gujarati-text font-bold">કુલ</td>
-            <td className="amount-cell font-bold">{formData.declarationData.totalIncome}</td>
+            <td className="font-bold">કુલ</td>
+            <td className="amount-cell font-bold">{formData.declarationData.totalIncome || 0}</td>
             <td className="text-center">21</td>
-            <td className="gujarati-text font-bold">કુલ</td>
-            <td className="amount-cell font-bold">{formData.declarationData.totalDeduction}</td>
+            <td className="font-bold">કુલ</td>
+            <td className="amount-cell font-bold">{formData.declarationData.totalDeduction || 0}</td>
           </tr>
         </tbody>
       </table>
 
       {/* Signature Section */}
-      <div className="signature-box mt-8">
-        <div className="signature-item">
-          <div className="signature-line gujarati-text">કર્મચારીની સહી</div>
-          <p className="mt-2 gujarati-text">હોદો: {client.designationGujarati || client.designation}</p>
-          <p className="gujarati-text">સ્થળ: {client.schoolNameGujarati || client.schoolName}</p>
-          <p className="gujarati-text">તારીખ: _______________</p>
+      <div className="flex justify-between mt-6 text-[11px]">
+        <div>
+          <p className="mb-8">કર્મચારીની સહી</p>
+          <p>હોદ્દો: {client.designationGujarati || client.designation || '-'}</p>
+          <p>સ્થળ: {client.schoolNameGujarati || client.schoolName || '-'}</p>
+          <p>તારીખ: _______________</p>
         </div>
-        <div className="signature-item">
-          <div className="signature-line gujarati-text">સંસ્થાના વડાની સહી</div>
-          <p className="mt-2 gujarati-text">સિક્કો</p>
-          <p className="gujarati-text">તારીખ: _______________</p>
+        <div className="text-right">
+          <p className="mb-8">સંસ્થાના વડાની સહી</p>
+          <p>સિક્કો</p>
+          <p>તારીખ: _______________</p>
         </div>
       </div>
 
-      <div className="footer-note">
-        Created By: Smart Computer Vinchhiya - Rupsangbhai Jamod-9924640689
+      <div className="text-center text-[8px] mt-4 pt-2 border-t border-dashed border-gray-400">
+        Created By: Smart Computer Vinchhiya - Rupsangbhai Jamod - 9924640689
       </div>
     </div>
   );

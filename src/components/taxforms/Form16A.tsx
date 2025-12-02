@@ -16,57 +16,44 @@ const Form16A = ({ client, formData }: Form16AProps) => {
 
   return (
     <div className="tax-form-container tax-form-print page-break" id="form-16a">
-      <div className="form-title">FORM 16 SEE RULES 31(1)(A)</div>
-      <p className="text-center text-xs mb-4">
+      <div className="text-center font-bold text-lg mb-1">FORM 16</div>
+      <div className="text-center text-xs mb-2">SEE RULES 31 (1) (A)</div>
+      <div className="text-center text-[10px] mb-3 border-b border-black pb-2">
         Certificate under section 203 of the Income-tax Act, 1961 for tax deducted at source from income chargeable under the head "Salaries"
-      </p>
+      </div>
 
-      {/* Header Info */}
-      <table className="mb-4">
+      {/* Header Info - Two Column Layout */}
+      <table className="mb-3" style={{ fontSize: '10px' }}>
         <tbody>
           <tr>
-            <td className="label-cell w-1/2">Name And Address of the employer</td>
-            <td className="label-cell w-1/2">Name And Designation of the employee</td>
-          </tr>
-          <tr>
-            <td>{form16.employerName}</td>
-            <td className="font-bold">{client.name}</td>
-          </tr>
-          <tr>
-            <td>{client.payCenterName}</td>
-            <td>{client.designation}</td>
-          </tr>
-          <tr>
-            <td>{client.payCenterAddress}</td>
-            <td>{client.schoolAddress}</td>
-          </tr>
-          <tr>
-            <td>PIN :- {client.place ? "360055" : ""}</td>
-            <td>{client.place}</td>
-          </tr>
-          <tr>
-            <td>PAN/GLR No: {form16.employerPan}</td>
-            <td>PAN/NO.: {client.panNo}</td>
-          </tr>
-          <tr>
-            <td>TAN: {form16.employerTan}</td>
-            <td>ASSESSMENT YEAR: {client.assessmentYear}</td>
-          </tr>
-          <tr>
-            <td colSpan={2}>
-              TDS Circle where Annual Return/Statement under section 206 is to be filed
+            <td className="w-1/2 align-top border border-black p-2">
+              <p className="font-bold mb-1">Name And Address of the employer</p>
+              <p>{form16.employerName || 'EDUCATION DEPARTMENT'}</p>
+              <p>{client.payCenterName || '-'}</p>
+              <p>{client.payCenterAddress || '-'}</p>
+              <p>PIN :- {client.place ? '360055' : ''}</p>
+              <p className="mt-2">PAN/GLR No: {form16.employerPan || '-'}</p>
+              <p>TAN: {form16.employerTan || 'RKTT01474E'}</p>
             </td>
-          </tr>
-          <tr>
-            <td colSpan={2}>
-              PERIOD: FROM {formData.salaryData.accountingYear}
+            <td className="w-1/2 align-top border border-black p-2">
+              <p className="font-bold mb-1">Name And Designation of the employee</p>
+              <p className="font-bold">{client.name}</p>
+              <p>{client.designation || '-'}</p>
+              <p>{client.schoolName || '-'}</p>
+              <p>{client.place || '-'}</p>
+              <p className="mt-2">PAN/NO.: {client.panNo || '-'}</p>
+              <p>ASSESSMENT YEAR: {client.assessmentYear || '2026-2027'}</p>
             </td>
           </tr>
         </tbody>
       </table>
 
+      <p className="text-[10px] mb-1">TDS Circle where Annual Return/Statement under section 206 is to be filed</p>
+      <p className="text-[10px] mb-3">PERIOD: FROM {formData.salaryData.accountingYear}</p>
+
       {/* Quarterly Acknowledgement */}
-      <table className="mb-4">
+      <p className="text-[10px] mb-1 font-bold">Acknowledgement Nos. of all Quarterly statements of TDS</p>
+      <table className="mb-3" style={{ fontSize: '10px' }}>
         <thead>
           <tr className="header-row">
             <th>Quarter</th>
@@ -104,8 +91,10 @@ const Form16A = ({ client, formData }: Form16AProps) => {
       </table>
 
       {/* Salary Details */}
-      <div className="section-title">DETAILS OF SALARY PAID AND ANY OTHER INCOME AND TAX DEDUCTED</div>
-      <table>
+      <div className="font-bold text-[11px] mb-1 bg-gray-200 p-1">
+        DETAILS OF SALARY PAID AND ANY OTHER INCOME AND TAX DEDUCTED
+      </div>
+      <table style={{ fontSize: '10px' }}>
         <tbody>
           <tr>
             <td colSpan={2}>1. Gross Salary</td>
@@ -113,168 +102,168 @@ const Form16A = ({ client, formData }: Form16AProps) => {
             <td></td>
           </tr>
           <tr>
-            <td></td>
+            <td className="w-8"></td>
             <td>(a) Salary as per provisions Contained in section 17(1)</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxA.grossSalary}</td>
+            <td className="text-right w-10">RS.</td>
+            <td className="amount-cell w-20">{taxA.grossSalary || 0}</td>
           </tr>
           <tr>
             <td></td>
             <td>(b) Value of perquisites u/s 17(2)</td>
-            <td className="amount-cell">RS.</td>
+            <td className="text-right">RS.</td>
             <td className="amount-cell">0</td>
           </tr>
           <tr>
             <td></td>
             <td>(c) Profits in lieu of salary under section 17(3)</td>
-            <td className="amount-cell">RS.</td>
+            <td className="text-right">RS.</td>
             <td className="amount-cell">0</td>
           </tr>
           <tr className="total-row">
             <td></td>
             <td>(d) TOTAL</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell font-bold">{taxA.grossSalary}</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell font-bold">{taxA.grossSalary || 0}</td>
           </tr>
           <tr>
             <td colSpan={2}>2. Less: Allowance to the extent exempt under section 10</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxA.totalExempt}</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{taxA.totalExempt || 0}</td>
           </tr>
           <tr className="total-row">
             <td colSpan={2}>3. BALANCE (1-2)</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell font-bold">{taxA.balanceSalary || taxA.grossSalary}</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell font-bold">{taxA.balanceSalary || taxA.grossSalary || 0}</td>
           </tr>
           <tr>
-            <td colSpan={2}>4. DEDUCTIONS:</td>
-            <td></td>
-            <td></td>
+            <td colSpan={4}>4. DEDUCTIONS:</td>
           </tr>
           <tr>
             <td></td>
             <td>(a) Standard Deduction</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxA.standardDeduction}</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{taxA.standardDeduction || 50000}</td>
           </tr>
           <tr>
             <td></td>
             <td>(b) Tax on Employment</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxA.professionTax}</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{taxA.professionTax || 0}</td>
           </tr>
           <tr className="total-row">
             <td colSpan={2}>5. Aggregate of 4(a) and (b)</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell font-bold">{taxA.standardDeduction + taxA.professionTax}</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell font-bold">{(taxA.standardDeduction || 50000) + (taxA.professionTax || 0)}</td>
           </tr>
           <tr className="total-row">
             <td colSpan={2}>6. Income chargeable under the head 'Salaries' (3-5)</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell font-bold">{taxA.professionalIncome}</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell font-bold">{taxA.professionalIncome || 0}</td>
           </tr>
           <tr>
             <td colSpan={2}>Less: H.B.A Interest as per Rule 24(2)(vi)</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxA.housingLoanInterest}</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{taxA.housingLoanInterest || 0}</td>
           </tr>
           <tr>
             <td colSpan={2}>7. Add: Any other income reported by the employee</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxA.totalOtherIncome}</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{taxA.totalOtherIncome || 0}</td>
           </tr>
           <tr className="total-row">
             <td colSpan={2}>8. GROSS TOTAL INCOME (6+7)</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell font-bold">{taxA.grossTotalIncome}</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell font-bold">{taxA.grossTotalIncome || 0}</td>
           </tr>
         </tbody>
       </table>
 
       {/* Section 80C Deductions */}
-      <div className="section-title">9. DEDUCTIONS UNDER CHAPTER VI-A</div>
-      <table>
+      <div className="font-bold text-[11px] mt-2 mb-1 bg-gray-200 p-1">
+        9. DEDUCTIONS UNDER CHAPTER VI-A
+      </div>
+      <table style={{ fontSize: '10px' }}>
         <tbody>
           <tr className="header-row">
             <td colSpan={4}>(A) Section 80C, 80CCC and 80CCD</td>
           </tr>
           <tr>
-            <td>(i)</td>
+            <td className="w-8">(I)</td>
             <td>G.P.F / C.P.F</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxB.gpf + taxB.cpf}</td>
+            <td className="text-right w-10">RS.</td>
+            <td className="amount-cell w-20">{(taxB.gpf || 0) + (taxB.cpf || 0)}</td>
           </tr>
           <tr>
-            <td>(ii)</td>
+            <td>(II)</td>
             <td>GOVT. GROUP</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxB.groupInsurance}</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{taxB.groupInsurance || 0}</td>
           </tr>
           <tr>
-            <td>(iii)</td>
+            <td>(III)</td>
             <td>L.I.C.</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxB.licPremium}</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{taxB.licPremium || 0}</td>
           </tr>
           <tr>
-            <td>(iv)</td>
+            <td>(IV)</td>
             <td>P.L.I</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxB.pliPremium}</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{taxB.pliPremium || 0}</td>
           </tr>
           <tr>
-            <td>(v)</td>
+            <td>(V)</td>
             <td>N.S.C.</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxB.nscInvestment}</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{taxB.nscInvestment || 0}</td>
           </tr>
           <tr>
-            <td>(vi)</td>
+            <td>(VI)</td>
             <td>EDUCATION FEE</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxB.educationFee}</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{taxB.educationFee || 0}</td>
           </tr>
           <tr>
-            <td>(vii)</td>
+            <td>(VII)</td>
             <td>HOME LOAN INS.</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxB.housingLoanPrincipal}</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{taxB.housingLoanPrincipal || 0}</td>
           </tr>
           <tr>
-            <td>(viii)</td>
+            <td>(VIII)</td>
             <td>S.B.I. LIFE / FD / SSY</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell">{taxB.otherInvestment80C}</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{taxB.otherInvestment80C || 0}</td>
           </tr>
           <tr className="total-row">
             <td></td>
-            <td>Total (Section 80C)</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell font-bold">{taxB.max80C}</td>
+            <td>Total (i) to (viii) [Section 80C]</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell font-bold">{taxB.max80C || 0}</td>
           </tr>
           <tr>
             <td>(B)</td>
             <td>Section 80CCC</td>
-            <td className="amount-cell">RS.</td>
+            <td className="text-right">RS.</td>
             <td className="amount-cell">0</td>
           </tr>
           <tr>
             <td>(C)</td>
             <td>Section 80CCD</td>
-            <td className="amount-cell">RS.</td>
+            <td className="text-right">RS.</td>
             <td className="amount-cell">0</td>
           </tr>
           <tr className="total-row">
             <td>(D)</td>
             <td>TOTAL: (A) to (C) [Section 80C, 80CCC, 80CCD]</td>
-            <td className="amount-cell">RS.</td>
-            <td className="amount-cell font-bold">{taxB.max80C}</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell font-bold">{taxB.max80C || 0}</td>
           </tr>
         </tbody>
       </table>
 
-      <div className="footer-note">
-        Created By: Smart Computer Vinchhiya - Rupsangbhai Jamod-9924640689
+      <div className="text-center text-[8px] mt-4 pt-2 border-t border-dashed border-gray-400">
+        Created By: Smart Computer Vinchhiya - Rupsangbhai Jamod - 9924640689
       </div>
     </div>
   );
