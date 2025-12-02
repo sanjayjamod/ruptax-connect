@@ -1,6 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import TaxFormAdmin from "./pages/TaxFormAdmin";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -11,6 +10,7 @@ import AdminLogin from "./pages/AdminLogin";
 import TaxForm from "./pages/TaxForm";
 import AdminDashboard from "./pages/AdminDashboard";
 import ClientDashboard from "./pages/ClientDashboard";
+import TaxFormAdmin from "./pages/TaxFormAdmin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +29,7 @@ const App = () => (
           <Route path="/tax-form" element={<TaxForm />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/client-dashboard" element={<ClientDashboard />} />
+          <Route path="/tax-form-admin" element={<TaxFormAdmin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Client } from "@/types/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, Edit, Trash2, Eye, FileText } from "lucide-react";
+import { Search, Edit, Trash2, FileText } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,8 +39,9 @@ const ClientList = ({
   onSearchChange,
   onEdit,
   onDelete,
-  onViewForm,
 }: ClientListProps) => {
+  const navigate = useNavigate();
+
   const getStatusBadge = (status: Client["formStatus"]) => {
     const variants = {
       pending: "bg-yellow-500/20 text-yellow-600 border-yellow-500/30",
@@ -57,6 +58,10 @@ const ClientList = ({
         {labels[status]}
       </Badge>
     );
+  };
+
+  const handleFillForm = (clientId: string) => {
+    navigate(`/tax-form-admin?clientId=${clientId}`);
   };
 
   return (
@@ -114,12 +119,14 @@ const ClientList = ({
                   <TableCell>
                     <div className="flex items-center justify-end gap-1">
                       <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onViewForm(client)}
-                        title="View/Fill Form"
+                        variant="default"
+                        size="sm"
+                        onClick={() => handleFillForm(client.id)}
+                        title="Fill Tax Form"
+                        className="gap-1"
                       >
                         <FileText className="h-4 w-4" />
+                        Fill Form
                       </Button>
                       <Button
                         variant="ghost"
