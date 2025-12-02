@@ -9,6 +9,7 @@ import Register from "./pages/Register";
 import AdminLogin from "./pages/AdminLogin";
 import TaxForm from "./pages/TaxForm";
 import AdminDashboard from "./pages/AdminDashboard";
+import ClientDashboard from "./pages/ClientDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/tax-form" element={<TaxForm />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/client-dashboard" element={<ClientDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

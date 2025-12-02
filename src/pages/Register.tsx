@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { UserPlus, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { registerClient } from "@/lib/clientStorage";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -62,15 +63,27 @@ const Register = () => {
 
     setIsLoading(true);
     
-    // Simulate registration - replace with actual auth logic
+    // Register client and save to storage
+    const result = registerClient(formData.fullName, formData.mobile, formData.password);
+    
     setTimeout(() => {
       setIsLoading(false);
+      
+      if ('error' in result) {
+        toast({
+          title: "Registration Failed",
+          description: result.error,
+          variant: "destructive",
+        });
+        return;
+      }
+      
       toast({
-        title: "Registration Successful",
-        description: "Welcome to RupTax! Please login to continue.",
+        title: "Registration Successful!",
+        description: `Your Client ID is: ${result.id}. Please login to continue.`,
       });
       navigate("/client-login");
-    }, 1500);
+    }, 1000);
   };
 
   return (

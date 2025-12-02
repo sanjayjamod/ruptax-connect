@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { User, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { loginClient } from "@/lib/clientStorage";
 
 const ClientLogin = () => {
   const navigate = useNavigate();
@@ -33,15 +34,27 @@ const ClientLogin = () => {
 
     setIsLoading(true);
     
-    // Simulate login - replace with actual auth logic
+    // Login client
+    const result = loginClient(formData.mobile, formData.password);
+    
     setTimeout(() => {
       setIsLoading(false);
+      
+      if ('error' in result) {
+        toast({
+          title: "Login Failed",
+          description: result.error,
+          variant: "destructive",
+        });
+        return;
+      }
+      
       toast({
         title: "Login Successful",
-        description: "Welcome back to RupTax!",
+        description: `Welcome back, ${result.name}! (ID: ${result.id})`,
       });
-      navigate("/tax-form");
-    }, 1500);
+      navigate("/client-dashboard");
+    }, 1000);
   };
 
   return (
@@ -62,7 +75,7 @@ const ClientLogin = () => {
                 type="tel"
                 placeholder="Enter your mobile number"
                 value={formData.mobile}
-                onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, mobile: e.target.value.replace(/\D/g, '').slice(0, 10) })}
                 maxLength={10}
               />
             </div>
