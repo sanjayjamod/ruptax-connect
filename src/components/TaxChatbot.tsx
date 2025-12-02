@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/sheet";
 import { MessageCircle, Send, Loader2, Bot, User, X } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { TaxFormData } from "@/types/taxForm";
+import { Client } from "@/types/client";
 
 interface Message {
   role: "user" | "assistant";
@@ -19,6 +21,8 @@ interface Message {
 
 interface TaxChatbotProps {
   activeForm?: string;
+  formData?: TaxFormData | null;
+  client?: Client | null;
 }
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tax-chatbot`;
@@ -32,8 +36,37 @@ const formHelpMessages: Record<string, string> = {
   form16b: "નમસ્તે! 🙏 Form 16B માટે મદદ:\n\n• Part B - Income Details\n• Gross Salary Breakdown\n• Deductions under Chapter VI-A\n• Tax Computation\n• Net Tax Payable\n\nકોઈ પ્રશ્ન પૂછો!"
 };
 
-const TaxChatbot = ({ activeForm }: TaxChatbotProps) => {
+const TaxChatbot = ({ activeForm, formData, client }: TaxChatbotProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  
+  // Create data summary for personalized advice
+  const getDataSummary = () => {
+    if (!formData) return null;
+    
+    const salary = formData.salaryData.totals;
+    const decl = formData.declarationData;
+    const taxB = formData.taxCalculationB;
+    
+    return {
+      clientName: client?.name || "Client",
+      grossSalary: salary.totalSalary,
+      totalDeductions: salary.totalDeduction,
+      netSalary: salary.netPay,
+      gpf: salary.gpf,
+      cpf: salary.cpf,
+      professionTax: salary.professionTax,
+      licPremium: decl.licPremium,
+      ppf: decl.ppf,
+      medicalInsurance: decl.medicalInsurance,
+      housingLoan: decl.housingLoanInterest + decl.housingLoanPrincipal,
+      total80C: taxB.total80C,
+      taxableIncome: taxB.taxableIncome,
+      totalTaxPayable: taxB.totalTaxPayable,
+      taxPaid: taxB.taxPaid,
+      balanceTax: taxB.balanceTax
+    };
+  };
+  
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -74,7 +107,11 @@ const TaxChatbot = ({ activeForm }: TaxChatbotProps) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ messages: [...messages, userMsg], activeForm }),
+        body: JSON.stringify({ 
+          messages: [...messages, userMsg], 
+          activeForm,
+          dataSummary: getDataSummary()
+        }),
       });
 
       if (!resp.ok) {

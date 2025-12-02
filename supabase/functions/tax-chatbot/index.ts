@@ -44,7 +44,35 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, activeForm } = await req.json();
+    const { messages, activeForm, dataSummary } = await req.json();
+    
+    // Build personalized data context if available
+    let dataContext = "";
+    if (dataSummary) {
+      dataContext = `
+
+યુઝરનો ભરેલો ડેટા (Personalized Analysis માટે):
+- Client: ${dataSummary.clientName}
+- કુલ પગાર (Gross Salary): ₹${dataSummary.grossSalary?.toLocaleString('en-IN') || 0}
+- કુલ કપાત (Total Deductions): ₹${dataSummary.totalDeductions?.toLocaleString('en-IN') || 0}
+- ચોખ્ખો પગાર (Net Salary): ₹${dataSummary.netSalary?.toLocaleString('en-IN') || 0}
+- GPF: ₹${dataSummary.gpf?.toLocaleString('en-IN') || 0}
+- CPF: ₹${dataSummary.cpf?.toLocaleString('en-IN') || 0}
+- LIC Premium: ₹${dataSummary.licPremium?.toLocaleString('en-IN') || 0}
+- PPF: ₹${dataSummary.ppf?.toLocaleString('en-IN') || 0}
+- Medical Insurance: ₹${dataSummary.medicalInsurance?.toLocaleString('en-IN') || 0}
+- Housing Loan: ₹${dataSummary.housingLoan?.toLocaleString('en-IN') || 0}
+- કુલ 80C: ₹${dataSummary.total80C?.toLocaleString('en-IN') || 0} (Maximum: ₹1,50,000)
+- Taxable Income: ₹${dataSummary.taxableIncome?.toLocaleString('en-IN') || 0}
+- Total Tax Payable: ₹${dataSummary.totalTaxPayable?.toLocaleString('en-IN') || 0}
+- Tax Paid: ₹${dataSummary.taxPaid?.toLocaleString('en-IN') || 0}
+- Balance Tax: ₹${dataSummary.balanceTax?.toLocaleString('en-IN') || 0}
+
+આ ડેટા જોઈને personalized tax saving suggestions આપો. જેમ કે:
+- 80C limit પૂરી થઈ છે કે નહીં?
+- વધુ કપાત ક્યાં લઈ શકાય?
+- Tax બચાવવા માટે શું કરી શકાય?`;
+    }
     
     // Form-specific context in Gujarati
     const formContexts: Record<string, string> = {
@@ -116,7 +144,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: SYSTEM_PROMPT + formContext },
+          { role: "system", content: SYSTEM_PROMPT + formContext + dataContext },
           ...messages,
         ],
         stream: true,
