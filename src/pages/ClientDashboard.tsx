@@ -2,11 +2,14 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { Client } from "@/types/client";
-import { getCurrentClient, logoutClient } from "@/lib/clientStorage";
+import { getCurrentClient, logoutClient, updateClient } from "@/lib/clientStorage";
+import { useToast } from "@/hooks/use-toast";
 import { 
   LogOut, 
   User, 
@@ -14,15 +17,19 @@ import {
   Clock, 
   CheckCircle2, 
   Phone,
-  Mail,
   Building,
   CreditCard,
-  Calendar
+  Save,
+  Edit2,
+  X
 } from "lucide-react";
 
 const ClientDashboard = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [client, setClient] = useState<Client | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState<Partial<Client>>({});
 
   useEffect(() => {
     const currentClient = getCurrentClient();
@@ -31,11 +38,40 @@ const ClientDashboard = () => {
       return;
     }
     setClient(currentClient);
+    setFormData(currentClient);
   }, [navigate]);
 
   const handleLogout = () => {
     logoutClient();
     navigate("/client-login");
+  };
+
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    setFormData(client || {});
+    setIsEditing(false);
+  };
+
+  const handleSave = () => {
+    if (!client) return;
+    
+    const updated = updateClient(client.id, formData);
+    if (updated) {
+      setClient(updated);
+      setFormData(updated);
+      setIsEditing(false);
+      toast({
+        title: "સફળ!",
+        description: "તમારી માહિતી સેવ થઈ ગઈ છે।",
+      });
+    }
+  };
+
+  const handleChange = (field: keyof Client, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const getStatusBadge = (status: Client["formStatus"]) => {
@@ -68,10 +104,29 @@ const ClientDashboard = () => {
                 Client ID: <span className="font-mono font-semibold text-primary">{client.id}</span>
               </p>
             </div>
-            <Button variant="destructive" onClick={handleLogout}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Logout
-            </Button>
+            <div className="flex gap-2">
+              {!isEditing ? (
+                <Button variant="outline" onClick={handleEdit}>
+                  <Edit2 className="h-4 w-4 mr-2" />
+                  Edit Details
+                </Button>
+              ) : (
+                <>
+                  <Button variant="outline" onClick={handleCancel}>
+                    <X className="h-4 w-4 mr-2" />
+                    Cancel
+                  </Button>
+                  <Button onClick={handleSave}>
+                    <Save className="h-4 w-4 mr-2" />
+                    Save
+                  </Button>
+                </>
+              )}
+              <Button variant="destructive" onClick={handleLogout}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            </div>
           </div>
 
           {/* Status Card */}
@@ -97,7 +152,7 @@ const ClientDashboard = () => {
               {client.formStatus === "pending" && (
                 <div className="flex items-center gap-3 text-yellow-600">
                   <Clock className="h-5 w-5" />
-                  <p>Your form is pending. Our team will fill your details soon.</p>
+                  <p>कृपया अपनी जानकारी भरें ताकि हम आपका ITR फॉर्म जल्दी तैयार कर सकें।</p>
                 </div>
               )}
               {client.formStatus === "completed" && (
@@ -115,6 +170,15 @@ const ClientDashboard = () => {
             </div>
           </div>
 
+          {/* Edit Mode Instructions */}
+          {isEditing && (
+            <div className="mb-6 rounded-lg border border-primary/30 bg-primary/5 p-4">
+              <p className="text-sm text-primary font-medium">
+                📝 कृपया नीचे अपनी सभी जानकारी सही-सही भरें। जितनी ज़्यादा जानकारी आप भरेंगे, उतनी जल्दी हम आपका फॉर्म तैयार कर पाएंगे।
+              </p>
+            </div>
+          )}
+
           {/* Details Grid */}
           <div className="grid gap-6 md:grid-cols-2">
             {/* Personal Info */}
@@ -123,12 +187,50 @@ const ClientDashboard = () => {
                 <User className="h-5 w-5 text-primary" />
                 Personal Information
               </h3>
-              <div className="space-y-3">
-                <InfoRow label="Full Name" value={client.name || "-"} />
-                <InfoRow label="Name (Gujarati)" value={client.nameGujarati || "-"} />
-                <InfoRow label="Date of Birth" value={client.dateOfBirth || "-"} />
-                <InfoRow label="PAN Number" value={client.panNo || "-"} mono />
-                <InfoRow label="Aadhar Number" value={client.aadharNo || "-"} mono />
+              <div className="space-y-4">
+                <FieldRow 
+                  label="Full Name (English)" 
+                  value={formData.name || ""} 
+                  field="name"
+                  isEditing={isEditing}
+                  onChange={handleChange}
+                  placeholder="JOHN DOE"
+                />
+                <FieldRow 
+                  label="Name (ગુજરાતી)" 
+                  value={formData.nameGujarati || ""} 
+                  field="nameGujarati"
+                  isEditing={isEditing}
+                  onChange={handleChange}
+                  placeholder="જ્હોન ડો"
+                />
+                <FieldRow 
+                  label="Date of Birth" 
+                  value={formData.dateOfBirth || ""} 
+                  field="dateOfBirth"
+                  isEditing={isEditing}
+                  onChange={handleChange}
+                  placeholder="DD/MM/YYYY"
+                  type="date"
+                />
+                <FieldRow 
+                  label="PAN Number" 
+                  value={formData.panNo || ""} 
+                  field="panNo"
+                  isEditing={isEditing}
+                  onChange={handleChange}
+                  placeholder="ABCDE1234F"
+                  mono
+                />
+                <FieldRow 
+                  label="Aadhar Number" 
+                  value={formData.aadharNo || ""} 
+                  field="aadharNo"
+                  isEditing={isEditing}
+                  onChange={handleChange}
+                  placeholder="1234 5678 9012"
+                  mono
+                />
               </div>
             </div>
 
@@ -138,10 +240,40 @@ const ClientDashboard = () => {
                 <Phone className="h-5 w-5 text-primary" />
                 Contact Information
               </h3>
-              <div className="space-y-3">
-                <InfoRow label="Mobile" value={client.mobileNo || "-"} mono />
-                <InfoRow label="Email" value={client.email || "-"} />
-                <InfoRow label="Place" value={client.place || "-"} />
+              <div className="space-y-4">
+                <FieldRow 
+                  label="Mobile Number" 
+                  value={formData.mobileNo || ""} 
+                  field="mobileNo"
+                  isEditing={false} // Mobile can't be changed
+                  onChange={handleChange}
+                  mono
+                />
+                <FieldRow 
+                  label="Email" 
+                  value={formData.email || ""} 
+                  field="email"
+                  isEditing={isEditing}
+                  onChange={handleChange}
+                  placeholder="email@example.com"
+                  type="email"
+                />
+                <FieldRow 
+                  label="Place / City" 
+                  value={formData.place || ""} 
+                  field="place"
+                  isEditing={isEditing}
+                  onChange={handleChange}
+                  placeholder="Ahmedabad"
+                />
+                <FieldRow 
+                  label="TDO" 
+                  value={formData.tdo || ""} 
+                  field="tdo"
+                  isEditing={isEditing}
+                  onChange={handleChange}
+                  placeholder="TDO Name"
+                />
               </div>
             </div>
 
@@ -151,11 +283,79 @@ const ClientDashboard = () => {
                 <Building className="h-5 w-5 text-primary" />
                 Work Details
               </h3>
-              <div className="space-y-3">
-                <InfoRow label="School Name" value={client.schoolName || "-"} />
-                <InfoRow label="Designation" value={client.designation || "-"} />
-                <InfoRow label="School Address" value={client.schoolAddress || "-"} />
-                <InfoRow label="Pay Center" value={client.payCenterName || "-"} />
+              <div className="space-y-4">
+                <FieldRow 
+                  label="School Name (English)" 
+                  value={formData.schoolName || ""} 
+                  field="schoolName"
+                  isEditing={isEditing}
+                  onChange={handleChange}
+                  placeholder="Government Primary School"
+                />
+                <FieldRow 
+                  label="School Name (ગુજરાતી)" 
+                  value={formData.schoolNameGujarati || ""} 
+                  field="schoolNameGujarati"
+                  isEditing={isEditing}
+                  onChange={handleChange}
+                  placeholder="સરકારી પ્રાથમિક શાળા"
+                />
+                <FieldRow 
+                  label="Designation (English)" 
+                  value={formData.designation || ""} 
+                  field="designation"
+                  isEditing={isEditing}
+                  onChange={handleChange}
+                  placeholder="Teacher"
+                />
+                <FieldRow 
+                  label="Designation (ગુજરાતી)" 
+                  value={formData.designationGujarati || ""} 
+                  field="designationGujarati"
+                  isEditing={isEditing}
+                  onChange={handleChange}
+                  placeholder="શિક્ષક"
+                />
+                <FieldRow 
+                  label="School Address" 
+                  value={formData.schoolAddress || ""} 
+                  field="schoolAddress"
+                  isEditing={isEditing}
+                  onChange={handleChange}
+                  placeholder="Full school address"
+                />
+                <FieldRow 
+                  label="Address (ગુજરાતી)" 
+                  value={formData.addressGujarati || ""} 
+                  field="addressGujarati"
+                  isEditing={isEditing}
+                  onChange={handleChange}
+                  placeholder="સંપૂર્ણ સરનામું"
+                />
+                <FieldRow 
+                  label="Pay Center Name" 
+                  value={formData.payCenterName || ""} 
+                  field="payCenterName"
+                  isEditing={isEditing}
+                  onChange={handleChange}
+                  placeholder="Pay Center"
+                />
+                <FieldRow 
+                  label="Pay Center Address" 
+                  value={formData.payCenterAddress || ""} 
+                  field="payCenterAddress"
+                  isEditing={isEditing}
+                  onChange={handleChange}
+                  placeholder="Pay Center Address"
+                />
+                <FieldRow 
+                  label="Head Master Place" 
+                  value={formData.headMasterPlace || ""} 
+                  field="headMasterPlace"
+                  isEditing={isEditing}
+                  onChange={handleChange}
+                  placeholder="Headmaster's place"
+                />
               </div>
             </div>
 
@@ -165,10 +365,42 @@ const ClientDashboard = () => {
                 <CreditCard className="h-5 w-5 text-primary" />
                 Bank Details
               </h3>
-              <div className="space-y-3">
-                <InfoRow label="Bank Account" value={client.bankAcNo || "-"} mono />
-                <InfoRow label="IFSC Code" value={client.ifscCode || "-"} mono />
-                <InfoRow label="Annual Income" value={client.annualIncome ? `₹${parseInt(client.annualIncome).toLocaleString()}` : "-"} />
+              <div className="space-y-4">
+                <FieldRow 
+                  label="Bank Account Number" 
+                  value={formData.bankAcNo || ""} 
+                  field="bankAcNo"
+                  isEditing={isEditing}
+                  onChange={handleChange}
+                  placeholder="1234567890123456"
+                  mono
+                />
+                <FieldRow 
+                  label="IFSC Code" 
+                  value={formData.ifscCode || ""} 
+                  field="ifscCode"
+                  isEditing={isEditing}
+                  onChange={handleChange}
+                  placeholder="SBIN0001234"
+                  mono
+                />
+                <FieldRow 
+                  label="Annual Income (₹)" 
+                  value={formData.annualIncome || ""} 
+                  field="annualIncome"
+                  isEditing={isEditing}
+                  onChange={handleChange}
+                  placeholder="500000"
+                  type="number"
+                />
+                <FieldRow 
+                  label="Enter No." 
+                  value={formData.enterNo || ""} 
+                  field="enterNo"
+                  isEditing={isEditing}
+                  onChange={handleChange}
+                  placeholder="Enter Number"
+                />
               </div>
             </div>
           </div>
@@ -191,12 +423,43 @@ const ClientDashboard = () => {
   );
 };
 
-// Helper component for info rows
-const InfoRow = ({ label, value, mono }: { label: string; value: string; mono?: boolean }) => (
-  <div className="flex justify-between">
-    <span className="text-muted-foreground">{label}</span>
-    <span className={`font-medium text-foreground ${mono ? "font-mono" : ""}`}>{value}</span>
-  </div>
-);
+// Helper component for field rows
+interface FieldRowProps {
+  label: string;
+  value: string;
+  field: keyof Client;
+  isEditing: boolean;
+  onChange: (field: keyof Client, value: string) => void;
+  placeholder?: string;
+  mono?: boolean;
+  type?: string;
+}
+
+const FieldRow = ({ label, value, field, isEditing, onChange, placeholder, mono, type = "text" }: FieldRowProps) => {
+  if (isEditing) {
+    return (
+      <div className="space-y-1.5">
+        <Label htmlFor={field} className="text-sm text-muted-foreground">{label}</Label>
+        <Input
+          id={field}
+          type={type}
+          value={value}
+          onChange={(e) => onChange(field, type === "text" ? e.target.value.toUpperCase() : e.target.value)}
+          placeholder={placeholder}
+          className={mono ? "font-mono" : ""}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex justify-between items-center py-1">
+      <span className="text-muted-foreground">{label}</span>
+      <span className={`font-medium text-foreground ${mono ? "font-mono" : ""}`}>
+        {value || "-"}
+      </span>
+    </div>
+  );
+};
 
 export default ClientDashboard;
