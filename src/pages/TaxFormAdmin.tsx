@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,10 +15,11 @@ import AavakVeraFormA from "@/components/taxforms/AavakVeraFormA";
 import AavakVeraFormB from "@/components/taxforms/AavakVeraFormB";
 import Form16A from "@/components/taxforms/Form16A";
 import Form16B from "@/components/taxforms/Form16B";
-import { Search, Printer, FileText, FileSpreadsheet, Save, ArrowLeft, Calculator } from "lucide-react";
+import { Search, Printer, FileText, FileSpreadsheet, Save, ArrowLeft, Calculator, RefreshCw } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import TaxChatbot from "@/components/TaxChatbot";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import SideCalculator from "@/components/admin/SideCalculator";
 
 const TaxFormAdmin = () => {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ const TaxFormAdmin = () => {
   const [client, setClient] = useState<Client | null>(null);
   const [formData, setFormData] = useState<TaxFormData | null>(null);
   const [activeTab, setActiveTab] = useState("pagar");
+  const [autoCalcEnabled, setAutoCalcEnabled] = useState(true);
   const printRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -42,9 +44,9 @@ const TaxFormAdmin = () => {
       setClient(foundClient);
       setClientId(id);
       const taxForm = getOrCreateTaxForm(id);
-      // Auto-calculate totals on load
-      const withTotals = calculateSalaryTotals(taxForm);
-      setFormData(withTotals);
+      // Auto-calculate on load
+      const calculated = calculateTax(taxForm);
+      setFormData(calculated);
     } else {
       toast({ title: "Error", description: "Client not found", variant: "destructive" });
     }
@@ -56,26 +58,33 @@ const TaxFormAdmin = () => {
     }
   };
 
+  // Auto-calculate when form data changes (Excel-like formula behavior)
+  const handleFormChange = useCallback((newData: TaxFormData) => {
+    if (autoCalcEnabled) {
+      // Auto-calculate totals and tax like Excel formulas
+      const calculated = calculateTax(newData);
+      setFormData(calculated);
+    } else {
+      setFormData(newData);
+    }
+  }, [autoCalcEnabled]);
+
   const handleSave = () => {
     if (formData) {
-      const withTotals = calculateSalaryTotals(formData);
-      saveTaxForm(withTotals);
-      setFormData(withTotals);
+      const calculated = calculateTax(formData);
+      saveTaxForm(calculated);
+      setFormData(calculated);
       toast({ title: "Saved", description: "Form data saved successfully" });
     }
   };
 
   const handleCalculate = () => {
-    console.log("Calculate clicked, formData:", formData);
     if (formData) {
-      console.log("Starting tax calculation...");
       const calculated = calculateTax(formData);
-      console.log("Calculation result:", calculated.taxCalculationB);
       setFormData(calculated);
       saveTaxForm(calculated);
       toast({ title: "Calculated", description: "Tax calculation completed" });
     } else {
-      console.log("No formData available");
       toast({ title: "Error", description: "Please load a client first", variant: "destructive" });
     }
   };
@@ -258,6 +267,15 @@ const TaxFormAdmin = () => {
 
             {client && (
               <>
+                <Button 
+                  onClick={() => setAutoCalcEnabled(!autoCalcEnabled)} 
+                  variant={autoCalcEnabled ? "default" : "outline"} 
+                  size="sm"
+                  title={autoCalcEnabled ? "Auto-calc ON" : "Auto-calc OFF"}
+                >
+                  <RefreshCw className={`h-4 w-4 mr-1 ${autoCalcEnabled ? 'animate-spin' : ''}`} /> 
+                  Auto
+                </Button>
                 <Button onClick={handleCalculate} variant="secondary" size="sm">
                   <Calculator className="h-4 w-4 mr-1" /> Calculate
                 </Button>
@@ -305,22 +323,22 @@ const TaxFormAdmin = () => {
 
                 <div className="border rounded-lg p-4 bg-white overflow-auto max-h-[70vh]">
                   <TabsContent value="pagar" className="mt-0">
-                    <PagarForm client={client} formData={formData} onChange={setFormData} />
+                    <PagarForm client={client} formData={formData} onChange={handleFormChange} />
                   </TabsContent>
                   <TabsContent value="declaration" className="mt-0">
-                    <DeclarationForm client={client} formData={formData} onChange={setFormData} />
+                    <DeclarationForm client={client} formData={formData} onChange={handleFormChange} />
                   </TabsContent>
                   <TabsContent value="formA" className="mt-0">
-                    <AavakVeraFormA client={client} formData={formData} onChange={setFormData} />
+                    <AavakVeraFormA client={client} formData={formData} onChange={handleFormChange} />
                   </TabsContent>
                   <TabsContent value="formB" className="mt-0">
-                    <AavakVeraFormB client={client} formData={formData} onChange={setFormData} />
+                    <AavakVeraFormB client={client} formData={formData} onChange={handleFormChange} />
                   </TabsContent>
                   <TabsContent value="form16a" className="mt-0">
-                    <Form16A client={client} formData={formData} onChange={setFormData} />
+                    <Form16A client={client} formData={formData} onChange={handleFormChange} />
                   </TabsContent>
                   <TabsContent value="form16b" className="mt-0">
-                    <Form16B client={client} formData={formData} onChange={setFormData} />
+                    <Form16B client={client} formData={formData} onChange={handleFormChange} />
                   </TabsContent>
                 </div>
               </Tabs>
@@ -350,6 +368,7 @@ const TaxFormAdmin = () => {
         <Footer />
       </div>
       
+      <SideCalculator />
       <TaxChatbot />
       <WhatsAppButton />
     </div>
