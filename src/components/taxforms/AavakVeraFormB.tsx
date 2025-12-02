@@ -1,6 +1,5 @@
 import { Client } from "@/types/client";
 import { TaxFormData } from "@/types/taxForm";
-import { Input } from "@/components/ui/input";
 import "./PrintStyles.css";
 
 interface AavakVeraFormBProps {
@@ -20,15 +19,17 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false }: AavakV
     });
   };
 
-  const InputField = ({ field, value }: { field: keyof typeof taxB; value: number }) => (
+  const renderInputField = (field: keyof typeof taxB, value: number) => (
     readOnly ? (
       <span>{value || 0}</span>
     ) : (
-      <Input
-        type="number"
-        value={value || ''}
-        onChange={(e) => updateField(field, Number(e.target.value) || 0)}
-        className="w-20 h-5 text-xs text-right p-1 border-0 bg-transparent inline-block"
+      <input
+        type="text"
+        inputMode="numeric"
+        pattern="[0-9]*"
+        defaultValue={value || ''}
+        onBlur={(e) => updateField(field, Number(e.target.value) || 0)}
+        className="w-20 h-5 text-xs text-right p-1 border-0 bg-transparent inline-block focus:outline-none focus:bg-yellow-50"
       />
     )
   );
@@ -143,7 +144,7 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false }: AavakV
             <td colSpan={2}>મેડીકલેઇમ 80-D (Upto Rs.25000)</td>
             <td className="text-right">Rs.</td>
             <td className="amount-cell">
-              <InputField field="medicalInsurance80D" value={taxB.medicalInsurance80D} />
+              {renderInputField("medicalInsurance80D", taxB.medicalInsurance80D)}
             </td>
           </tr>
           <tr>
@@ -151,7 +152,7 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false }: AavakV
             <td colSpan={2}>વિકલાંગ આશ્રિત 80-DD (Upto Rs.50000)</td>
             <td className="text-right">Rs.</td>
             <td className="amount-cell">
-              <InputField field="disabledDependent80DD" value={taxB.disabledDependent80DD} />
+              {renderInputField("disabledDependent80DD", taxB.disabledDependent80DD)}
             </td>
           </tr>
           <tr>
@@ -159,7 +160,7 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false }: AavakV
             <td colSpan={2}>ગંભીર રોગ 80-DDB (Upto Rs.40000)</td>
             <td className="text-right">Rs.</td>
             <td className="amount-cell">
-              <InputField field="seriousDisease80DDB" value={taxB.seriousDisease80DDB} />
+              {renderInputField("seriousDisease80DDB", taxB.seriousDisease80DDB)}
             </td>
           </tr>
           <tr>
@@ -167,7 +168,7 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false }: AavakV
             <td colSpan={2}>અંધ/અપંગ 80-U (75000-125000)</td>
             <td className="text-right">Rs.</td>
             <td className="amount-cell">
-              <InputField field="disability80U" value={taxB.disability80U} />
+              {renderInputField("disability80U", taxB.disability80U)}
             </td>
           </tr>
           <tr>
@@ -175,7 +176,7 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false }: AavakV
             <td colSpan={2}>દાન 80-G (50%)</td>
             <td className="text-right">Rs.</td>
             <td className="amount-cell">
-              <InputField field="donation80G" value={taxB.donation80G} />
+              {renderInputField("donation80G", taxB.donation80G)}
             </td>
           </tr>
           <tr>
@@ -183,7 +184,7 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false }: AavakV
             <td colSpan={2}>સેવિંગ બેંક વ્યાજ 80TTA (Rs.10000 મર્યાદા)</td>
             <td className="text-right">Rs.</td>
             <td className="amount-cell">
-              <InputField field="savingsBankInterest80TTA" value={taxB.savingsBankInterest80TTA} />
+              {renderInputField("savingsBankInterest80TTA", taxB.savingsBankInterest80TTA)}
             </td>
           </tr>
           <tr className="total-row">
@@ -268,7 +269,7 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false }: AavakV
             <td colSpan={2}>RELIEF UNDER SECTION 89</td>
             <td className="text-right">RS.</td>
             <td className="amount-cell">
-              <InputField field="relief89" value={taxB.relief89} />
+              {renderInputField("relief89", taxB.relief89)}
             </td>
           </tr>
           <tr className="total-row">
@@ -304,11 +305,11 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false }: AavakV
               {readOnly ? (
                 taxB.recoveredMonth || '___________'
               ) : (
-                <Input
+                <input
                   type="text"
-                  value={taxB.recoveredMonth || ''}
-                  onChange={(e) => updateField('recoveredMonth', e.target.value)}
-                  className="w-24 h-5 text-xs p-1 border-0 bg-transparent inline-block"
+                  defaultValue={taxB.recoveredMonth || ''}
+                  onBlur={(e) => updateField('recoveredMonth', e.target.value)}
+                  className="w-24 h-5 text-xs p-1 border-0 bg-transparent inline-block focus:outline-none focus:bg-yellow-50"
                   placeholder="Month"
                 />
               )}
