@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, Edit, Trash2, FileText } from "lucide-react";
+import { Search, Edit, Trash2, FileText, Key, StickyNote } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,6 +23,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import ClientPasswordManager from "./ClientPasswordManager";
+import AdminNotes from "./AdminNotes";
 
 interface ClientListProps {
   clients: Client[];
@@ -31,6 +33,7 @@ interface ClientListProps {
   onEdit: (client: Client) => void;
   onDelete: (id: string) => void;
   onViewForm: (client: Client) => void;
+  onPasswordUpdate?: (clientId: string, newPassword: string) => void;
 }
 
 const ClientList = ({
@@ -39,6 +42,7 @@ const ClientList = ({
   onSearchChange,
   onEdit,
   onDelete,
+  onPasswordUpdate,
 }: ClientListProps) => {
   const navigate = useNavigate();
 
@@ -117,7 +121,7 @@ const ClientList = ({
                   <TableCell className="max-w-[200px] truncate">{client.schoolName}</TableCell>
                   <TableCell>{getStatusBadge(client.formStatus)}</TableCell>
                   <TableCell>
-                    <div className="flex items-center justify-end gap-1">
+                    <div className="flex items-center justify-end gap-1 flex-wrap">
                       <Button
                         variant="default"
                         size="sm"
@@ -128,6 +132,13 @@ const ClientList = ({
                         <FileText className="h-4 w-4" />
                         Fill Form
                       </Button>
+                      {onPasswordUpdate && (
+                        <ClientPasswordManager 
+                          client={client} 
+                          onPasswordUpdate={onPasswordUpdate} 
+                        />
+                      )}
+                      <AdminNotes clientId={client.id} clientName={client.name} />
                       <Button
                         variant="ghost"
                         size="icon"

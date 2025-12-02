@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import TaxChatbot from "@/components/TaxChatbot";
 import ProfilePictureUpload from "@/components/client/ProfilePictureUpload";
 import DocumentManager from "@/components/client/DocumentManager";
 import PasswordReset from "@/components/client/PasswordReset";
@@ -469,6 +470,7 @@ const ClientDashboard = () => {
 
       <Footer />
       <WhatsAppButton />
+      <TaxChatbot />
     </div>
   );
 };

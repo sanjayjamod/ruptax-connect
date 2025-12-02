@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,8 +7,12 @@ import AuthCard from "@/components/AuthCard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import { Shield, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Shield, Eye, EyeOff, Loader2, User } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+
+// Admin credentials
+const ADMIN_EMAIL = "ruptax@gmail.com";
+const ADMIN_PASSWORD = "89$#RUT@sat$#89";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -33,15 +37,25 @@ const AdminLogin = () => {
 
     setIsLoading(true);
     
-    // Simulate admin login - replace with actual auth logic
     setTimeout(() => {
-      setIsLoading(false);
-      toast({
-        title: "Admin Login Successful",
-        description: "Welcome to the admin dashboard!",
-      });
-      navigate("/admin-dashboard");
-    }, 1500);
+      // Verify admin credentials
+      if (formData.username === ADMIN_EMAIL && formData.password === ADMIN_PASSWORD) {
+        setIsLoading(false);
+        localStorage.setItem("ruptax_admin_logged_in", "true");
+        toast({
+          title: "Admin Login Successful",
+          description: "Welcome to the admin dashboard!",
+        });
+        navigate("/admin-dashboard");
+      } else {
+        setIsLoading(false);
+        toast({
+          title: "Login Failed",
+          description: "Invalid email or password",
+          variant: "destructive",
+        });
+      }
+    }, 1000);
   };
 
   return (
@@ -101,6 +115,16 @@ const AdminLogin = () => {
           <div className="mt-6 rounded-lg bg-muted p-3 text-center text-xs text-muted-foreground">
             <Shield className="mx-auto mb-1 h-4 w-4" />
             This is a secure admin area. Unauthorized access is prohibited.
+          </div>
+
+          <div className="mt-4 text-center">
+            <Link 
+              to="/client-login" 
+              className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+            >
+              <User className="h-4 w-4" />
+              Go to Client Login
+            </Link>
           </div>
         </AuthCard>
       </main>

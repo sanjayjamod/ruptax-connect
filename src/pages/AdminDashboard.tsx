@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import TaxChatbot from "@/components/TaxChatbot";
 import StatsCards from "@/components/admin/StatsCards";
 import ClientList from "@/components/admin/ClientList";
 import ClientForm from "@/components/admin/ClientForm";
+import AdminNotes from "@/components/admin/AdminNotes";
 import { Client, ClientFormData } from "@/types/client";
 import {
   getAllClients,
@@ -17,7 +19,7 @@ import {
   getClientStats,
 } from "@/lib/clientStorage";
 import { toast } from "@/hooks/use-toast";
-import { LogOut, UserPlus, Download } from "lucide-react";
+import { LogOut, UserPlus, Download, FileJson, StickyNote } from "lucide-react";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -94,11 +96,26 @@ const AdminDashboard = () => {
 
   // Handle logout
   const handleLogout = () => {
+    localStorage.removeItem("ruptax_admin_logged_in");
     navigate("/admin-login");
   };
 
-  // Export data
-  const handleExport = () => {
+  // Handle password update
+  const handlePasswordUpdate = (clientId: string, newPassword: string) => {
+    const STORAGE_KEY = "ruptax_clients";
+    const data = localStorage.getItem(STORAGE_KEY);
+    const clientsData = data ? JSON.parse(data) : [];
+    const index = clientsData.findIndex((c: Client) => c.id === clientId);
+    if (index >= 0) {
+      clientsData[index].password = newPassword;
+      clientsData[index].updatedAt = new Date().toISOString();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(clientsData));
+      loadData();
+    }
+  };
+
+  // Export data as JSON
+  const handleExportJSON = () => {
     const data = JSON.stringify(clients, null, 2);
     const blob = new Blob([data], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -110,6 +127,48 @@ const AdminDashboard = () => {
     toast({
       title: "Export Successful",
       description: `${clients.length} clients exported to JSON file.`,
+    });
+  };
+
+  // Export data as CSV
+  const handleExportCSV = () => {
+    const headers = [
+      "ID", "Enter No", "Name", "Name (Gujarati)", "School Name", "School Name (Gujarati)",
+      "Designation", "Designation (Gujarati)", "School Address", "Address (Gujarati)",
+      "PAN No", "Bank A/C No", "IFSC Code", "Aadhar No", "DOB", "Mobile", "Email",
+      "Pay Center Name", "Pay Center Address", "Place", "TDO", "Head Master Place",
+      "Annual Income", "Occupation", "Assessment Year", "Status", "Password", "Created At"
+    ];
+    
+    const csvRows = [headers.join(",")];
+    
+    clients.forEach(client => {
+      const row = [
+        client.id, client.enterNo, `"${client.name}"`, `"${client.nameGujarati}"`,
+        `"${client.schoolName}"`, `"${client.schoolNameGujarati}"`,
+        `"${client.designation}"`, `"${client.designationGujarati}"`,
+        `"${client.schoolAddress}"`, `"${client.addressGujarati}"`,
+        client.panNo, client.bankAcNo, client.ifscCode, client.aadharNo,
+        client.dateOfBirth, client.mobileNo, client.email,
+        `"${client.payCenterName}"`, `"${client.payCenterAddress}"`,
+        client.place, `"${client.tdo}"`, `"${client.headMasterPlace}"`,
+        client.annualIncome, client.occupation, client.assessmentYear,
+        client.formStatus, client.password || "", client.createdAt
+      ];
+      csvRows.push(row.join(","));
+    });
+    
+    const csvContent = csvRows.join("\n");
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `ruptax_clients_${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast({
+      title: "Export Successful",
+      description: `${clients.length} clients exported to CSV file.`,
     });
   };
 
@@ -130,9 +189,14 @@ const AdminDashboard = () => {
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" onClick={handleExport}>
+              <AdminNotes />
+              <Button variant="outline" onClick={handleExportJSON}>
+                <FileJson className="h-4 w-4 mr-2" />
+                JSON
+              </Button>
+              <Button variant="outline" onClick={handleExportCSV}>
                 <Download className="h-4 w-4 mr-2" />
-                Export
+                CSV
               </Button>
               <Button
                 onClick={() => {
@@ -167,6 +231,7 @@ const AdminDashboard = () => {
               onEdit={handleEditClient}
               onDelete={handleDeleteClient}
               onViewForm={handleViewForm}
+              onPasswordUpdate={handlePasswordUpdate}
             />
           </div>
         </div>
@@ -186,6 +251,7 @@ const AdminDashboard = () => {
 
       <Footer />
       <WhatsAppButton />
+      <TaxChatbot />
     </div>
   );
 };
