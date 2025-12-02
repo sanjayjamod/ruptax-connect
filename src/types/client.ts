@@ -25,6 +25,7 @@ export interface Client {
   occupation: string;
   assessmentYear: string;
   formStatus: 'pending' | 'completed' | 'submitted';
+  password?: string; // For client login
   createdAt: string;
   updatedAt: string;
 }

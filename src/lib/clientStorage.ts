@@ -2,6 +2,7 @@ import { Client, ClientFormData } from "@/types/client";
 
 const STORAGE_KEY = "ruptax_clients";
 const COUNTER_KEY = "ruptax_client_counter";
+const CURRENT_CLIENT_KEY = "ruptax_current_client";
 
 // Get current year prefix (2026 -> "2026")
 const getYearPrefix = () => {
@@ -27,6 +28,12 @@ export const getClientById = (id: string): Client | undefined => {
   return clients.find((c) => c.id === id);
 };
 
+// Get client by mobile number
+export const getClientByMobile = (mobile: string): Client | undefined => {
+  const clients = getAllClients();
+  return clients.find((c) => c.mobileNo === mobile);
+};
+
 // Search clients
 export const searchClients = (query: string): Client[] => {
   const clients = getAllClients();
@@ -41,7 +48,84 @@ export const searchClients = (query: string): Client[] => {
   );
 };
 
-// Add new client
+// Register new client (from client registration)
+export const registerClient = (
+  name: string,
+  mobile: string,
+  password: string
+): Client | { error: string } => {
+  // Check if mobile already exists
+  const existingClient = getClientByMobile(mobile);
+  if (existingClient) {
+    return { error: "Mobile number already registered" };
+  }
+
+  const clients = getAllClients();
+  const newClient: Client = {
+    id: generateClientId(),
+    enterNo: "",
+    name: name.toUpperCase(),
+    nameGujarati: "",
+    schoolName: "",
+    schoolNameGujarati: "",
+    designation: "",
+    designationGujarati: "",
+    schoolAddress: "",
+    addressGujarati: "",
+    panNo: "",
+    bankAcNo: "",
+    ifscCode: "",
+    aadharNo: "",
+    dateOfBirth: "",
+    mobileNo: mobile,
+    email: "",
+    payCenterName: "",
+    payCenterAddress: "",
+    place: "",
+    tdo: "",
+    headMasterPlace: "",
+    annualIncome: "",
+    occupation: "salaried",
+    assessmentYear: "2026-27",
+    formStatus: "pending",
+    password: password, // Store password for login
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+  clients.push(newClient);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(clients));
+  return newClient;
+};
+
+// Login client
+export const loginClient = (
+  mobile: string,
+  password: string
+): Client | { error: string } => {
+  const client = getClientByMobile(mobile);
+  if (!client) {
+    return { error: "Mobile number not registered" };
+  }
+  if ((client as any).password !== password) {
+    return { error: "Incorrect password" };
+  }
+  // Store current logged in client
+  localStorage.setItem(CURRENT_CLIENT_KEY, JSON.stringify(client));
+  return client;
+};
+
+// Get current logged in client
+export const getCurrentClient = (): Client | null => {
+  const data = localStorage.getItem(CURRENT_CLIENT_KEY);
+  return data ? JSON.parse(data) : null;
+};
+
+// Logout client
+export const logoutClient = () => {
+  localStorage.removeItem(CURRENT_CLIENT_KEY);
+};
+
+// Add new client (from admin)
 export const addClient = (formData: ClientFormData): Client => {
   const clients = getAllClients();
   const newClient: Client = {
@@ -68,6 +152,13 @@ export const updateClient = (id: string, formData: Partial<ClientFormData>): Cli
     updatedAt: new Date().toISOString(),
   };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(clients));
+  
+  // Update current client if logged in
+  const currentClient = getCurrentClient();
+  if (currentClient && currentClient.id === id) {
+    localStorage.setItem(CURRENT_CLIENT_KEY, JSON.stringify(clients[index]));
+  }
+  
   return clients[index];
 };
 
