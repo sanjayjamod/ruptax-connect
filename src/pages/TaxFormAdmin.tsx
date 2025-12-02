@@ -64,11 +64,17 @@ const TaxFormAdmin = () => {
   };
 
   const handleCalculate = () => {
+    console.log("Calculate clicked, formData:", formData);
     if (formData) {
+      console.log("Starting tax calculation...");
       const calculated = calculateTax(formData);
+      console.log("Calculation result:", calculated.taxCalculationB);
       setFormData(calculated);
       saveTaxForm(calculated);
       toast({ title: "Calculated", description: "Tax calculation completed" });
+    } else {
+      console.log("No formData available");
+      toast({ title: "Error", description: "Please load a client first", variant: "destructive" });
     }
   };
 
