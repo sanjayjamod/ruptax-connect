@@ -16,6 +16,7 @@ export default {
       fontFamily: {
         sans: ['DM Sans', 'sans-serif'],
         display: ['Outfit', 'sans-serif'],
+        gujarati: ['Noto Sans Gujarati', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
