@@ -369,7 +369,7 @@ const TaxFormAdmin = () => {
       </div>
       
       <SideCalculator />
-      <TaxChatbot />
+      <TaxChatbot activeForm={activeTab} />
       <WhatsAppButton />
     </div>
   );

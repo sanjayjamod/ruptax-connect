@@ -44,7 +44,63 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
+    const { messages, activeForm } = await req.json();
+    
+    // Form-specific context in Gujarati
+    const formContexts: Record<string, string> = {
+      pagar: `
+હાલમાં યુઝર પગાર ફોર્મ ભરી રહ્યા છે. આ ફોર્મમાં મદદ કરો:
+- Basic Pay, Grade Pay, DA (મોંઘવારી ભથ્થું)
+- HRA (મકાન ભાડા ભથ્થું), Medical Allowance
+- GPF/CPF કપાત, Profession Tax
+- માસિક Total Salary અને Net Pay ગણતરી
+- 12 મહિનાની salary entry (April-March)`,
+      declaration: `
+હાલમાં યુઝર Declaration ફોર્મ ભરી રહ્યા છે. આ ફોર્મમાં મદદ કરો:
+- Bank Interest (બચત ખાતા પર વ્યાજ)
+- NSC Interest, FD Interest
+- Exam Income (પરીક્ષા આવક)
+- LIC Premium, PPF Investment
+- Housing Loan Interest/Principal
+- Sukanya Samridhi, 5 Year FD`,
+      formA: `
+હાલમાં યુઝર આવકવેરા ફોર્મ A ભરી રહ્યા છે. આ ફોર્મમાં મદદ કરો:
+- Gross Salary ગણતરી
+- HRA Exemption (10% or 40% rule)
+- Standard Deduction ₹75,000
+- Profession Tax કપાત
+- Interest Income (Bank, NSC, FD)
+- Gross Total Income ગણતરી`,
+      formB: `
+હાલમાં યુઝર આવકવેરા ફોર્મ B ભરી રહ્યા છે. આ ફોર્મમાં મદદ કરો:
+- Section 80C (₹1,50,000 limit): GPF, CPF, LIC, PPF, NSC, ELSS
+- Section 80D: Medical Insurance (₹25,000/₹50,000)
+- Section 80TTA: Savings Interest (₹10,000 limit)
+- Tax Slab Calculation (Old Regime AY 2026-27):
+  * ₹0-2.5L: 0%
+  * ₹2.5-5L: 5%
+  * ₹5-10L: 20%
+  * ₹10L+: 30%
+- Rebate 87A (₹12,500 if income ≤ ₹5L)
+- Education Cess 4%`,
+      form16a: `
+હાલમાં યુઝર Form 16A ભરી રહ્યા છે. આ ફોર્મમાં મદદ કરો:
+- Part A: TDS Certificate Details
+- Employer TAN, PAN Details
+- Assessment Year 2026-27
+- Period of Employment
+- Summary of Tax Deducted`,
+      form16b: `
+હાલમાં યુઝર Form 16B ભરી રહ્યા છે. આ ફોર્મમાં મદદ કરો:
+- Part B: Annexure with Income Details
+- Gross Salary Breakup
+- Allowances and Perquisites
+- Deductions under Chapter VI-A
+- Total Tax Liability
+- Relief under Section 89 (if applicable)`
+    };
+    
+    const formContext = activeForm && formContexts[activeForm] ? formContexts[activeForm] : "";
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -60,7 +116,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: SYSTEM_PROMPT },
+          { role: "system", content: SYSTEM_PROMPT + formContext },
           ...messages,
         ],
         stream: true,

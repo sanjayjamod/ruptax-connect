@@ -17,16 +17,39 @@ interface Message {
   content: string;
 }
 
+interface TaxChatbotProps {
+  activeForm?: string;
+}
+
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tax-chatbot`;
 
-const TaxChatbot = () => {
+const formHelpMessages: Record<string, string> = {
+  pagar: "નમસ્તે! 🙏 હું પગાર ફોર્મ ભરવામાં મદદ કરું છું.\n\n• Basic Pay, Grade Pay, DA ભરો\n• HRA, Medical Allowance\n• GPF/CPF કપાત\n• Profession Tax\n• Net Salary ગણતરી\n\nકોઈ પ્રશ્ન પૂછો!",
+  declaration: "નમસ્તે! 🙏 Declaration Form માટે મદદ:\n\n• Bank Interest (બચત ખાતું)\n• NSC/FD વ્યાજ\n• LIC Premium\n• PPF રોકાણ\n• Housing Loan\n• 80C/80D કપાત\n\nકોઈ પ્રશ્ન પૂછો!",
+  formA: "નમસ્તે! 🙏 આવકવેરા ફોર્મ A માટે મદદ:\n\n• કુલ પગાર ગણતરી\n• HRA મુક્તિ\n• Standard Deduction ₹75,000\n• Profession Tax\n• અન્ય આવક (વ્યાજ, પરીક્ષા)\n• Gross Total Income\n\nકોઈ પ્રશ્ન પૂછો!",
+  formB: "નમસ્તે! 🙏 આવકવેરા ફોર્મ B માટે મદદ:\n\n• 80C કપાત (₹1.5 લાખ સુધી)\n• GPF, CPF, LIC, PPF\n• 80D Medical Insurance\n• Tax Slab ગણતરી\n• Rebate 87A\n• Education Cess 4%\n\nકોઈ પ્રશ્ન પૂછો!",
+  form16a: "નમસ્તે! 🙏 Form 16A માટે મદદ:\n\n• Part A - TDS Details\n• Employer Information\n• PAN, TAN Details\n• Tax Deducted Summary\n• Quarter-wise TDS\n\nકોઈ પ્રશ્ન પૂછો!",
+  form16b: "નમસ્તે! 🙏 Form 16B માટે મદદ:\n\n• Part B - Income Details\n• Gross Salary Breakdown\n• Deductions under Chapter VI-A\n• Tax Computation\n• Net Tax Payable\n\nકોઈ પ્રશ્ન પૂછો!"
+};
+
+const TaxChatbot = ({ activeForm }: TaxChatbotProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "નમસ્તે! 🙏 હું તમારો આવકવેરા સહાયક છું.\n\nતમે મને પૂછી શકો છો:\n• ITR ફાઇલિંગ\n• ટેક્સ કપાત (80C, 80D)\n• ફોર્મ 16 વિશે\n• TDS ગણતરી\n• GPF/CPF/LIC રોકાણો\n• પગાર ફોર્મ ભરવા વિશે\n\nતમારો પ્રશ્ન ગુજરાતીમાં પૂછો!"
+      content: formHelpMessages[activeForm || ""] || "નમસ્તે! 🙏 હું તમારો આવકવેરા સહાયક છું.\n\nતમે મને પૂછી શકો છો:\n• ITR ફાઇલિંગ\n• ટેક્સ કપાત (80C, 80D)\n• ફોર્મ 16 વિશે\n• TDS ગણતરી\n• GPF/CPF/LIC રોકાણો\n• પગાર ફોર્મ ભરવા વિશે\n\nતમારો પ્રશ્ન ગુજરાતીમાં પૂછો!"
     }
   ]);
+  
+  // Update welcome message when active form changes
+  useEffect(() => {
+    if (activeForm && formHelpMessages[activeForm]) {
+      setMessages([{
+        role: "assistant",
+        content: formHelpMessages[activeForm]
+      }]);
+    }
+  }, [activeForm]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -51,7 +74,7 @@ const TaxChatbot = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ messages: [...messages, userMsg] }),
+        body: JSON.stringify({ messages: [...messages, userMsg], activeForm }),
       });
 
       if (!resp.ok) {
