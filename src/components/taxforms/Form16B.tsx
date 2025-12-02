@@ -10,7 +10,7 @@ interface Form16BProps {
   readOnly?: boolean;
 }
 
-const monthNames = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'January', 'February', 'March'];
+const monthNames = ['April-25', 'May-25', 'June-25', 'July-25', 'August-25', 'September-25', 'October-25', 'November-25', 'December-25', 'January-26', 'February-26', 'March-26'];
 const monthKeys = ['apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec', 'jan', 'feb', 'mar'] as const;
 
 const Form16B = ({ client, formData }: Form16BProps) => {
@@ -171,7 +171,7 @@ const Form16B = ({ client, formData }: Form16BProps) => {
               <td className="amount-cell">{form16.monthlyTds[month].surcharge}</td>
               <td className="amount-cell">{form16.monthlyTds[month].cess}</td>
               <td className="amount-cell">{form16.monthlyTds[month].total || form16.monthlyTds[month].tds}</td>
-              <td>{monthNames[index]}-{index < 9 ? '22' : '23'}</td>
+              <td>{monthNames[index]}</td>
             </tr>
           ))}
           <tr className="total-row">
