@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { getClientById } from "@/lib/clientStorage";
+import { getClientById, updateClientStatus } from "@/lib/clientStorage";
 import { getOrCreateTaxForm, saveTaxForm, calculateTax, calculateSalaryTotals } from "@/lib/taxFormStorage";
 import { fillSampleDataForClient } from "@/lib/sampleTaxData";
 import { Client } from "@/types/client";
@@ -71,11 +71,14 @@ const TaxFormAdmin = () => {
   }, [autoCalcEnabled]);
 
   const handleSave = () => {
-    if (formData) {
+    if (formData && client) {
       const calculated = calculateTax(formData);
       saveTaxForm(calculated);
       setFormData(calculated);
-      toast({ title: "Saved", description: "Form data saved successfully" });
+      // Update client status to completed when form is saved
+      updateClientStatus(client.id, "completed");
+      setClient({ ...client, formStatus: "completed" });
+      toast({ title: "Saved", description: "Form saved and status updated to Completed" });
     }
   };
 
