@@ -9,6 +9,7 @@ import StatsCards from "@/components/admin/StatsCards";
 import ClientList from "@/components/admin/ClientList";
 import ClientForm from "@/components/admin/ClientForm";
 import AdminNotes from "@/components/admin/AdminNotes";
+import AdvancedFilters from "@/components/admin/AdvancedFilters";
 import { Client, ClientFormData } from "@/types/client";
 import {
   getAllClients,
@@ -32,6 +33,19 @@ const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Advanced filters state
+  const [filters, setFilters] = useState({
+    school: "all",
+    paySchool: "all",
+    status: "all",
+    salaryRange: "all",
+  });
+  const [groupBy, setGroupBy] = useState("none");
+
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
 
   // Check admin authentication
   useEffect(() => {
@@ -108,11 +122,57 @@ const AdminDashboard = () => {
     }
   };
 
-  // Filtered clients based on search
+  // Filtered clients based on search and advanced filters
   const filteredClients = useMemo(() => {
-    if (!searchQuery.trim()) return clients;
-    return searchClients(searchQuery);
-  }, [clients, searchQuery]);
+    let result = clients;
+    
+    // Text search
+    if (searchQuery.trim()) {
+      const lowerQuery = searchQuery.toLowerCase();
+      result = result.filter(c =>
+        c.id.includes(lowerQuery) ||
+        c.name.toLowerCase().includes(lowerQuery) ||
+        c.mobileNo.includes(lowerQuery) ||
+        c.panNo.toLowerCase().includes(lowerQuery) ||
+        c.schoolName.toLowerCase().includes(lowerQuery)
+      );
+    }
+    
+    // School filter
+    if (filters.school !== "all") {
+      result = result.filter(c => c.schoolName === filters.school);
+    }
+    
+    // Pay School filter
+    if (filters.paySchool !== "all") {
+      result = result.filter(c => 
+        c.payCenterName === filters.paySchool || 
+        c.schoolNameGujarati === filters.paySchool
+      );
+    }
+    
+    // Status filter
+    if (filters.status !== "all") {
+      result = result.filter(c => c.formStatus === filters.status);
+    }
+    
+    // Salary range filter
+    if (filters.salaryRange !== "all") {
+      result = result.filter(c => {
+        const income = parseInt(c.annualIncome) || 0;
+        switch (filters.salaryRange) {
+          case "above10L": return income >= 1000000;
+          case "5Lto10L": return income >= 500000 && income < 1000000;
+          case "3Lto5L": return income >= 300000 && income < 500000;
+          case "below3L": return income > 0 && income < 300000;
+          case "noSalary": return income === 0;
+          default: return true;
+        }
+      });
+    }
+    
+    return result;
+  }, [clients, searchQuery, filters]);
 
   // Handle add/edit client
   const handleSaveClient = (formData: ClientFormData) => {
@@ -302,14 +362,28 @@ const AdminDashboard = () => {
           </div>
 
           {/* Stats */}
-          <div className="mb-8">
+          <div className="mb-6">
             <StatsCards {...stats} />
+          </div>
+
+          {/* Advanced Filters & Statistics */}
+          <div className="mb-6">
+            <AdvancedFilters
+              clients={clients}
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              groupBy={groupBy}
+              onGroupByChange={setGroupBy}
+            />
           </div>
 
           {/* Client List */}
           <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-            <h2 className="mb-4 font-display text-xl font-semibold text-foreground">
-              Teacher Registrations
+            <h2 className="mb-4 font-display text-xl font-semibold text-foreground flex items-center justify-between">
+              <span>Teacher Registrations</span>
+              <span className="text-sm font-normal text-muted-foreground">
+                Showing {filteredClients.length} of {clients.length}
+              </span>
             </h2>
             <ClientList
               clients={filteredClients}
