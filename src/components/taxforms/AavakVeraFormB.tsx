@@ -208,30 +208,65 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false }: AavakV
         </tbody>
       </table>
 
-      {/* Tax Slabs */}
-      <div className="font-bold text-[11px] mt-3 mb-1 bg-gray-200 p-1">TAX CALCULATION</div>
-      <table style={{ fontSize: '10px' }}>
+      {/* Tax Slabs - NEW REGIME 2025-26 */}
+      <div className="font-bold text-[11px] mt-3 mb-1 bg-gray-200 p-1">TAX CALCULATION (NEW REGIME 2025-26)</div>
+      <table style={{ fontSize: '9px' }}>
         <tbody>
           <tr>
             <td className="w-6">1</td>
-            <td>Upto Rs.2,50,000 (Male & Female)</td>
-            <td className="text-center w-12">0%</td>
-            <td className="amount-cell w-20">250000</td>
-            <td className="amount-cell w-20">{taxB.taxSlab1 || 0}</td>
+            <td>Upto Rs.4,00,000 (Male & Female)</td>
+            <td className="text-center w-10">0%</td>
+            <td className="amount-cell w-16">400000</td>
+            <td className="amount-cell w-16">400000</td>
+            <td className="amount-cell w-16">0</td>
           </tr>
           <tr>
             <td>2</td>
-            <td>Rs.2,50,001 To 5,00,000</td>
+            <td>Rs.4,00,001 To 8,00,000</td>
             <td className="text-center">5%</td>
-            <td className="amount-cell">250000</td>
-            <td className="amount-cell">{taxB.taxSlab2 || 0}</td>
+            <td className="amount-cell">400000</td>
+            <td className="amount-cell">{Math.min(Math.max(0, (taxB.roundedTaxableIncome || 0) - 400000), 400000)}</td>
+            <td className="amount-cell">{Math.round(Math.min(Math.max(0, (taxB.roundedTaxableIncome || 0) - 400000), 400000) * 0.05)}</td>
           </tr>
           <tr>
             <td>3</td>
-            <td>Rs.5,00,001 To 10,00,000</td>
+            <td>Rs.8,00,001 To 12,00,000</td>
+            <td className="text-center">10%</td>
+            <td className="amount-cell">400000</td>
+            <td className="amount-cell">{Math.min(Math.max(0, (taxB.roundedTaxableIncome || 0) - 800000), 400000)}</td>
+            <td className="amount-cell">{Math.round(Math.min(Math.max(0, (taxB.roundedTaxableIncome || 0) - 800000), 400000) * 0.10)}</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Rs.12,00,001 To 16,00,000</td>
+            <td className="text-center">15%</td>
+            <td className="amount-cell">400000</td>
+            <td className="amount-cell">{Math.min(Math.max(0, (taxB.roundedTaxableIncome || 0) - 1200000), 400000)}</td>
+            <td className="amount-cell">{Math.round(Math.min(Math.max(0, (taxB.roundedTaxableIncome || 0) - 1200000), 400000) * 0.15)}</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>Rs.16,00,001 To 20,00,000</td>
             <td className="text-center">20%</td>
-            <td className="amount-cell">{Math.max(0, (taxB.roundedTaxableIncome || 0) - 500000)}</td>
-            <td className="amount-cell">{taxB.taxSlab3 || 0}</td>
+            <td className="amount-cell">400000</td>
+            <td className="amount-cell">{Math.min(Math.max(0, (taxB.roundedTaxableIncome || 0) - 1600000), 400000)}</td>
+            <td className="amount-cell">{Math.round(Math.min(Math.max(0, (taxB.roundedTaxableIncome || 0) - 1600000), 400000) * 0.20)}</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>Rs.20,00,001 To 24,00,000</td>
+            <td className="text-center">25%</td>
+            <td className="amount-cell">400000</td>
+            <td className="amount-cell">{Math.min(Math.max(0, (taxB.roundedTaxableIncome || 0) - 2000000), 400000)}</td>
+            <td className="amount-cell">{Math.round(Math.min(Math.max(0, (taxB.roundedTaxableIncome || 0) - 2000000), 400000) * 0.25)}</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>UP TO Rs.24,00,001+</td>
+            <td className="text-center">30%</td>
+            <td className="amount-cell"></td>
+            <td className="amount-cell">{Math.max(0, (taxB.roundedTaxableIncome || 0) - 2400000)}</td>
+            <td className="amount-cell">{Math.round(Math.max(0, (taxB.roundedTaxableIncome || 0) - 2400000) * 0.30)}</td>
           </tr>
         </tbody>
       </table>
@@ -246,7 +281,7 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false }: AavakV
             <td className="amount-cell font-bold w-20">{taxB.totalTax || 0}</td>
           </tr>
           <tr>
-            <td colSpan={2}>Tax Rebate Section 87A (Up To Rs.12500)</td>
+            <td colSpan={2}>Tax Rebate Section 87A (Up To Rs.25,000 if income ≤7L)</td>
             <td className="text-right">RS.</td>
             <td className="amount-cell">{taxB.taxRebate87A || 0}</td>
           </tr>

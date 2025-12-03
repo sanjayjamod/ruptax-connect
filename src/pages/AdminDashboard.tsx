@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
@@ -18,8 +18,9 @@ import {
   deleteClient,
   getClientStats,
 } from "@/lib/clientStorage";
+import { importTeachersFromHTML, readFileAsText } from "@/lib/excelImport";
 import { toast } from "@/hooks/use-toast";
-import { LogOut, UserPlus, Download, FileJson, StickyNote } from "lucide-react";
+import { LogOut, UserPlus, Download, FileJson, Upload } from "lucide-react";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ const AdminDashboard = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load clients and stats
   const loadData = () => {
@@ -40,6 +42,58 @@ const AdminDashboard = () => {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Handle Excel/HTML import
+  const handleExcelImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsLoading(true);
+      const content = await readFileAsText(file);
+      const teachers = importTeachersFromHTML(content);
+      
+      if (teachers.length === 0) {
+        toast({
+          title: "Import Failed",
+          description: "No valid teacher data found in the file.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      let imported = 0;
+      let skipped = 0;
+      
+      teachers.forEach((teacherData) => {
+        // Check if client with same enterNo already exists
+        const existing = clients.find(c => c.enterNo === teacherData.enterNo);
+        if (!existing) {
+          addClient(teacherData);
+          imported++;
+        } else {
+          skipped++;
+        }
+      });
+      
+      loadData();
+      toast({
+        title: "Import Successful",
+        description: `${imported} teachers imported, ${skipped} skipped (already exist).`,
+      });
+    } catch (error) {
+      toast({
+        title: "Import Error",
+        description: "Failed to parse the file. Make sure it's an Excel/HTML file.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
 
   // Filtered clients based on search
   const filteredClients = useMemo(() => {
@@ -190,6 +244,21 @@ const AdminDashboard = () => {
             </div>
             <div className="flex flex-wrap gap-2">
               <AdminNotes />
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleExcelImport}
+                accept=".xls,.xlsx,.html,.htm"
+                className="hidden"
+              />
+              <Button 
+                variant="outline" 
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isLoading}
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Import Excel
+              </Button>
               <Button variant="outline" onClick={handleExportJSON}>
                 <FileJson className="h-4 w-4 mr-2" />
                 JSON

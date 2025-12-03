@@ -9,6 +9,8 @@ export interface MonthlySalary {
   principalAllowance: number;
   daArrears: number;
   salaryArrears: number;
+  otherIncome1: number; // Row 11 - અન્ય આવક 1
+  otherIncome2: number; // Row 12 - અન્ય આવક 2
   totalSalary: number;
   // Deductions
   gpf: number;
@@ -184,6 +186,8 @@ export const emptyMonthlySalary: MonthlySalary = {
   principalAllowance: 0,
   daArrears: 0,
   salaryArrears: 0,
+  otherIncome1: 0,
+  otherIncome2: 0,
   totalSalary: 0,
   gpf: 0,
   cpf: 0,
@@ -244,7 +248,7 @@ export const getEmptyTaxFormData = (clientId: string): TaxFormData => ({
     totalExempt: 0,
     balanceSalary: 0,
     professionTax: 0,
-    standardDeduction: 50000,
+    standardDeduction: 75000, // NEW REGIME: Rs. 75,000
     professionalIncome: 0,
     bankInterest: 0,
     nscInterest: 0,
@@ -270,7 +274,7 @@ export const getEmptyTaxFormData = (clientId: string): TaxFormData => ({
     educationFee: 0,
     otherInvestment80C: 0,
     total80C: 0,
-    max80C: 150000,
+    max80C: 0, // NEW REGIME: No 80C deduction
     medicalInsurance80D: 0,
     disabledDependent80DD: 0,
     seriousDisease80DDB: 0,
@@ -292,7 +296,7 @@ export const getEmptyTaxFormData = (clientId: string): TaxFormData => ({
     netTaxPayable: 0,
     taxPaid: 0,
     balanceTax: 0,
-    recoveredMonth: "",
+    recoveredMonth: "FEB-2026 paid March 2026",
     totalTaxPaid: 0,
   },
   form16Data: {
@@ -324,7 +328,7 @@ export const getEmptyTaxFormData = (clientId: string): TaxFormData => ({
     headMasterName: "",
     headMasterFatherName: "",
     headMasterDesignation: "HEAD MASTER",
-    certificationDate: "",
+    certificationDate: "31-03-2026",
     certificationPlace: "",
   },
   createdAt: new Date().toISOString(),

@@ -150,9 +150,9 @@ const AavakVeraFormA = ({ client, formData, onChange, readOnly = false }: AavakV
           </tr>
           <tr>
             <td>(a)</td>
-            <td colSpan={2}>વ્યવસાય વેરાની ભરેલ રકમ + STANDARD DEDUCTION</td>
+            <td colSpan={2}>STANDARD DEDUCTION (NEW REGIME)</td>
             <td className="text-right">Rs.</td>
-            <td className="amount-cell">{(taxA.professionTax || 0) + (taxA.standardDeduction || 50000)}</td>
+            <td className="amount-cell font-bold">{taxA.standardDeduction || 75000}</td>
           </tr>
           <tr className="total-row">
             <td colSpan={3}>(Column:3-4) PRO INCOME</td>

@@ -20,7 +20,8 @@ const PagarForm = ({ client, formData, onChange, readOnly = false }: PagarFormPr
     // Calculate totals for the month
     const m = newMonths[month];
     m.totalSalary = (m.basic || 0) + (m.gradePay || 0) + (m.da || 0) + (m.hra || 0) + (m.medical || 0) + 
-                    (m.disabilityAllowance || 0) + (m.principalAllowance || 0) + (m.daArrears || 0) + (m.salaryArrears || 0);
+                    (m.disabilityAllowance || 0) + (m.principalAllowance || 0) + (m.daArrears || 0) + 
+                    (m.salaryArrears || 0) + (m.otherIncome1 || 0) + (m.otherIncome2 || 0);
     m.totalDeduction = (m.gpf || 0) + (m.cpf || 0) + (m.professionTax || 0) + (m.society || 0) + 
                        (m.groupInsurance || 0) + (m.incomeTax || 0);
     m.netPay = m.totalSalary - m.totalDeduction;
@@ -163,6 +164,20 @@ const PagarForm = ({ client, formData, onChange, readOnly = false }: PagarFormPr
             <td>પગાર એરિયર્સ</td>
             {months.map(month => renderInputCell(month, "salaryArrears"))}
             <td className="amount-cell font-bold">{calculateColumnTotal('salaryArrears')}</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td className="text-center">11</td>
+            <td>અન્ય આવક 1</td>
+            {months.map(month => renderInputCell(month, "otherIncome1"))}
+            <td className="amount-cell font-bold">{calculateColumnTotal('otherIncome1')}</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td className="text-center">12</td>
+            <td>અન્ય આવક 2</td>
+            {months.map(month => renderInputCell(month, "otherIncome2"))}
+            <td className="amount-cell font-bold">{calculateColumnTotal('otherIncome2')}</td>
             <td></td>
           </tr>
           <tr className="total-row">
