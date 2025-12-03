@@ -71,6 +71,8 @@ export const calculateSalaryTotals = (formData: TaxFormData): TaxFormData => {
     principalAllowance: sumField('principalAllowance'),
     daArrears: sumField('daArrears'),
     salaryArrears: sumField('salaryArrears'),
+    otherIncome1: sumField('otherIncome1'),
+    otherIncome2: sumField('otherIncome2'),
     totalSalary: sumField('totalSalary'),
     gpf: sumField('gpf'),
     cpf: sumField('cpf'),
@@ -109,7 +111,7 @@ export const calculateSalaryTotals = (formData: TaxFormData): TaxFormData => {
   };
 };
 
-// Calculate tax - Main calculation function
+// Calculate tax - Main calculation function (NEW TAX REGIME 2025-26)
 export const calculateTax = (formData: TaxFormData): TaxFormData => {
   // First calculate salary totals
   const withTotals = calculateSalaryTotals(formData);
@@ -120,20 +122,20 @@ export const calculateTax = (formData: TaxFormData): TaxFormData => {
   // 1. Gross Salary = Sum of all salary components
   const grossSalary = totals.totalSalary;
   
-  // 2. Exemptions under Section 10
-  const hraExempt = 0; // HRA exemption if living in rented house
-  const transportAllowance = 0; // Transport allowance (Rs.9600 limit)
-  const totalExempt = hraExempt + transportAllowance;
+  // 2. Exemptions under Section 10 (New Regime - No exemptions)
+  const hraExempt = 0; // Not available in new regime
+  const transportAllowance = 0; // Not available in new regime
+  const totalExempt = 0;
   
   // 3. Balance Salary after exemptions
   const balanceSalary = grossSalary - totalExempt;
   
   // 4. Deductions
   const professionTax = totals.professionTax;
-  const standardDeduction = 50000; // Standard deduction as per IT rules
+  const standardDeduction = 75000; // NEW REGIME: Rs. 75,000 Standard Deduction
   
-  // 5. Professional Income = Balance Salary - Profession Tax - Standard Deduction
-  const professionalIncome = balanceSalary - professionTax - standardDeduction;
+  // 5. Professional Income = Balance Salary - Standard Deduction
+  const professionalIncome = Math.max(0, balanceSalary - standardDeduction);
   
   // 6. Other Income
   const bankInterest = decl.bankInterest || 0;
@@ -150,14 +152,14 @@ export const calculateTax = (formData: TaxFormData): TaxFormData => {
   // 7. Gross Total Income = Professional Income + Other Income
   const grossTotalIncome = professionalIncome + totalOtherIncome;
   
-  // 8. Housing Loan Interest deduction under Section 24(2)
-  const housingLoanInterest = decl.housingLoanInterest || 0;
+  // 8. Housing Loan Interest deduction (limited in new regime)
+  const housingLoanInterest = 0; // Not deductible in new regime
   
-  // 9. PRO Income = Gross Total Income - Housing Loan Interest
-  const proIncome = grossTotalIncome - housingLoanInterest;
+  // 9. PRO Income = Gross Total Income
+  const proIncome = grossTotalIncome;
 
   // ============ TAX CALCULATION B ============
-  // Section 80C Deductions
+  // Section 80C Deductions - NOT AVAILABLE IN NEW REGIME
   const gpf = totals.gpf;
   const cpf = totals.cpf;
   const groupInsurance = totals.groupInsurance;
@@ -169,58 +171,103 @@ export const calculateTax = (formData: TaxFormData): TaxFormData => {
   const educationFee = decl.educationFee || 0;
   const otherInvestment80C = (decl.sbiLife || 0) + (decl.sukanyaSamridhi || 0) + (decl.fiveYearFD || 0);
 
-  // Total 80C investments
+  // Total 80C investments (for reference only - not deductible in new regime)
   const total80C = gpf + cpf + licPremium + pliPremium + groupInsurance + ppf + 
                    nscInvestment + housingLoanPrincipal + educationFee + otherInvestment80C;
   
-  // Maximum 80C deduction is Rs. 1,50,000
-  const max80C = Math.min(total80C, 150000);
+  // NEW REGIME: No 80C deduction
+  const max80C = 0;
 
-  // Other Section Deductions
-  const medicalInsurance80D = decl.medicalInsurance || 0; // Max 25000 (50000 for senior)
-  const disabledDependent80DD = withTotals.taxCalculationB.disabledDependent80DD || 0; // Max 50000/125000
-  const seriousDisease80DDB = withTotals.taxCalculationB.seriousDisease80DDB || 0; // Max 40000
-  const disability80U = withTotals.taxCalculationB.disability80U || 0; // 75000/125000
-  const donation80G = withTotals.taxCalculationB.donation80G || 0; // 50% deduction
-  const savingsBankInterest80TTA = Math.min(bankInterest, 10000); // Max 10000
+  // Other Section Deductions - NOT AVAILABLE IN NEW REGIME
+  const medicalInsurance80D = 0;
+  const disabledDependent80DD = 0;
+  const seriousDisease80DDB = 0;
+  const disability80U = 0;
+  const donation80G = 0;
+  const savingsBankInterest80TTA = 0;
 
-  // Total Deductions under Chapter VI-A
-  const totalDeductions = max80C + medicalInsurance80D + disabledDependent80DD + 
-                          seriousDisease80DDB + disability80U + donation80G + savingsBankInterest80TTA;
+  // Total Deductions under Chapter VI-A (Zero in new regime)
+  const totalDeductions = 0;
 
   // Taxable Income = PRO Income - Total Deductions
   const taxableIncome = Math.max(0, proIncome - totalDeductions);
   
   // Round to nearest 10 (as per IT rules)
-  const roundedTaxableIncome = Math.floor(taxableIncome / 10) * 10;
+  const roundedTaxableIncome = Math.ceil(taxableIncome / 10) * 10;
 
-  // ============ TAX SLAB CALCULATION (OLD REGIME) ============
-  // Slab 1: 0 - 2,50,000 = 0%
-  // Slab 2: 2,50,001 - 5,00,000 = 5%
-  // Slab 3: 5,00,001 - 10,00,000 = 20%
-  // Slab 4: Above 10,00,000 = 30%
+  // ============ NEW TAX REGIME SLABS 2025-26 ============
+  // Slab 1: 0 - 4,00,000 = 0%
+  // Slab 2: 4,00,001 - 8,00,000 = 5%
+  // Slab 3: 8,00,001 - 12,00,000 = 10%
+  // Slab 4: 12,00,001 - 16,00,000 = 15%
+  // Slab 5: 16,00,001 - 20,00,000 = 20%
+  // Slab 6: 20,00,001 - 24,00,000 = 25%
+  // Slab 7: Above 24,00,000 = 30%
   
-  let taxSlab1 = 0; // 0% on first 2.5L
-  let taxSlab2 = 0; // 5% on 2.5L to 5L
-  let taxSlab3 = 0; // 20% on 5L to 10L
-
-  if (roundedTaxableIncome > 250000) {
-    // Calculate tax on 2.5L to 5L @ 5%
-    const taxableIn5Percent = Math.min(roundedTaxableIncome - 250000, 250000);
-    taxSlab2 = Math.round(taxableIn5Percent * 0.05);
-    
-    if (roundedTaxableIncome > 500000) {
-      // Calculate tax on 5L to 10L @ 20%
-      const taxableIn20Percent = Math.min(roundedTaxableIncome - 500000, 500000);
-      taxSlab3 = Math.round(taxableIn20Percent * 0.20);
-    }
+  let totalTax = 0;
+  const taxSlabs: { min: number; max: number; rate: number; tax: number }[] = [];
+  
+  // Slab 1: 0 to 4L @ 0%
+  const slab1Max = Math.min(roundedTaxableIncome, 400000);
+  taxSlabs.push({ min: 0, max: 400000, rate: 0, tax: 0 });
+  
+  // Slab 2: 4L to 8L @ 5%
+  if (roundedTaxableIncome > 400000) {
+    const slab2Amount = Math.min(roundedTaxableIncome - 400000, 400000);
+    const slab2Tax = Math.round(slab2Amount * 0.05);
+    taxSlabs.push({ min: 400000, max: 800000, rate: 5, tax: slab2Tax });
+    totalTax += slab2Tax;
   }
-
-  const totalTax = taxSlab1 + taxSlab2 + taxSlab3;
   
-  // Tax Rebate under Section 87A
-  // If taxable income <= 5,00,000, rebate up to Rs. 12,500
-  const taxRebate87A = roundedTaxableIncome <= 500000 ? Math.min(totalTax, 12500) : 0;
+  // Slab 3: 8L to 12L @ 10%
+  if (roundedTaxableIncome > 800000) {
+    const slab3Amount = Math.min(roundedTaxableIncome - 800000, 400000);
+    const slab3Tax = Math.round(slab3Amount * 0.10);
+    taxSlabs.push({ min: 800000, max: 1200000, rate: 10, tax: slab3Tax });
+    totalTax += slab3Tax;
+  }
+  
+  // Slab 4: 12L to 16L @ 15%
+  if (roundedTaxableIncome > 1200000) {
+    const slab4Amount = Math.min(roundedTaxableIncome - 1200000, 400000);
+    const slab4Tax = Math.round(slab4Amount * 0.15);
+    taxSlabs.push({ min: 1200000, max: 1600000, rate: 15, tax: slab4Tax });
+    totalTax += slab4Tax;
+  }
+  
+  // Slab 5: 16L to 20L @ 20%
+  if (roundedTaxableIncome > 1600000) {
+    const slab5Amount = Math.min(roundedTaxableIncome - 1600000, 400000);
+    const slab5Tax = Math.round(slab5Amount * 0.20);
+    taxSlabs.push({ min: 1600000, max: 2000000, rate: 20, tax: slab5Tax });
+    totalTax += slab5Tax;
+  }
+  
+  // Slab 6: 20L to 24L @ 25%
+  if (roundedTaxableIncome > 2000000) {
+    const slab6Amount = Math.min(roundedTaxableIncome - 2000000, 400000);
+    const slab6Tax = Math.round(slab6Amount * 0.25);
+    taxSlabs.push({ min: 2000000, max: 2400000, rate: 25, tax: slab6Tax });
+    totalTax += slab6Tax;
+  }
+  
+  // Slab 7: Above 24L @ 30%
+  if (roundedTaxableIncome > 2400000) {
+    const slab7Amount = roundedTaxableIncome - 2400000;
+    const slab7Tax = Math.round(slab7Amount * 0.30);
+    taxSlabs.push({ min: 2400000, max: roundedTaxableIncome, rate: 30, tax: slab7Tax });
+    totalTax += slab7Tax;
+  }
+  
+  // Legacy slab fields (for backward compatibility)
+  const taxSlab1 = 0; // 0-4L @ 0%
+  const taxSlab2 = taxSlabs[1]?.tax || 0; // 4-8L @ 5%
+  const taxSlab3 = (taxSlabs[2]?.tax || 0) + (taxSlabs[3]?.tax || 0) + 
+                   (taxSlabs[4]?.tax || 0) + (taxSlabs[5]?.tax || 0) + (taxSlabs[6]?.tax || 0);
+  
+  // Tax Rebate under Section 87A (NEW REGIME)
+  // If taxable income <= 7,00,000, full rebate up to Rs. 25,000
+  const taxRebate87A = roundedTaxableIncome <= 700000 ? Math.min(totalTax, 25000) : 0;
   
   const taxAfterRebate = Math.max(0, totalTax - taxRebate87A);
   
@@ -278,12 +325,12 @@ export const calculateTax = (formData: TaxFormData): TaxFormData => {
       otherInvestment80C,
       total80C,
       max80C,
-      medicalInsurance80D,
-      disabledDependent80DD,
-      seriousDisease80DDB,
-      disability80U,
-      donation80G,
-      savingsBankInterest80TTA,
+      medicalInsurance80D: withTotals.taxCalculationB.medicalInsurance80D || 0,
+      disabledDependent80DD: withTotals.taxCalculationB.disabledDependent80DD || 0,
+      seriousDisease80DDB: withTotals.taxCalculationB.seriousDisease80DDB || 0,
+      disability80U: withTotals.taxCalculationB.disability80U || 0,
+      donation80G: withTotals.taxCalculationB.donation80G || 0,
+      savingsBankInterest80TTA: withTotals.taxCalculationB.savingsBankInterest80TTA || 0,
       totalDeductions,
       taxableIncome,
       roundedTaxableIncome,
@@ -299,7 +346,7 @@ export const calculateTax = (formData: TaxFormData): TaxFormData => {
       netTaxPayable,
       taxPaid,
       balanceTax,
-      recoveredMonth: withTotals.taxCalculationB.recoveredMonth || "",
+      recoveredMonth: withTotals.taxCalculationB.recoveredMonth || "FEB-2026 paid March 2026",
       totalTaxPaid: netTaxPayable,
     },
   };

@@ -140,9 +140,9 @@ const Form16A = ({ client, formData }: Form16AProps) => {
           </tr>
           <tr>
             <td></td>
-            <td>(a) Standard Deduction</td>
+            <td>(a) Standard Deduction (New Regime)</td>
             <td className="text-right">RS.</td>
-            <td className="amount-cell">{taxA.standardDeduction || 50000}</td>
+            <td className="amount-cell">{taxA.standardDeduction || 75000}</td>
           </tr>
           <tr>
             <td></td>
@@ -153,7 +153,7 @@ const Form16A = ({ client, formData }: Form16AProps) => {
           <tr className="total-row">
             <td colSpan={2}>5. Aggregate of 4(a) and (b)</td>
             <td className="text-right">RS.</td>
-            <td className="amount-cell font-bold">{(taxA.standardDeduction || 50000) + (taxA.professionTax || 0)}</td>
+            <td className="amount-cell font-bold">{(taxA.standardDeduction || 75000) + (taxA.professionTax || 0)}</td>
           </tr>
           <tr className="total-row">
             <td colSpan={2}>6. Income chargeable under the head 'Salaries' (3-5)</td>
