@@ -126,12 +126,15 @@ export const logoutClient = () => {
 };
 
 // Add new client (from admin)
-export const addClient = (formData: ClientFormData): Client => {
+export const addClient = (formData: ClientFormData, password?: string): Client => {
   const clients = getAllClients();
+  // Use mobile as password if not provided
+  const clientPassword = password || formData.mobileNo || "123456";
   const newClient: Client = {
     ...formData,
     id: generateClientId(),
     formStatus: "pending",
+    password: clientPassword,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
