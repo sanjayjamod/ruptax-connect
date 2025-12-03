@@ -30,7 +30,18 @@ const AdminDashboard = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Check admin authentication
+  useEffect(() => {
+    const adminLoggedIn = localStorage.getItem("ruptax_admin_logged_in");
+    if (adminLoggedIn !== "true") {
+      navigate("/admin-login");
+      return;
+    }
+    setIsAuthenticated(true);
+  }, [navigate]);
 
   // Load clients and stats
   const loadData = () => {
@@ -40,8 +51,10 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
+    if (isAuthenticated) {
+      loadData();
+    }
+  }, [isAuthenticated]);
 
   // Handle Excel/HTML import
   const handleExcelImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -225,6 +238,11 @@ const AdminDashboard = () => {
       description: `${clients.length} clients exported to CSV file.`,
     });
   };
+
+  // Don't render until authentication is verified
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-background">

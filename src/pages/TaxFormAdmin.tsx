@@ -30,14 +30,26 @@ const TaxFormAdmin = () => {
   const [formData, setFormData] = useState<TaxFormData | null>(null);
   const [activeTab, setActiveTab] = useState("pagar");
   const [autoCalcEnabled, setAutoCalcEnabled] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
 
+  // Check admin authentication
   useEffect(() => {
+    const adminLoggedIn = localStorage.getItem("ruptax_admin_logged_in");
+    if (adminLoggedIn !== "true") {
+      navigate("/admin-login");
+      return;
+    }
+    setIsAuthenticated(true);
+  }, [navigate]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
     const id = searchParams.get("clientId");
     if (id) {
       loadClient(id);
     }
-  }, [searchParams]);
+  }, [searchParams, isAuthenticated]);
 
   const loadClient = (id: string) => {
     const foundClient = getClientById(id);
@@ -252,6 +264,11 @@ const TaxFormAdmin = () => {
     window.print();
     toast({ title: "PDF", description: "Use 'Save as PDF' option in print dialog" });
   };
+
+  // Don't render until authentication is verified
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
