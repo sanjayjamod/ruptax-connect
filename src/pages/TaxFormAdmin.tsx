@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getClientById } from "@/lib/clientStorage";
 import { getOrCreateTaxForm, saveTaxForm, calculateTax, calculateSalaryTotals } from "@/lib/taxFormStorage";
+import { fillSampleDataForClient } from "@/lib/sampleTaxData";
 import { Client } from "@/types/client";
 import { TaxFormData } from "@/types/taxForm";
 import PagarForm from "@/components/taxforms/PagarForm";
@@ -15,7 +16,7 @@ import AavakVeraFormA from "@/components/taxforms/AavakVeraFormA";
 import AavakVeraFormB from "@/components/taxforms/AavakVeraFormB";
 import Form16A from "@/components/taxforms/Form16A";
 import Form16B from "@/components/taxforms/Form16B";
-import { Search, Printer, FileText, FileSpreadsheet, Save, ArrowLeft, Calculator, RefreshCw } from "lucide-react";
+import { Search, Printer, FileText, FileSpreadsheet, Save, ArrowLeft, Calculator, RefreshCw, Database } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import TaxChatbot from "@/components/TaxChatbot";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -86,6 +87,17 @@ const TaxFormAdmin = () => {
       toast({ title: "Calculated", description: "Tax calculation completed" });
     } else {
       toast({ title: "Error", description: "Please load a client first", variant: "destructive" });
+    }
+  };
+
+  const handleLoadSampleData = () => {
+    if (client) {
+      const filledData = fillSampleDataForClient(client.id);
+      setFormData(filledData);
+      toast({ 
+        title: "Sample Data Loaded", 
+        description: `Excel data filled for ${client.name}. Click Save to persist.` 
+      });
     }
   };
 
@@ -267,6 +279,9 @@ const TaxFormAdmin = () => {
 
             {client && (
               <>
+                <Button onClick={handleLoadSampleData} variant="secondary" size="sm" title="Load sample data from Excel">
+                  <Database className="h-4 w-4 mr-1" /> Sample
+                </Button>
                 <Button 
                   onClick={() => setAutoCalcEnabled(!autoCalcEnabled)} 
                   variant={autoCalcEnabled ? "default" : "outline"} 
