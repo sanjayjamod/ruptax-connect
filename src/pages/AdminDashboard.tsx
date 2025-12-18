@@ -20,7 +20,18 @@ import {
 } from "@/lib/clientStorage";
 import { importTeachersFromHTML, readFileAsText } from "@/lib/excelImport";
 import { toast } from "@/hooks/use-toast";
-import { LogOut, UserPlus, Download, FileJson, Upload, Loader2 } from "lucide-react";
+import { 
+  LogOut, 
+  UserPlus, 
+  Download, 
+  FileJson, 
+  Upload, 
+  Loader2, 
+  LayoutDashboard,
+  RefreshCw,
+  Calendar,
+  Shield
+} from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const AdminDashboard = () => {
@@ -32,6 +43,7 @@ const AdminDashboard = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Advanced filters state
@@ -73,6 +85,18 @@ const AdminDashboard = () => {
     setStats(getClientStats());
   };
 
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      loadData();
+      setIsRefreshing(false);
+      toast({
+        title: "Data Refreshed",
+        description: "Client data has been updated.",
+      });
+    }, 500);
+  };
+
   useEffect(() => {
     if (!authLoading && user && isAdmin) {
       loadData();
@@ -102,7 +126,6 @@ const AdminDashboard = () => {
       let skipped = 0;
       
       teachers.forEach((teacherData) => {
-        // Check if client with same enterNo already exists
         const existing = clients.find(c => c.enterNo === teacherData.enterNo);
         if (!existing) {
           addClient(teacherData);
@@ -135,7 +158,6 @@ const AdminDashboard = () => {
   const filteredClients = useMemo(() => {
     let result = clients;
     
-    // Text search
     if (searchQuery.trim()) {
       const lowerQuery = searchQuery.toLowerCase();
       result = result.filter(c =>
@@ -147,12 +169,10 @@ const AdminDashboard = () => {
       );
     }
     
-    // School filter
     if (filters.school !== "all") {
       result = result.filter(c => c.schoolName === filters.school);
     }
     
-    // Pay School filter
     if (filters.paySchool !== "all") {
       result = result.filter(c => 
         c.payCenterName === filters.paySchool || 
@@ -160,12 +180,10 @@ const AdminDashboard = () => {
       );
     }
     
-    // Status filter
     if (filters.status !== "all") {
       result = result.filter(c => c.formStatus === filters.status);
     }
     
-    // Salary range filter
     if (filters.salaryRange !== "all") {
       result = result.filter(c => {
         const income = parseInt(c.annualIncome) || 0;
@@ -236,10 +254,8 @@ const AdminDashboard = () => {
     navigate("/admin-login");
   };
 
-  // Handle password update - Note: This will need to be updated to use Supabase
+  // Handle password update
   const handlePasswordUpdate = (clientId: string, newPassword: string) => {
-    // For now, keep localStorage update for backwards compatibility
-    // TODO: Migrate to Supabase user management
     const STORAGE_KEY = "ruptax_clients";
     const data = localStorage.getItem(STORAGE_KEY);
     const clientsData = data ? JSON.parse(data) : [];
@@ -313,8 +329,15 @@ const AdminDashboard = () => {
   // Show loading while checking auth
   if (authLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background via-background to-muted">
+        <div className="text-center space-y-4">
+          <div className="relative">
+            <div className="h-16 w-16 mx-auto rounded-2xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/20">
+              <Loader2 className="h-8 w-8 animate-spin text-primary-foreground" />
+            </div>
+          </div>
+          <p className="text-muted-foreground animate-pulse">Loading dashboard...</p>
+        </div>
       </div>
     );
   }
@@ -324,24 +347,96 @@ const AdminDashboard = () => {
     return null;
   }
 
+  const currentDate = new Date().toLocaleDateString('en-IN', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-gradient-to-br from-background via-background to-muted/30">
       <Header />
 
-      <main className="flex-1 py-8">
-        <div className="container mx-auto px-4">
-          {/* Header */}
-          <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1 className="font-display text-3xl font-bold text-foreground">
-                Admin Dashboard
-              </h1>
-              <p className="text-muted-foreground">
-                Manage teacher tax registrations (ID: 202601, 202602...)
-              </p>
+      <main className="flex-1 py-6 lg:py-8">
+        <div className="container mx-auto px-4 max-w-7xl">
+          
+          {/* Hero Header Section */}
+          <div className="relative mb-8 overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary/90 to-primary/70 p-6 lg:p-8 text-primary-foreground shadow-xl shadow-primary/20">
+            {/* Background Pattern */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/20 blur-3xl" />
+              <div className="absolute -left-10 -bottom-10 h-40 w-40 rounded-full bg-white/20 blur-3xl" />
+            </div>
+            
+            <div className="relative z-10">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-xl bg-white/20 p-2.5 backdrop-blur-sm">
+                      <LayoutDashboard className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h1 className="font-display text-2xl lg:text-3xl font-bold">
+                        Admin Dashboard
+                      </h1>
+                      <p className="text-primary-foreground/80 text-sm">
+                        RupTax Income Tax Registration System
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4 text-sm text-primary-foreground/70">
+                    <span className="flex items-center gap-1.5">
+                      <Calendar className="h-4 w-4" />
+                      {currentDate}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <Shield className="h-4 w-4" />
+                      Assessment Year 2026-27
+                    </span>
+                  </div>
+                </div>
+                
+                {/* Quick Actions */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button 
+                    variant="secondary" 
+                    size="sm"
+                    onClick={handleRefresh}
+                    disabled={isRefreshing}
+                    className="bg-white/20 hover:bg-white/30 text-primary-foreground border-0 backdrop-blur-sm"
+                  >
+                    <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                    Refresh
+                  </Button>
+                  <AdminNotes />
+                  <Button 
+                    onClick={() => {
+                      setEditingClient(null);
+                      setIsFormOpen(true);
+                    }}
+                    size="sm"
+                    className="bg-white text-primary hover:bg-white/90 shadow-lg"
+                  >
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Add Teacher
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Stats Cards */}
+          <div className="mb-6 animate-fade-in">
+            <StatsCards {...stats} />
+          </div>
+
+          {/* Action Bar */}
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card/50 backdrop-blur-sm p-4 shadow-sm">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-muted-foreground">Quick Actions:</span>
             </div>
             <div className="flex flex-wrap gap-2">
-              <AdminNotes />
               <input
                 type="file"
                 ref={fileInputRef}
@@ -351,39 +446,27 @@ const AdminDashboard = () => {
               />
               <Button 
                 variant="outline" 
+                size="sm"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isLoading}
+                className="h-9"
               >
                 <Upload className="h-4 w-4 mr-2" />
                 Import Excel
               </Button>
-              <Button variant="outline" onClick={handleExportJSON}>
+              <Button variant="outline" size="sm" onClick={handleExportJSON} className="h-9">
                 <FileJson className="h-4 w-4 mr-2" />
-                JSON
+                Export JSON
               </Button>
-              <Button variant="outline" onClick={handleExportCSV}>
+              <Button variant="outline" size="sm" onClick={handleExportCSV} className="h-9">
                 <Download className="h-4 w-4 mr-2" />
-                CSV
+                Export CSV
               </Button>
-              <Button
-                onClick={() => {
-                  setEditingClient(null);
-                  setIsFormOpen(true);
-                }}
-              >
-                <UserPlus className="h-4 w-4 mr-2" />
-                Add Client
-              </Button>
-              <Button variant="destructive" onClick={handleLogout}>
+              <Button variant="destructive" size="sm" onClick={handleLogout} className="h-9">
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
               </Button>
             </div>
-          </div>
-
-          {/* Stats */}
-          <div className="mb-6">
-            <StatsCards {...stats} />
           </div>
 
           {/* Advanced Filters & Statistics */}
@@ -398,22 +481,40 @@ const AdminDashboard = () => {
           </div>
 
           {/* Client List */}
-          <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-            <h2 className="mb-4 font-display text-xl font-semibold text-foreground flex items-center justify-between">
-              <span>Teacher Registrations</span>
-              <span className="text-sm font-normal text-muted-foreground">
-                Showing {filteredClients.length} of {clients.length}
-              </span>
-            </h2>
-            <ClientList
-              clients={filteredClients}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              onEdit={handleEditClient}
-              onDelete={handleDeleteClient}
-              onViewForm={handleViewForm}
-              onPasswordUpdate={handlePasswordUpdate}
-            />
+          <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+            <div className="border-b border-border bg-gradient-to-r from-muted/30 to-muted/10 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="rounded-lg bg-primary/10 p-2">
+                    <Users className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h2 className="font-display text-lg font-semibold text-foreground">
+                      Teacher Registrations
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      Manage and track all tax registrations
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+                    {filteredClients.length} of {clients.length}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="p-6">
+              <ClientList
+                clients={filteredClients}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                onEdit={handleEditClient}
+                onDelete={handleDeleteClient}
+                onViewForm={handleViewForm}
+                onPasswordUpdate={handlePasswordUpdate}
+              />
+            </div>
           </div>
         </div>
       </main>
@@ -436,5 +537,8 @@ const AdminDashboard = () => {
     </div>
   );
 };
+
+// Need to import Users for the icon
+import { Users } from "lucide-react";
 
 export default AdminDashboard;
