@@ -17,8 +17,8 @@ const AdminLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    username: "",
-    password: "",
+    username: "",admin
+    password: "",21452145
   });
 
   // Redirect if already logged in as admin
