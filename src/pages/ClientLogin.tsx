@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,16 +9,28 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { User, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { loginClient } from "@/lib/clientStorage";
+import { useAuth } from "@/hooks/useAuth";
 
 const ClientLogin = () => {
   const navigate = useNavigate();
+  const { signIn, user, isAdmin, isLoading: authLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     mobile: "",
     password: "",
   });
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user && !authLoading) {
+      if (isAdmin) {
+        navigate("/admin-dashboard");
+      } else {
+        navigate("/client-dashboard");
+      }
+    }
+  }, [user, isAdmin, authLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,30 +44,46 @@ const ClientLogin = () => {
       return;
     }
 
+    if (formData.mobile.length !== 10) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid 10-digit mobile number",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     
-    // Login client
-    const result = loginClient(formData.mobile, formData.password);
+    // Convert mobile to email format for Supabase Auth
+    const email = `${formData.mobile}@ruptax.local`;
     
-    setTimeout(() => {
-      setIsLoading(false);
-      
-      if ('error' in result) {
-        toast({
-          title: "Login Failed",
-          description: result.error,
-          variant: "destructive",
-        });
-        return;
-      }
-      
+    const { error } = await signIn(email, formData.password);
+    
+    setIsLoading(false);
+    
+    if (error) {
       toast({
-        title: "Login Successful",
-        description: `Welcome back, ${result.name}! (ID: ${result.id})`,
+        title: "Login Failed",
+        description: "Invalid mobile number or password",
+        variant: "destructive",
       });
-      navigate("/client-dashboard");
-    }, 1000);
+      return;
+    }
+    
+    toast({
+      title: "Login Successful",
+      description: "Welcome back!",
+    });
   };
+
+  if (authLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
