@@ -14,16 +14,132 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      clients: {
+        Row: {
+          aadhar_number: string | null
+          address: string | null
+          annual_income: number | null
+          bank_account: string | null
+          bank_name: string | null
+          created_at: string | null
+          designation: string | null
+          email: string | null
+          form_status: string | null
+          id: string
+          ifsc_code: string | null
+          mobile: string | null
+          name: string
+          notes: string | null
+          pan_number: string | null
+          pay_school: string | null
+          school_name: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          aadhar_number?: string | null
+          address?: string | null
+          annual_income?: number | null
+          bank_account?: string | null
+          bank_name?: string | null
+          created_at?: string | null
+          designation?: string | null
+          email?: string | null
+          form_status?: string | null
+          id: string
+          ifsc_code?: string | null
+          mobile?: string | null
+          name: string
+          notes?: string | null
+          pan_number?: string | null
+          pay_school?: string | null
+          school_name?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          aadhar_number?: string | null
+          address?: string | null
+          annual_income?: number | null
+          bank_account?: string | null
+          bank_name?: string | null
+          created_at?: string | null
+          designation?: string | null
+          email?: string | null
+          form_status?: string | null
+          id?: string
+          ifsc_code?: string | null
+          mobile?: string | null
+          name?: string
+          notes?: string | null
+          pan_number?: string | null
+          pay_school?: string | null
+          school_name?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+          mobile: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id: string
+          mobile?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          mobile?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "client"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +266,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "client"],
+    },
   },
 } as const

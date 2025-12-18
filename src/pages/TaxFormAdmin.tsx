@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getClientById, updateClientStatus } from "@/lib/clientStorage";
-import { getOrCreateTaxForm, saveTaxForm, calculateTax, calculateSalaryTotals } from "@/lib/taxFormStorage";
+import { getOrCreateTaxForm, saveTaxForm, calculateTax } from "@/lib/taxFormStorage";
 import { fillSampleDataForClient } from "@/lib/sampleTaxData";
 import { Client } from "@/types/client";
 import { TaxFormData } from "@/types/taxForm";
@@ -16,40 +16,51 @@ import AavakVeraFormA from "@/components/taxforms/AavakVeraFormA";
 import AavakVeraFormB from "@/components/taxforms/AavakVeraFormB";
 import Form16A from "@/components/taxforms/Form16A";
 import Form16B from "@/components/taxforms/Form16B";
-import { Search, Printer, FileText, FileSpreadsheet, Save, ArrowLeft, Calculator, RefreshCw, Database } from "lucide-react";
+import { Search, Printer, FileText, FileSpreadsheet, Save, ArrowLeft, Calculator, RefreshCw, Database, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import TaxChatbot from "@/components/TaxChatbot";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import SideCalculator from "@/components/admin/SideCalculator";
+import { useAuth } from "@/hooks/useAuth";
 
 const TaxFormAdmin = () => {
   const navigate = useNavigate();
+  const { user, isAdmin, isLoading: authLoading } = useAuth();
   const [searchParams] = useSearchParams();
   const [clientId, setClientId] = useState(searchParams.get("clientId") || "");
   const [client, setClient] = useState<Client | null>(null);
   const [formData, setFormData] = useState<TaxFormData | null>(null);
   const [activeTab, setActiveTab] = useState("pagar");
   const [autoCalcEnabled, setAutoCalcEnabled] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
 
-  // Check admin authentication
+  // Check admin authentication via Supabase
   useEffect(() => {
-    const adminLoggedIn = localStorage.getItem("ruptax_admin_logged_in");
-    if (adminLoggedIn !== "true") {
-      navigate("/admin-login");
-      return;
+    if (!authLoading) {
+      if (!user) {
+        navigate("/admin-login");
+        return;
+      }
+      if (!isAdmin) {
+        toast({
+          title: "Access Denied",
+          description: "You don't have admin privileges.",
+          variant: "destructive",
+        });
+        navigate("/client-dashboard");
+        return;
+      }
     }
-    setIsAuthenticated(true);
-  }, [navigate]);
+  }, [user, isAdmin, authLoading, navigate]);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
-    const id = searchParams.get("clientId");
-    if (id) {
-      loadClient(id);
+    if (!authLoading && user && isAdmin) {
+      const id = searchParams.get("clientId");
+      if (id) {
+        loadClient(id);
+      }
     }
-  }, [searchParams, isAuthenticated]);
+  }, [searchParams, authLoading, user, isAdmin]);
 
   const loadClient = (id: string) => {
     const foundClient = getClientById(id);
@@ -265,8 +276,17 @@ const TaxFormAdmin = () => {
     toast({ title: "PDF", description: "Use 'Save as PDF' option in print dialog" });
   };
 
+  // Show loading while checking auth
+  if (authLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   // Don't render until authentication is verified
-  if (!isAuthenticated) {
+  if (!user || !isAdmin) {
     return null;
   }
 
@@ -404,7 +424,7 @@ const TaxFormAdmin = () => {
       </div>
       
       <SideCalculator />
-      <TaxChatbot activeForm={activeTab} formData={formData} client={client} />
+      <TaxChatbot formData={formData} />
       <WhatsAppButton />
     </div>
   );
