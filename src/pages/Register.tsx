@@ -18,7 +18,7 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
-    email: "",
+    mobile: "",
     password: "",
     confirmPassword: "",
   });
@@ -33,7 +33,7 @@ const Register = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.fullName || !formData.email || !formData.password || !formData.confirmPassword) {
+    if (!formData.fullName || !formData.mobile || !formData.password || !formData.confirmPassword) {
       toast({
         title: "Error",
         description: "Please fill in all fields",
@@ -42,12 +42,10 @@ const Register = () => {
       return;
     }
 
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
+    if (formData.mobile.length !== 10) {
       toast({
         title: "Error",
-        description: "Please enter a valid email address",
+        description: "Please enter a valid 10-digit mobile number",
         variant: "destructive",
       });
       return;
@@ -62,10 +60,10 @@ const Register = () => {
       return;
     }
 
-    if (formData.password.length < 8) {
+    if (formData.password.length < 6) {
       toast({
         title: "Error",
-        description: "Password must be at least 8 characters",
+        description: "Password must be at least 6 characters",
         variant: "destructive",
       });
       return;
@@ -73,7 +71,10 @@ const Register = () => {
 
     setIsLoading(true);
     
-    const { error } = await signUp(formData.email, formData.password, formData.fullName);
+    // Convert mobile to email format for Supabase Auth
+    const email = `${formData.mobile}@ruptax.local`;
+    
+    const { error } = await signUp(email, formData.password, formData.fullName);
     
     setIsLoading(false);
     
@@ -88,7 +89,7 @@ const Register = () => {
     
     toast({
       title: "Registration Successful!",
-      description: "Please check your email to verify your account, then login.",
+      description: "Your account has been created. Please login.",
     });
     navigate("/client-login");
   };
@@ -116,13 +117,14 @@ const Register = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="mobile">Mobile Number</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email address"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                id="mobile"
+                type="tel"
+                placeholder="Enter your 10-digit mobile number"
+                value={formData.mobile}
+                onChange={(e) => setFormData({ ...formData, mobile: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                maxLength={10}
               />
             </div>
 
@@ -132,7 +134,7 @@ const Register = () => {
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Create a password (min 8 characters)"
+                  placeholder="Create a password (min 6 characters)"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />

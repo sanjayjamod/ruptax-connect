@@ -7,7 +7,7 @@ import AuthCard from "@/components/AuthCard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import { Shield, Eye, EyeOff, Loader2, User } from "lucide-react";
+import { Shield, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -17,21 +17,32 @@ const AdminLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    email: "",
+    mobile: "",
     password: "",
   });
 
-  // Redirect if already authenticated as admin
+  // Redirect if already logged in as admin
   useEffect(() => {
-    if (!authLoading && user && isAdmin) {
+    if (user && isAdmin && !authLoading) {
       navigate("/admin-dashboard");
     }
   }, [user, isAdmin, authLoading, navigate]);
 
+  // Show access denied if logged in but not admin
+  useEffect(() => {
+    if (user && !isAdmin && !authLoading) {
+      toast({
+        title: "Access Denied",
+        description: "You don't have admin privileges",
+        variant: "destructive",
+      });
+    }
+  }, [user, isAdmin, authLoading]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.email || !formData.password) {
+    if (!formData.mobile || !formData.password) {
       toast({
         title: "Error",
         description: "Please fill in all fields",
@@ -40,42 +51,46 @@ const AdminLogin = () => {
       return;
     }
 
-    setIsLoading(true);
-    
-    const { error } = await signIn(formData.email, formData.password);
-    
-    if (error) {
-      setIsLoading(false);
+    if (formData.mobile.length !== 10) {
       toast({
-        title: "Login Failed",
-        description: error.message || "Invalid email or password",
+        title: "Error",
+        description: "Please enter a valid 10-digit mobile number",
         variant: "destructive",
       });
       return;
     }
 
-    // Wait a moment for role check to complete
-    setTimeout(async () => {
-      setIsLoading(false);
-      // The useEffect will handle redirect if user is admin
-      // If not admin, show error
+    setIsLoading(true);
+    
+    // Convert mobile to email format for Supabase Auth
+    const email = `${formData.mobile}@ruptax.local`;
+    
+    const { error } = await signIn(email, formData.password);
+    
+    setIsLoading(false);
+    
+    if (error) {
       toast({
-        title: "Checking permissions...",
-        description: "Verifying admin access",
-      });
-    }, 1000);
-  };
-
-  // Show message if logged in but not admin
-  useEffect(() => {
-    if (!authLoading && user && !isAdmin && !isLoading) {
-      toast({
-        title: "Access Denied",
-        description: "You don't have admin privileges. Please contact support.",
+        title: "Login Failed",
+        description: "Invalid mobile number or password",
         variant: "destructive",
       });
+      return;
     }
-  }, [user, isAdmin, authLoading, isLoading]);
+    
+    toast({
+      title: "Login Successful",
+      description: "Welcome back, Admin!",
+    });
+  };
+
+  if (authLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -89,13 +104,14 @@ const AdminLogin = () => {
         >
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="mobile">Mobile Number</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="Enter admin email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                id="mobile"
+                type="tel"
+                placeholder="Enter your mobile number"
+                value={formData.mobile}
+                onChange={(e) => setFormData({ ...formData, mobile: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                maxLength={10}
               />
             </div>
 
@@ -105,7 +121,7 @@ const AdminLogin = () => {
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter admin password"
+                  placeholder="Enter your password"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
@@ -119,30 +135,24 @@ const AdminLogin = () => {
               </div>
             </div>
 
-            <Button type="submit" variant="hero" className="w-full" disabled={isLoading || authLoading}>
+            <Button type="submit" variant="hero" className="w-full" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Authenticating...
+                  Logging in...
                 </>
               ) : (
-                "Login as Admin"
+                "Login"
               )}
             </Button>
           </form>
 
-          <div className="mt-6 rounded-lg bg-muted p-3 text-center text-xs text-muted-foreground">
-            <Shield className="mx-auto mb-1 h-4 w-4" />
-            This is a secure admin area. Unauthorized access is prohibited.
-          </div>
-
-          <div className="mt-4 text-center">
+          <div className="mt-4 pt-4 border-t border-border text-center">
             <Link 
               to="/client-login" 
-              className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"
             >
-              <User className="h-4 w-4" />
-              Go to Client Login
+              ← Client Login
             </Link>
           </div>
         </AuthCard>
