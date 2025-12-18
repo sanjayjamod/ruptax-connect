@@ -17,7 +17,7 @@ const AdminLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    mobile: "",
+    username: "",
     password: "",
   });
 
@@ -42,7 +42,7 @@ const AdminLogin = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.mobile || !formData.password) {
+    if (!formData.username || !formData.password) {
       toast({
         title: "Error",
         description: "Please fill in all fields",
@@ -51,19 +51,10 @@ const AdminLogin = () => {
       return;
     }
 
-    if (formData.mobile.length !== 10) {
-      toast({
-        title: "Error",
-        description: "Please enter a valid 10-digit mobile number",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsLoading(true);
     
-    // Convert mobile to email format for Supabase Auth
-    const email = `${formData.mobile}@ruptax.local`;
+    // Convert username to email format for Supabase Auth
+    const email = `${formData.username}@ruptax.local`;
     
     const { error } = await signIn(email, formData.password);
     
@@ -104,14 +95,13 @@ const AdminLogin = () => {
         >
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="mobile">Mobile Number</Label>
+              <Label htmlFor="username">Admin ID</Label>
               <Input
-                id="mobile"
-                type="tel"
-                placeholder="Enter your mobile number"
-                value={formData.mobile}
-                onChange={(e) => setFormData({ ...formData, mobile: e.target.value.replace(/\D/g, '').slice(0, 10) })}
-                maxLength={10}
+                id="username"
+                type="text"
+                placeholder="Enter admin ID"
+                value={formData.username}
+                onChange={(e) => setFormData({ ...formData, username: e.target.value.trim() })}
               />
             </div>
 

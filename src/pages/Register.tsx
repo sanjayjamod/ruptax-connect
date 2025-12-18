@@ -18,7 +18,7 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
-    mobile: "",
+    username: "",
     password: "",
     confirmPassword: "",
   });
@@ -33,7 +33,7 @@ const Register = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.fullName || !formData.mobile || !formData.password || !formData.confirmPassword) {
+    if (!formData.fullName || !formData.username || !formData.password || !formData.confirmPassword) {
       toast({
         title: "Error",
         description: "Please fill in all fields",
@@ -42,10 +42,10 @@ const Register = () => {
       return;
     }
 
-    if (formData.mobile.length !== 10) {
+    if (formData.username.length < 3) {
       toast({
         title: "Error",
-        description: "Please enter a valid 10-digit mobile number",
+        description: "Username must be at least 3 characters",
         variant: "destructive",
       });
       return;
@@ -71,8 +71,8 @@ const Register = () => {
 
     setIsLoading(true);
     
-    // Convert mobile to email format for Supabase Auth
-    const email = `${formData.mobile}@ruptax.local`;
+    // Convert username to email format for Supabase Auth
+    const email = `${formData.username}@ruptax.local`;
     
     const { error } = await signUp(email, formData.password, formData.fullName);
     
@@ -117,14 +117,13 @@ const Register = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="mobile">Mobile Number</Label>
+              <Label htmlFor="username">Username / Mobile</Label>
               <Input
-                id="mobile"
-                type="tel"
-                placeholder="Enter your 10-digit mobile number"
-                value={formData.mobile}
-                onChange={(e) => setFormData({ ...formData, mobile: e.target.value.replace(/\D/g, '').slice(0, 10) })}
-                maxLength={10}
+                id="username"
+                type="text"
+                placeholder="Enter username or mobile number"
+                value={formData.username}
+                onChange={(e) => setFormData({ ...formData, username: e.target.value.trim() })}
               />
             </div>
 
