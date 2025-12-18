@@ -13,7 +13,6 @@ import AdvancedFilters from "@/components/admin/AdvancedFilters";
 import { Client, ClientFormData } from "@/types/client";
 import {
   getAllClients,
-  searchClients,
   addClient,
   updateClient,
   deleteClient,
@@ -21,17 +20,18 @@ import {
 } from "@/lib/clientStorage";
 import { importTeachersFromHTML, readFileAsText } from "@/lib/excelImport";
 import { toast } from "@/hooks/use-toast";
-import { LogOut, UserPlus, Download, FileJson, Upload } from "lucide-react";
+import { LogOut, UserPlus, Download, FileJson, Upload, Loader2 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const { user, isAdmin, isLoading: authLoading, signOut } = useAuth();
   const [clients, setClients] = useState<Client[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [stats, setStats] = useState({ total: 0, pending: 0, completed: 0, submitted: 0 });
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Advanced filters state
@@ -47,15 +47,24 @@ const AdminDashboard = () => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
-  // Check admin authentication
+  // Check admin authentication via Supabase
   useEffect(() => {
-    const adminLoggedIn = localStorage.getItem("ruptax_admin_logged_in");
-    if (adminLoggedIn !== "true") {
-      navigate("/admin-login");
-      return;
+    if (!authLoading) {
+      if (!user) {
+        navigate("/admin-login");
+        return;
+      }
+      if (!isAdmin) {
+        toast({
+          title: "Access Denied",
+          description: "You don't have admin privileges.",
+          variant: "destructive",
+        });
+        navigate("/client-dashboard");
+        return;
+      }
     }
-    setIsAuthenticated(true);
-  }, [navigate]);
+  }, [user, isAdmin, authLoading, navigate]);
 
   // Load clients and stats
   const loadData = () => {
@@ -65,10 +74,10 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (!authLoading && user && isAdmin) {
       loadData();
     }
-  }, [isAuthenticated]);
+  }, [authLoading, user, isAdmin]);
 
   // Handle Excel/HTML import
   const handleExcelImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -222,13 +231,15 @@ const AdminDashboard = () => {
   };
 
   // Handle logout
-  const handleLogout = () => {
-    localStorage.removeItem("ruptax_admin_logged_in");
+  const handleLogout = async () => {
+    await signOut();
     navigate("/admin-login");
   };
 
-  // Handle password update
+  // Handle password update - Note: This will need to be updated to use Supabase
   const handlePasswordUpdate = (clientId: string, newPassword: string) => {
+    // For now, keep localStorage update for backwards compatibility
+    // TODO: Migrate to Supabase user management
     const STORAGE_KEY = "ruptax_clients";
     const data = localStorage.getItem(STORAGE_KEY);
     const clientsData = data ? JSON.parse(data) : [];
@@ -264,7 +275,7 @@ const AdminDashboard = () => {
       "Designation", "Designation (Gujarati)", "School Address", "Address (Gujarati)",
       "PAN No", "Bank A/C No", "IFSC Code", "Aadhar No", "DOB", "Mobile", "Email",
       "Pay Center Name", "Pay Center Address", "Place", "TDO", "Head Master Place",
-      "Annual Income", "Occupation", "Assessment Year", "Status", "Password", "Created At"
+      "Annual Income", "Occupation", "Assessment Year", "Status", "Created At"
     ];
     
     const csvRows = [headers.join(",")];
@@ -280,7 +291,7 @@ const AdminDashboard = () => {
         `"${client.payCenterName}"`, `"${client.payCenterAddress}"`,
         client.place, `"${client.tdo}"`, `"${client.headMasterPlace}"`,
         client.annualIncome, client.occupation, client.assessmentYear,
-        client.formStatus, client.password || "", client.createdAt
+        client.formStatus, client.createdAt
       ];
       csvRows.push(row.join(","));
     });
@@ -299,8 +310,17 @@ const AdminDashboard = () => {
     });
   };
 
+  // Show loading while checking auth
+  if (authLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   // Don't render until authentication is verified
-  if (!isAuthenticated) {
+  if (!user || !isAdmin) {
     return null;
   }
 

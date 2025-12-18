@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,24 +9,29 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { Shield, Eye, EyeOff, Loader2, User } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-
-// Admin credentials
-const ADMIN_EMAIL = "ruptax@gmail.com";
-const ADMIN_PASSWORD = "89$#RUT@sat$#89";
+import { useAuth } from "@/hooks/useAuth";
 
 const AdminLogin = () => {
   const navigate = useNavigate();
+  const { signIn, user, isAdmin, isLoading: authLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    username: "",
+    email: "",
     password: "",
   });
+
+  // Redirect if already authenticated as admin
+  useEffect(() => {
+    if (!authLoading && user && isAdmin) {
+      navigate("/admin-dashboard");
+    }
+  }, [user, isAdmin, authLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.username || !formData.password) {
+    if (!formData.email || !formData.password) {
       toast({
         title: "Error",
         description: "Please fill in all fields",
@@ -37,26 +42,40 @@ const AdminLogin = () => {
 
     setIsLoading(true);
     
-    setTimeout(() => {
-      // Verify admin credentials
-      if (formData.username === ADMIN_EMAIL && formData.password === ADMIN_PASSWORD) {
-        setIsLoading(false);
-        localStorage.setItem("ruptax_admin_logged_in", "true");
-        toast({
-          title: "Admin Login Successful",
-          description: "Welcome to the admin dashboard!",
-        });
-        navigate("/admin-dashboard");
-      } else {
-        setIsLoading(false);
-        toast({
-          title: "Login Failed",
-          description: "Invalid email or password",
-          variant: "destructive",
-        });
-      }
+    const { error } = await signIn(formData.email, formData.password);
+    
+    if (error) {
+      setIsLoading(false);
+      toast({
+        title: "Login Failed",
+        description: error.message || "Invalid email or password",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Wait a moment for role check to complete
+    setTimeout(async () => {
+      setIsLoading(false);
+      // The useEffect will handle redirect if user is admin
+      // If not admin, show error
+      toast({
+        title: "Checking permissions...",
+        description: "Verifying admin access",
+      });
     }, 1000);
   };
+
+  // Show message if logged in but not admin
+  useEffect(() => {
+    if (!authLoading && user && !isAdmin && !isLoading) {
+      toast({
+        title: "Access Denied",
+        description: "You don't have admin privileges. Please contact support.",
+        variant: "destructive",
+      });
+    }
+  }, [user, isAdmin, authLoading, isLoading]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -70,13 +89,13 @@ const AdminLogin = () => {
         >
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="username"
-                type="text"
-                placeholder="Enter admin username"
-                value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                id="email"
+                type="email"
+                placeholder="Enter admin email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />
             </div>
 
@@ -100,7 +119,7 @@ const AdminLogin = () => {
               </div>
             </div>
 
-            <Button type="submit" variant="hero" className="w-full" disabled={isLoading}>
+            <Button type="submit" variant="hero" className="w-full" disabled={isLoading || authLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,23 +9,31 @@ import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { UserPlus, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { registerClient } from "@/lib/clientStorage";
+import { useAuth } from "@/hooks/useAuth";
 
 const Register = () => {
   const navigate = useNavigate();
+  const { signUp, user, isLoading: authLoading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
-    mobile: "",
+    email: "",
     password: "",
     confirmPassword: "",
   });
 
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!authLoading && user) {
+      navigate("/client-dashboard");
+    }
+  }, [user, authLoading, navigate]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.fullName || !formData.mobile || !formData.password || !formData.confirmPassword) {
+    if (!formData.fullName || !formData.email || !formData.password || !formData.confirmPassword) {
       toast({
         title: "Error",
         description: "Please fill in all fields",
@@ -34,10 +42,12 @@ const Register = () => {
       return;
     }
 
-    if (formData.mobile.length !== 10) {
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
       toast({
         title: "Error",
-        description: "Please enter a valid 10-digit mobile number",
+        description: "Please enter a valid email address",
         variant: "destructive",
       });
       return;
@@ -52,10 +62,10 @@ const Register = () => {
       return;
     }
 
-    if (formData.password.length < 6) {
+    if (formData.password.length < 8) {
       toast({
         title: "Error",
-        description: "Password must be at least 6 characters",
+        description: "Password must be at least 8 characters",
         variant: "destructive",
       });
       return;
@@ -63,27 +73,24 @@ const Register = () => {
 
     setIsLoading(true);
     
-    // Register client and save to storage
-    const result = registerClient(formData.fullName, formData.mobile, formData.password);
+    const { error } = await signUp(formData.email, formData.password, formData.fullName);
     
-    setTimeout(() => {
-      setIsLoading(false);
-      
-      if ('error' in result) {
-        toast({
-          title: "Registration Failed",
-          description: result.error,
-          variant: "destructive",
-        });
-        return;
-      }
-      
+    setIsLoading(false);
+    
+    if (error) {
       toast({
-        title: "Registration Successful!",
-        description: `Your Client ID is: ${result.id}. Please login to continue.`,
+        title: "Registration Failed",
+        description: error.message || "Could not create account",
+        variant: "destructive",
       });
-      navigate("/client-login");
-    }, 1000);
+      return;
+    }
+    
+    toast({
+      title: "Registration Successful!",
+      description: "Please check your email to verify your account, then login.",
+    });
+    navigate("/client-login");
   };
 
   return (
@@ -109,14 +116,13 @@ const Register = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="mobile">Mobile Number</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
-                id="mobile"
-                type="tel"
-                placeholder="Enter your mobile number"
-                value={formData.mobile}
-                onChange={(e) => setFormData({ ...formData, mobile: e.target.value.replace(/\D/g, '').slice(0, 10) })}
-                maxLength={10}
+                id="email"
+                type="email"
+                placeholder="Enter your email address"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />
             </div>
 
@@ -126,7 +132,7 @@ const Register = () => {
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Create a password"
+                  placeholder="Create a password (min 8 characters)"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
@@ -151,7 +157,7 @@ const Register = () => {
               />
             </div>
 
-            <Button type="submit" variant="hero" className="w-full" disabled={isLoading}>
+            <Button type="submit" variant="hero" className="w-full" disabled={isLoading || authLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
