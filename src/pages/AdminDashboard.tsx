@@ -1,8 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import TaxChatbot from "@/components/TaxChatbot";
 import StatsCards from "@/components/admin/StatsCards";
@@ -10,6 +8,9 @@ import ClientList from "@/components/admin/ClientList";
 import ClientForm from "@/components/admin/ClientForm";
 import AdminNotes from "@/components/admin/AdminNotes";
 import AdvancedFilters from "@/components/admin/AdvancedFilters";
+import AdminSidebar from "@/components/admin/AdminSidebar";
+import SideCalculator from "@/components/admin/SideCalculator";
+import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { Client, ClientFormData } from "@/types/client";
 import {
   getAllClients,
@@ -21,16 +22,12 @@ import {
 import { importTeachersFromHTML, readFileAsText } from "@/lib/excelImport";
 import { toast } from "@/hooks/use-toast";
 import { 
-  LogOut, 
-  UserPlus, 
-  Download, 
-  FileJson, 
-  Upload, 
   Loader2, 
-  LayoutDashboard,
-  RefreshCw,
   Calendar,
-  Shield
+  Shield,
+  Users,
+  RefreshCw,
+  Menu
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -44,6 +41,9 @@ const AdminDashboard = () => {
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [activeSection, setActiveSection] = useState("dashboard");
+  const [showNotes, setShowNotes] = useState(false);
+  const [showCalculator, setShowCalculator] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Advanced filters state
@@ -154,6 +154,10 @@ const AdminDashboard = () => {
     }
   };
 
+  const triggerFileImport = () => {
+    fileInputRef.current?.click();
+  };
+
   // Filtered clients based on search and advanced filters
   const filteredClients = useMemo(() => {
     let result = clients;
@@ -248,12 +252,6 @@ const AdminDashboard = () => {
     setIsFormOpen(true);
   };
 
-  // Handle logout
-  const handleLogout = async () => {
-    await signOut();
-    navigate("/admin-login");
-  };
-
   // Handle password update
   const handlePasswordUpdate = (clientId: string, newPassword: string) => {
     const STORAGE_KEY = "ruptax_clients";
@@ -326,6 +324,14 @@ const AdminDashboard = () => {
     });
   };
 
+  // Handle section change
+  const handleSectionChange = (section: string) => {
+    setActiveSection(section);
+    if (section === "calculator") {
+      setShowCalculator(true);
+    }
+  };
+
   // Show loading while checking auth
   if (authLoading) {
     return (
@@ -355,190 +361,173 @@ const AdminDashboard = () => {
   });
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-background via-background to-muted/30">
-      <Header />
+    <SidebarProvider defaultOpen={true}>
+      <div className="flex min-h-screen w-full bg-gradient-to-br from-background via-background to-muted/30">
+        {/* Hidden file input for Excel import */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleExcelImport}
+          accept=".xls,.xlsx,.html,.htm"
+          className="hidden"
+        />
 
-      <main className="flex-1 py-6 lg:py-8">
-        <div className="container mx-auto px-4 max-w-7xl">
-          
-          {/* Hero Header Section */}
-          <div className="relative mb-8 overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary/90 to-primary/70 p-6 lg:p-8 text-primary-foreground shadow-xl shadow-primary/20">
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/20 blur-3xl" />
-              <div className="absolute -left-10 -bottom-10 h-40 w-40 rounded-full bg-white/20 blur-3xl" />
-            </div>
+        {/* Admin Sidebar */}
+        <AdminSidebar
+          onAddClient={() => {
+            setEditingClient(null);
+            setIsFormOpen(true);
+          }}
+          onImportExcel={triggerFileImport}
+          onExportJSON={handleExportJSON}
+          onExportCSV={handleExportCSV}
+          onOpenNotes={() => setShowNotes(true)}
+          activeSection={activeSection}
+          onSectionChange={handleSectionChange}
+        />
+
+        {/* Main Content Area */}
+        <SidebarInset className="flex-1">
+          {/* Top Header Bar */}
+          <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 lg:px-6">
+            <SidebarTrigger className="h-8 w-8" />
             
-            <div className="relative z-10">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3">
-                    <div className="rounded-xl bg-white/20 p-2.5 backdrop-blur-sm">
-                      <LayoutDashboard className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <h1 className="font-display text-2xl lg:text-3xl font-bold">
-                        Admin Dashboard
-                      </h1>
-                      <p className="text-primary-foreground/80 text-sm">
-                        RupTax Income Tax Registration System
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 text-sm text-primary-foreground/70">
-                    <span className="flex items-center gap-1.5">
-                      <Calendar className="h-4 w-4" />
-                      {currentDate}
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <Shield className="h-4 w-4" />
-                      Assessment Year 2026-27
-                    </span>
-                  </div>
-                </div>
-                
-                {/* Quick Actions */}
-                <div className="flex flex-wrap items-center gap-2">
-                  <Button 
-                    variant="secondary" 
-                    size="sm"
-                    onClick={handleRefresh}
-                    disabled={isRefreshing}
-                    className="bg-white/20 hover:bg-white/30 text-primary-foreground border-0 backdrop-blur-sm"
-                  >
-                    <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-                    Refresh
-                  </Button>
-                  <AdminNotes />
-                  <Button 
-                    onClick={() => {
-                      setEditingClient(null);
-                      setIsFormOpen(true);
-                    }}
-                    size="sm"
-                    className="bg-white text-primary hover:bg-white/90 shadow-lg"
-                  >
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Add Teacher
-                  </Button>
-                </div>
+            <div className="flex-1 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <h1 className="font-display text-lg font-semibold text-foreground">
+                  {activeSection === "dashboard" && "Dashboard"}
+                  {activeSection === "teachers" && "Teachers"}
+                  {activeSection === "forms" && "Tax Forms"}
+                  {activeSection === "calculator" && "Calculator"}
+                  {activeSection === "notes" && "Notes"}
+                </h1>
+              </div>
+              
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <span className="hidden sm:flex items-center gap-1.5">
+                  <Calendar className="h-4 w-4" />
+                  {currentDate}
+                </span>
+                <span className="flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                  <Shield className="h-3 w-3" />
+                  AY 2026-27
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRefresh}
+                  disabled={isRefreshing}
+                >
+                  <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                </Button>
               </div>
             </div>
-          </div>
+          </header>
 
-          {/* Stats Cards */}
-          <div className="mb-6 animate-fade-in">
-            <StatsCards {...stats} />
-          </div>
+          {/* Main Content */}
+          <main className="flex-1 p-4 lg:p-6">
+            <div className="mx-auto max-w-7xl space-y-6">
+              {/* Stats Cards - Always visible */}
+              {activeSection === "dashboard" && (
+                <div className="animate-fade-in">
+                  <StatsCards {...stats} />
+                </div>
+              )}
 
-          {/* Action Bar */}
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card/50 backdrop-blur-sm p-4 shadow-sm">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-muted-foreground">Quick Actions:</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleExcelImport}
-                accept=".xls,.xlsx,.html,.htm"
-                className="hidden"
-              />
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isLoading}
-                className="h-9"
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                Import Excel
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleExportJSON} className="h-9">
-                <FileJson className="h-4 w-4 mr-2" />
-                Export JSON
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleExportCSV} className="h-9">
-                <Download className="h-4 w-4 mr-2" />
-                Export CSV
-              </Button>
-              <Button variant="destructive" size="sm" onClick={handleLogout} className="h-9">
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
-              </Button>
-            </div>
-          </div>
+              {/* Advanced Filters */}
+              {(activeSection === "dashboard" || activeSection === "teachers") && (
+                <div className="animate-fade-in">
+                  <AdvancedFilters
+                    clients={clients}
+                    filters={filters}
+                    onFilterChange={handleFilterChange}
+                    groupBy={groupBy}
+                    onGroupByChange={setGroupBy}
+                  />
+                </div>
+              )}
 
-          {/* Advanced Filters & Statistics */}
-          <div className="mb-6">
-            <AdvancedFilters
-              clients={clients}
-              filters={filters}
-              onFilterChange={handleFilterChange}
-              groupBy={groupBy}
-              onGroupByChange={setGroupBy}
-            />
-          </div>
-
-          {/* Client List */}
-          <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
-            <div className="border-b border-border bg-gradient-to-r from-muted/30 to-muted/10 px-6 py-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-lg bg-primary/10 p-2">
-                    <Users className="h-5 w-5 text-primary" />
+              {/* Client List */}
+              {(activeSection === "dashboard" || activeSection === "teachers") && (
+                <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden animate-fade-in">
+                  <div className="border-b border-border bg-gradient-to-r from-muted/30 to-muted/10 px-6 py-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="rounded-lg bg-primary/10 p-2">
+                          <Users className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                          <h2 className="font-display text-lg font-semibold text-foreground">
+                            Teacher Registrations
+                          </h2>
+                          <p className="text-sm text-muted-foreground">
+                            Manage and track all tax registrations
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+                          {filteredClients.length} of {clients.length}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="font-display text-lg font-semibold text-foreground">
-                      Teacher Registrations
-                    </h2>
-                    <p className="text-sm text-muted-foreground">
-                      Manage and track all tax registrations
-                    </p>
+                  <div className="p-6">
+                    <ClientList
+                      clients={filteredClients}
+                      searchQuery={searchQuery}
+                      onSearchChange={setSearchQuery}
+                      onEdit={handleEditClient}
+                      onDelete={handleDeleteClient}
+                      onViewForm={handleViewForm}
+                      onPasswordUpdate={handlePasswordUpdate}
+                    />
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
-                    {filteredClients.length} of {clients.length}
-                  </span>
+              )}
+
+              {/* Calculator Section */}
+              {activeSection === "calculator" && (
+                <div className="animate-fade-in">
+                  <SideCalculator />
                 </div>
-              </div>
-            </div>
-            <div className="p-6">
-              <ClientList
-                clients={filteredClients}
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-                onEdit={handleEditClient}
-                onDelete={handleDeleteClient}
-                onViewForm={handleViewForm}
-                onPasswordUpdate={handlePasswordUpdate}
-              />
-            </div>
-          </div>
-        </div>
-      </main>
+              )}
 
-      {/* Client Form Dialog */}
-      <ClientForm
-        open={isFormOpen}
-        onClose={() => {
-          setIsFormOpen(false);
-          setEditingClient(null);
-        }}
-        onSave={handleSaveClient}
-        client={editingClient}
-        isLoading={isLoading}
-      />
+              {/* Forms Section */}
+              {activeSection === "forms" && (
+                <div className="rounded-2xl border border-border bg-card p-6 shadow-sm animate-fade-in">
+                  <h2 className="font-display text-xl font-semibold text-foreground mb-4">
+                    Tax Forms Management
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Select a teacher from the Teachers section to view or edit their tax forms.
+                  </p>
+                </div>
+              )}
+            </div>
+          </main>
+        </SidebarInset>
 
-      <Footer />
-      <WhatsAppButton />
-      <TaxChatbot />
-    </div>
+        {/* Client Form Dialog */}
+        <ClientForm
+          open={isFormOpen}
+          onClose={() => {
+            setIsFormOpen(false);
+            setEditingClient(null);
+          }}
+          onSave={handleSaveClient}
+          client={editingClient}
+          isLoading={isLoading}
+        />
+
+        {/* Notes Dialog */}
+        {showNotes && <AdminNotes />}
+
+        <WhatsAppButton />
+        <TaxChatbot />
+      </div>
+    </SidebarProvider>
   );
 };
-
-// Need to import Users for the icon
-import { Users } from "lucide-react";
 
 export default AdminDashboard;
