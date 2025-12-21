@@ -10,7 +10,13 @@ import {
   StickyNote,
   Calculator,
   UserPlus,
-  ChevronLeft,
+  FolderOpen,
+  Mail,
+  MessageCircle,
+  RotateCcw,
+  Moon,
+  Sun,
+  ClipboardList,
 } from "lucide-react";
 import {
   Sidebar,
@@ -23,12 +29,11 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { Separator } from "@/components/ui/separator";
+import { useState } from "react";
 
 interface AdminSidebarProps {
   onAddClient?: () => void;
@@ -50,14 +55,21 @@ const AdminSidebar = ({
   onSectionChange,
 }: AdminSidebarProps) => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { signOut } = useAuth();
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
+  const [isDarkMode, setIsDarkMode] = useState(
+    document.documentElement.classList.contains("dark")
+  );
 
   const handleLogout = async () => {
     await signOut();
     navigate("/admin-login");
+  };
+
+  const toggleTheme = () => {
+    document.documentElement.classList.toggle("dark");
+    setIsDarkMode(!isDarkMode);
   };
 
   const menuItems = [
@@ -72,9 +84,19 @@ const AdminSidebar = ({
       section: "teachers",
     },
     {
-      title: "Tax Forms",
+      title: "Client Profiles",
+      icon: FolderOpen,
+      section: "profiles",
+    },
+    {
+      title: "Fill Form",
       icon: FileText,
-      section: "forms",
+      section: "fill-form",
+    },
+    {
+      title: "Filled Forms",
+      icon: ClipboardList,
+      section: "filled-forms",
     },
     {
       title: "Calculator",
@@ -86,6 +108,11 @@ const AdminSidebar = ({
       icon: StickyNote,
       section: "notes",
       onClick: onOpenNotes,
+    },
+    {
+      title: "Settings",
+      icon: Settings,
+      section: "settings",
     },
   ];
 
@@ -140,6 +167,8 @@ const AdminSidebar = ({
                     onClick={() => {
                       if (item.onClick) {
                         item.onClick();
+                      } else if (item.section === "fill-form") {
+                        navigate("/tax-form-admin");
                       } else if (onSectionChange) {
                         onSectionChange(item.section);
                       }
@@ -174,6 +203,30 @@ const AdminSidebar = ({
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <Separator className="my-2" />
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Theme</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  onClick={toggleTheme}
+                  tooltip={isDarkMode ? "Light Mode" : "Dark Mode"}
+                  className="transition-all duration-200"
+                >
+                  {isDarkMode ? (
+                    <Sun className="h-4 w-4" />
+                  ) : (
+                    <Moon className="h-4 w-4" />
+                  )}
+                  <span>{isDarkMode ? "Light Mode" : "Dark Mode"}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

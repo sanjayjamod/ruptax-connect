@@ -10,6 +10,9 @@ import AdminNotes from "@/components/admin/AdminNotes";
 import AdvancedFilters from "@/components/admin/AdvancedFilters";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import SideCalculator from "@/components/admin/SideCalculator";
+import ClientProfilesSection from "@/components/admin/ClientProfilesSection";
+import FilledFormsSection from "@/components/admin/FilledFormsSection";
+import AdminSettings from "@/components/admin/AdminSettings";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { Client, ClientFormData } from "@/types/client";
 import {
@@ -394,9 +397,11 @@ const AdminDashboard = () => {
                 <h1 className="font-display text-lg font-semibold text-foreground">
                   {activeSection === "dashboard" && "Dashboard"}
                   {activeSection === "teachers" && "Teachers"}
-                  {activeSection === "forms" && "Tax Forms"}
+                  {activeSection === "profiles" && "Client Profiles"}
+                  {activeSection === "filled-forms" && "Filled Forms"}
                   {activeSection === "calculator" && "Calculator"}
                   {activeSection === "notes" && "Notes"}
+                  {activeSection === "settings" && "Settings"}
                 </h1>
               </div>
               
@@ -490,15 +495,28 @@ const AdminDashboard = () => {
                 </div>
               )}
 
-              {/* Forms Section */}
-              {activeSection === "forms" && (
-                <div className="rounded-2xl border border-border bg-card p-6 shadow-sm animate-fade-in">
-                  <h2 className="font-display text-xl font-semibold text-foreground mb-4">
-                    Tax Forms Management
-                  </h2>
-                  <p className="text-muted-foreground">
-                    Select a teacher from the Teachers section to view or edit their tax forms.
-                  </p>
+              {/* Client Profiles Section */}
+              {activeSection === "profiles" && (
+                <div className="animate-fade-in">
+                  <ClientProfilesSection
+                    clients={filteredClients}
+                    onEditClient={handleEditClient}
+                    onViewForm={(client) => navigate(`/tax-form-admin?clientId=${client.id}`)}
+                  />
+                </div>
+              )}
+
+              {/* Filled Forms Section */}
+              {activeSection === "filled-forms" && (
+                <div className="animate-fade-in">
+                  <FilledFormsSection />
+                </div>
+              )}
+
+              {/* Settings Section */}
+              {activeSection === "settings" && (
+                <div className="animate-fade-in">
+                  <AdminSettings onResetData={loadData} />
                 </div>
               )}
             </div>
