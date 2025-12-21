@@ -252,18 +252,15 @@ const AdminDashboard = () => {
     setIsFormOpen(true);
   };
 
-  // Handle password update
+  // Handle password update - passwords should be managed through Supabase Auth
   const handlePasswordUpdate = (clientId: string, newPassword: string) => {
-    const STORAGE_KEY = "ruptax_clients";
-    const data = localStorage.getItem(STORAGE_KEY);
-    const clientsData = data ? JSON.parse(data) : [];
-    const index = clientsData.findIndex((c: Client) => c.id === clientId);
-    if (index >= 0) {
-      clientsData[index].password = newPassword;
-      clientsData[index].updatedAt = new Date().toISOString();
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(clientsData));
-      loadData();
-    }
+    // Password updates should go through proper Supabase Auth flow
+    // This is a placeholder - in production, use supabase.auth.admin.updateUserById
+    toast({
+      title: "Password Update",
+      description: "Password changes should be done through the secure authentication system.",
+      variant: "destructive",
+    });
   };
 
   // Export data as JSON

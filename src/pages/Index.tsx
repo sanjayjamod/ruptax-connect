@@ -12,36 +12,7 @@ import {
   Calculator,
   Users
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/hooks/use-toast";
-import { useState } from "react";
-
 const Index = () => {
-  const [creating, setCreating] = useState(false);
-
-  const createAdminUser = async () => {
-    setCreating(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('create-admin');
-      
-      if (error) throw error;
-      
-      toast({
-        title: "Success!",
-        description: data.message || "Admin account created",
-      });
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to create admin';
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setCreating(false);
-    }
-  };
-
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <Header />
@@ -157,19 +128,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-
-      {/* Hidden Admin Setup Button */}
-      <div className="fixed bottom-4 left-4 z-50">
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={createAdminUser}
-          disabled={creating}
-          className="opacity-50 hover:opacity-100 text-xs"
-        >
-          {creating ? "Creating..." : "Setup Admin"}
-        </Button>
-      </div>
 
       <Footer />
       <WhatsAppButton />

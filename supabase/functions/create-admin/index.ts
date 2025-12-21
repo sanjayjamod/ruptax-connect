@@ -16,6 +16,61 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     
+    // Require a setup token for admin creation (security measure)
+    const setupToken = Deno.env.get('ADMIN_SETUP_TOKEN')
+    const authHeader = req.headers.get('authorization')
+    
+    // Check if called with valid authorization
+    if (setupToken) {
+      const providedToken = req.headers.get('x-setup-token')
+      if (providedToken !== setupToken) {
+        console.log('Invalid or missing setup token')
+        return new Response(
+          JSON.stringify({ error: 'Forbidden: Invalid setup token', success: false }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 }
+        )
+      }
+    } else {
+      // If no setup token configured, require existing admin authorization
+      if (!authHeader) {
+        console.log('No authorization header provided')
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized: Admin authorization required', success: false }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+        )
+      }
+      
+      // Verify the caller is an existing admin
+      const supabaseClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!, {
+        global: { headers: { Authorization: authHeader } }
+      })
+      
+      const { data: { user }, error: authError } = await supabaseClient.auth.getUser()
+      if (authError || !user) {
+        console.log('Auth error:', authError?.message)
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized: Invalid credentials', success: false }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+        )
+      }
+      
+      // Check if user is admin
+      const { data: adminRole, error: roleError } = await supabaseClient
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle()
+      
+      if (roleError || !adminRole) {
+        console.log('User is not an admin')
+        return new Response(
+          JSON.stringify({ error: 'Forbidden: Admin access required', success: false }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 }
+        )
+      }
+    }
+    
     const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
       auth: {
         autoRefreshToken: false,
@@ -23,13 +78,33 @@ serve(async (req) => {
       }
     })
 
+    // Get credentials from request body or use secure defaults
+    const body = await req.json().catch(() => ({}))
+    const email = body.email || 'admin@ruptax.local'
+    const password = body.password
+    
+    if (!password) {
+      return new Response(
+        JSON.stringify({ error: 'Password is required', success: false }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      )
+    }
+    
+    // Validate password strength
+    if (password.length < 8) {
+      return new Response(
+        JSON.stringify({ error: 'Password must be at least 8 characters', success: false }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      )
+    }
+
     // Create admin user
     const { data: userData, error: createError } = await supabaseAdmin.auth.admin.createUser({
-      email: 'admin@ruptax.local',
-      password: '21452145',
+      email: email,
+      password: password,
       email_confirm: true,
       user_metadata: {
-        full_name: 'Roopsiangbhai Jamod'
+        full_name: body.fullName || 'Admin User'
       }
     })
 
