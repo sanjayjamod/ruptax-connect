@@ -83,7 +83,6 @@ const ClientPasswordManager = ({ client, onPasswordUpdate }: ClientPasswordManag
           <div className="rounded-lg bg-muted/50 p-3 text-sm">
             <p><strong>Client ID:</strong> {client.id}</p>
             <p><strong>Mobile:</strong> {client.mobileNo}</p>
-            <p><strong>Current Password:</strong> {client.password || "Not set"}</p>
           </div>
 
           <div className="space-y-2">
