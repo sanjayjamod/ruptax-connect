@@ -41,12 +41,23 @@
   [class*="Footer"],
   [class*="SideCalculator"],
   [class*="WhatsApp"],
-  [class*="Chatbot"] {
+  [class*="Chatbot"],
+  [class*="MessageCircle"],
+  a[href*="whatsapp"],
+  a[href*="wa.me"],
+  .fixed {
     display: none !important;
+    visibility: hidden !important;
   }
 
   .print-only {
     display: block !important;
+  }
+
+  /* Ensure footer credit shows at bottom of form */
+  .tax-form-print .form-footer-credit {
+    margin-top: auto;
+    padding-top: 4mm;
   }
 
   .tax-form-print {
