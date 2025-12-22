@@ -15,13 +15,13 @@ import AavakVeraFormA from "@/components/taxforms/AavakVeraFormA";
 import AavakVeraFormB from "@/components/taxforms/AavakVeraFormB";
 import Form16A from "@/components/taxforms/Form16A";
 import Form16B from "@/components/taxforms/Form16B";
-import { Search, Printer, FileText, FileSpreadsheet, Save, ArrowLeft, Calculator, RefreshCw, Database, Loader2 } from "lucide-react";
+import { Search, Printer, FileText, FileSpreadsheet, Save, ArrowLeft, Calculator, RefreshCw, Database, Loader2, PanelRightOpen, PanelRightClose } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import TaxChatbot from "@/components/TaxChatbot";
-import WhatsAppButton from "@/components/WhatsAppButton";
 import SideCalculator from "@/components/admin/SideCalculator";
+import SampleTemplates from "@/components/admin/SampleTemplates";
+import WhatsAppShare from "@/components/admin/WhatsAppShare";
 import { useAuth } from "@/hooks/useAuth";
-
 const TaxFormAdmin = () => {
   const navigate = useNavigate();
   const { user, isAdmin, isLoading: authLoading } = useAuth();
@@ -31,6 +31,7 @@ const TaxFormAdmin = () => {
   const [formData, setFormData] = useState<TaxFormData | null>(null);
   const [activeTab, setActiveTab] = useState("pagar");
   const [autoCalcEnabled, setAutoCalcEnabled] = useState(true);
+  const [showTemplates, setShowTemplates] = useState(true);
   const printRef = useRef<HTMLDivElement>(null);
 
   // Check admin authentication via Supabase
@@ -289,6 +290,17 @@ const TaxFormAdmin = () => {
     return null;
   }
 
+  const handleApplyTemplate = (templateData: TaxFormData) => {
+    if (client) {
+      const newData = {
+        ...templateData,
+        clientId: client.id,
+      };
+      const calculated = calculateTax(newData);
+      setFormData(calculated);
+    }
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <div className="no-print">
@@ -345,6 +357,15 @@ const TaxFormAdmin = () => {
                 <Button onClick={handleExportExcel} variant="outline" size="sm">
                   <FileSpreadsheet className="h-4 w-4 mr-1" /> Excel
                 </Button>
+                <WhatsAppShare client={client} onSharePDF={handleExportPDF} />
+                <Button 
+                  onClick={() => setShowTemplates(!showTemplates)} 
+                  variant="ghost" 
+                  size="sm"
+                  title={showTemplates ? "Hide Templates" : "Show Templates"}
+                >
+                  {showTemplates ? <PanelRightClose className="h-4 w-4" /> : <PanelRightOpen className="h-4 w-4" />}
+                </Button>
               </>
             )}
           </div>
@@ -362,47 +383,62 @@ const TaxFormAdmin = () => {
             </div>
           )}
 
-          {/* Forms - Screen View */}
-          {client && formData ? (
-            <div className="no-print">
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-6 mb-4">
-                  <TabsTrigger value="pagar" className="text-xs">પગાર</TabsTrigger>
-                  <TabsTrigger value="declaration" className="text-xs">Declaration</TabsTrigger>
-                  <TabsTrigger value="formA" className="text-xs">આવકવેરા A</TabsTrigger>
-                  <TabsTrigger value="formB" className="text-xs">આવકવેરા B</TabsTrigger>
-                  <TabsTrigger value="form16a" className="text-xs">Form 16A</TabsTrigger>
-                  <TabsTrigger value="form16b" className="text-xs">Form 16B</TabsTrigger>
-                </TabsList>
+          {/* Main Content with Sidebar */}
+          <div className="flex gap-4">
+            {/* Forms - Screen View */}
+            <div className={`flex-1 ${showTemplates && client ? '' : 'w-full'}`}>
+              {client && formData ? (
+                <div className="no-print">
+                  <Tabs value={activeTab} onValueChange={setActiveTab}>
+                    <TabsList className="grid w-full grid-cols-6 mb-4">
+                      <TabsTrigger value="pagar" className="text-xs">પગાર</TabsTrigger>
+                      <TabsTrigger value="declaration" className="text-xs">Declaration</TabsTrigger>
+                      <TabsTrigger value="formA" className="text-xs">આવકવેરા A</TabsTrigger>
+                      <TabsTrigger value="formB" className="text-xs">આવકવેરા B</TabsTrigger>
+                      <TabsTrigger value="form16a" className="text-xs">Form 16A</TabsTrigger>
+                      <TabsTrigger value="form16b" className="text-xs">Form 16B</TabsTrigger>
+                    </TabsList>
 
-                <div className="border rounded-lg p-4 bg-white overflow-auto max-h-[70vh]">
-                  <TabsContent value="pagar" className="mt-0">
-                    <PagarForm client={client} formData={formData} onChange={handleFormChange} />
-                  </TabsContent>
-                  <TabsContent value="declaration" className="mt-0">
-                    <DeclarationForm client={client} formData={formData} onChange={handleFormChange} />
-                  </TabsContent>
-                  <TabsContent value="formA" className="mt-0">
-                    <AavakVeraFormA client={client} formData={formData} onChange={handleFormChange} />
-                  </TabsContent>
-                  <TabsContent value="formB" className="mt-0">
-                    <AavakVeraFormB client={client} formData={formData} onChange={handleFormChange} />
-                  </TabsContent>
-                  <TabsContent value="form16a" className="mt-0">
-                    <Form16A client={client} formData={formData} onChange={handleFormChange} />
-                  </TabsContent>
-                  <TabsContent value="form16b" className="mt-0">
-                    <Form16B client={client} formData={formData} onChange={handleFormChange} />
-                  </TabsContent>
+                    <div className="border rounded-lg p-4 bg-white dark:bg-card overflow-auto max-h-[70vh]">
+                      <TabsContent value="pagar" className="mt-0">
+                        <PagarForm client={client} formData={formData} onChange={handleFormChange} />
+                      </TabsContent>
+                      <TabsContent value="declaration" className="mt-0">
+                        <DeclarationForm client={client} formData={formData} onChange={handleFormChange} />
+                      </TabsContent>
+                      <TabsContent value="formA" className="mt-0">
+                        <AavakVeraFormA client={client} formData={formData} onChange={handleFormChange} />
+                      </TabsContent>
+                      <TabsContent value="formB" className="mt-0">
+                        <AavakVeraFormB client={client} formData={formData} onChange={handleFormChange} />
+                      </TabsContent>
+                      <TabsContent value="form16a" className="mt-0">
+                        <Form16A client={client} formData={formData} onChange={handleFormChange} />
+                      </TabsContent>
+                      <TabsContent value="form16b" className="mt-0">
+                        <Form16B client={client} formData={formData} onChange={handleFormChange} />
+                      </TabsContent>
+                    </div>
+                  </Tabs>
                 </div>
-              </Tabs>
+              ) : (
+                <div className="text-center py-20 text-muted-foreground no-print">
+                  <FileText className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                  <p className="text-lg">Enter Client ID to load tax forms</p>
+                </div>
+              )}
             </div>
-          ) : (
-            <div className="text-center py-20 text-muted-foreground no-print">
-              <FileText className="h-16 w-16 mx-auto mb-4 opacity-50" />
-              <p className="text-lg">Enter Client ID to load tax forms</p>
-            </div>
-          )}
+
+            {/* Sample Templates Sidebar */}
+            {showTemplates && client && (
+              <div className="w-64 flex-shrink-0 no-print sample-templates-sidebar">
+                <SampleTemplates
+                  currentFormData={formData}
+                  onApplyTemplate={handleApplyTemplate}
+                />
+              </div>
+            )}
+          </div>
 
           {/* Print Area - All Forms for A4 Print */}
           {client && formData && (
@@ -420,7 +456,6 @@ const TaxFormAdmin = () => {
       
       <SideCalculator />
       <TaxChatbot formData={formData} />
-      <WhatsAppButton />
     </div>
   );
 };
