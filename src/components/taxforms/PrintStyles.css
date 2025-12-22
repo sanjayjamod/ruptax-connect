@@ -22,16 +22,20 @@
     color-adjust: exact !important;
   }
 
-  body {
+  html, body {
     background: #fff !important;
     margin: 0 !important;
     padding: 0 !important;
+    height: auto !important;
+    min-height: auto !important;
   }
 
+  /* Hide everything by default except print area */
   .no-print,
   header,
   footer,
   nav,
+  main > div > div:not(.print\\:block),
   .tabs-list,
   button,
   .sidebar-container,
@@ -40,24 +44,46 @@
   [class*="Header"],
   [class*="Footer"],
   [class*="SideCalculator"],
+  [class*="TaxChatbot"],
   [class*="WhatsApp"],
   [class*="Chatbot"],
   [class*="MessageCircle"],
   a[href*="whatsapp"],
   a[href*="wa.me"],
-  .fixed {
+  .fixed,
+  .bg-muted,
+  .mb-4.flex.flex-wrap,
+  .gap-4 > div:first-child {
     display: none !important;
     visibility: hidden !important;
+  }
+
+  /* Show print area */
+  .print\\:block,
+  .hidden.print\\:block {
+    display: block !important;
+    visibility: visible !important;
   }
 
   .print-only {
     display: block !important;
   }
 
-  /* Ensure footer credit shows at bottom of form */
-  .tax-form-print .form-footer-credit {
-    margin-top: auto;
-    padding-top: 4mm;
+  /* Remove min-height from containers */
+  .flex.min-h-screen,
+  .min-h-screen {
+    min-height: auto !important;
+    height: auto !important;
+  }
+
+  /* Remove padding from main */
+  main {
+    padding: 0 !important;
+  }
+
+  main > div {
+    padding: 0 !important;
+    margin: 0 !important;
   }
 
   .tax-form-print {
