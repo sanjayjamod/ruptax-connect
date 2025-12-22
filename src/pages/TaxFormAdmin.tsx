@@ -302,13 +302,24 @@ const TaxFormAdmin = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      <div className="no-print">
+    <>
+      {/* Print Area - All Forms for A4 Print - Outside main for clean printing */}
+      {client && formData && (
+        <div className="hidden print:block print-area" ref={printRef}>
+          <PagarForm client={client} formData={formData} onChange={setFormData} readOnly />
+          <DeclarationForm client={client} formData={formData} onChange={setFormData} readOnly />
+          <AavakVeraFormA client={client} formData={formData} onChange={setFormData} readOnly />
+          <AavakVeraFormB client={client} formData={formData} onChange={setFormData} readOnly />
+          <Form16A client={client} formData={formData} onChange={setFormData} readOnly />
+          <Form16B client={client} formData={formData} onChange={setFormData} readOnly />
+        </div>
+      )}
+
+      <div className="flex min-h-screen flex-col bg-background no-print">
         <Header />
-      </div>
-      
-      <main className="flex-1 py-4">
-        <div className="container mx-auto px-4">
+        
+        <main className="flex-1 py-4">
+          <div className="container mx-auto px-4">
           {/* Top Bar */}
           <div className="mb-4 flex flex-wrap items-center gap-3 no-print">
             <Button variant="outline" size="sm" onClick={() => navigate("/admin-dashboard")}>
@@ -439,24 +450,13 @@ const TaxFormAdmin = () => {
               </div>
             )}
           </div>
-
-          {/* Print Area - All Forms for A4 Print */}
-          {client && formData && (
-            <div className="hidden print:block" ref={printRef}>
-              <PagarForm client={client} formData={formData} onChange={setFormData} readOnly />
-              <DeclarationForm client={client} formData={formData} onChange={setFormData} readOnly />
-              <AavakVeraFormA client={client} formData={formData} onChange={setFormData} readOnly />
-              <AavakVeraFormB client={client} formData={formData} onChange={setFormData} readOnly />
-              <Form16A client={client} formData={formData} onChange={setFormData} readOnly />
-              <Form16B client={client} formData={formData} onChange={setFormData} readOnly />
-            </div>
-          )}
         </div>
       </main>
       
       <SideCalculator />
       <TaxChatbot formData={formData} />
     </div>
+    </>
   );
 };
 
