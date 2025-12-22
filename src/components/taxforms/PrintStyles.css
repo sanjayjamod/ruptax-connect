@@ -1,8 +1,19 @@
 /* Print Styles for Tax Forms - A4 Size */
+/* Default page style - Portrait for most forms */
 @media print {
   @page {
-    size: A4;
+    size: A4 portrait;
     margin: 8mm;
+  }
+
+  /* Pagar form specific - Landscape for wide table */
+  @page pagar {
+    size: A4 landscape;
+    margin: 5mm;
+  }
+
+  #pagar-form {
+    page: pagar;
   }
 
   * {
@@ -23,9 +34,14 @@
   nav,
   .tabs-list,
   button,
+  .sidebar-container,
+  .sample-templates-sidebar,
   [class*="TabsList"],
   [class*="Header"],
-  [class*="Footer"] {
+  [class*="Footer"],
+  [class*="SideCalculator"],
+  [class*="WhatsApp"],
+  [class*="Chatbot"] {
     display: none !important;
   }
 
@@ -153,19 +169,43 @@
     page-break-before: always !important;
   }
 
-  /* Pagar form specific - landscape for wide table */
+  /* Pagar form specific styles - optimized for landscape */
   #pagar-form {
     font-size: 7pt !important;
+    padding: 3mm !important;
   }
 
   #pagar-form table th,
   #pagar-form table td {
-    font-size: 6pt !important;
+    font-size: 6.5pt !important;
     padding: 1px 2px !important;
   }
 
   #pagar-form input {
     font-size: 6pt !important;
+  }
+
+  /* Portrait forms - Declaration, Aavak Vera A/B, Form 16A/B */
+  #declaration-form,
+  #aavak-vera-a-form,
+  #aavak-vera-b-form,
+  #form-16a,
+  #form-16b {
+    font-size: 9pt !important;
+  }
+
+  #declaration-form table th,
+  #declaration-form table td,
+  #aavak-vera-a-form table th,
+  #aavak-vera-a-form table td,
+  #aavak-vera-b-form table th,
+  #aavak-vera-b-form table td,
+  #form-16a table th,
+  #form-16a table td,
+  #form-16b table th,
+  #form-16b table td {
+    font-size: 8pt !important;
+    padding: 2px 4px !important;
   }
 }
 
