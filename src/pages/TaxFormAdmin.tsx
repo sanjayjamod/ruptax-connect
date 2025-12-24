@@ -402,6 +402,15 @@ const TaxFormAdmin = () => {
                   <RefreshCw className={`h-4 w-4 mr-1 ${autoCalcEnabled ? 'animate-spin' : ''}`} /> 
                   Auto
                 </Button>
+                <Button
+                  onClick={() => setIsManualMode(!isManualMode)} 
+                  variant={isManualMode ? "secondary" : "outline"} 
+                  size="sm"
+                  title={isManualMode ? "Manual Mode ON - Can edit auto fields" : "Manual Mode OFF"}
+                  className={isManualMode ? "bg-yellow-500/20 border-yellow-500 text-yellow-700" : ""}
+                >
+                  {isManualMode ? "Manual ON" : "Manual OFF"}
+                </Button>
                 <Button onClick={handleCalculate} variant="secondary" size="sm">
                   <Calculator className="h-4 w-4 mr-1" /> Calculate
                 </Button>
@@ -461,16 +470,16 @@ const TaxFormAdmin = () => {
 
                     <div className="border rounded-lg p-4 bg-white dark:bg-card overflow-auto max-h-[70vh]">
                       <TabsContent value="pagar" className="mt-0">
-                        <PagarForm client={client} formData={formData} onChange={handleFormChange} />
+                        <PagarForm client={client} formData={formData} onChange={handleFormChange} isManualMode={isManualMode} />
                       </TabsContent>
                       <TabsContent value="declaration" className="mt-0">
-                        <DeclarationForm client={client} formData={formData} onChange={handleFormChange} />
+                        <DeclarationForm client={client} formData={formData} onChange={handleFormChange} isManualMode={isManualMode} />
                       </TabsContent>
                       <TabsContent value="formA" className="mt-0">
-                        <AavakVeraFormA client={client} formData={formData} onChange={handleFormChange} />
+                        <AavakVeraFormA client={client} formData={formData} onChange={handleFormChange} isManualMode={isManualMode} />
                       </TabsContent>
                       <TabsContent value="formB" className="mt-0">
-                        <AavakVeraFormB client={client} formData={formData} onChange={handleFormChange} />
+                        <AavakVeraFormB client={client} formData={formData} onChange={handleFormChange} isManualMode={isManualMode} />
                       </TabsContent>
                       <TabsContent value="form16a" className="mt-0">
                         <Form16A client={client} formData={formData} onChange={handleFormChange} />
