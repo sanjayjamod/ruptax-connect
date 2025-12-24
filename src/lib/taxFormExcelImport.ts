@@ -266,15 +266,17 @@ const parseDeclarationSheet = (sheets: ExcelSheetData): TaxFormData['declaration
     totalDeduction: 0,
   };
   
-  // Parse declaration values
-  const incomeMapping: { [key: string]: keyof typeof declaration } = {
+  // Parse declaration values - only numeric fields
+  type NumericDeclarationKeys = 'bankInterest' | 'nscInterest' | 'examIncome' | 'fdInterest' | 'otherIncome' | 'totalIncome' | 'licPremium' | 'postInsurance' | 'ppf' | 'nscInvestment' | 'housingLoanInterest' | 'housingLoanPrincipal' | 'educationFee' | 'sbiLife' | 'sukanyaSamridhi' | 'medicalInsurance' | 'fiveYearFD' | 'otherDeduction' | 'totalDeduction';
+  
+  const incomeMapping: { [key: string]: NumericDeclarationKeys } = {
     'બેન્ક વ્યાજ': 'bankInterest',
     'N.S.C. શ્રેણી': 'nscInterest',
     'પરીક્ષાનું મહેનતાણું': 'examIncome',
     'ફિકસ ડિપૉજીટ': 'fdInterest',
   };
   
-  const deductionMapping: { [key: string]: keyof typeof declaration } = {
+  const deductionMapping: { [key: string]: NumericDeclarationKeys } = {
     'જીવન વિમા': 'licPremium',
     'પોસ્ટ વિમા': 'postInsurance',
     'P.P.F': 'ppf',

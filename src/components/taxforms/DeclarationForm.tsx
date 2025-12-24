@@ -28,6 +28,13 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false, isManua
     onChange({ ...formData, declarationData: newData });
   };
 
+  const updateTextField = (field: 'employeeSignatureLabel' | 'designationLabel' | 'placeLabel' | 'institutionHeadLabel' | 'stampLabel', value: string) => {
+    onChange({
+      ...formData,
+      declarationData: { ...formData.declarationData, [field]: value }
+    });
+  };
+
   // Manual input cell - yellow background
   const renderManualInputCell = (field: keyof typeof formData.declarationData) => (
     <td className="amount-cell">
@@ -223,18 +230,75 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false, isManua
         </tbody>
       </table>
 
-      {/* Signature Section - Paragraph Format */}
+      {/* Signature Section - Editable Paragraph Format */}
       <div className="mt-8 text-[11px] leading-relaxed">
         <div className="flex justify-between">
           <div className="text-left">
-            <p className="font-bold mb-4">કર્મચારીની સહી</p>
-            <p className="mb-1">હોદ્દો: {client.designationGujarati || client.designation || 'શિક્ષક'}</p>
-            <p className="mb-1">સ્થળ: {client.schoolNameGujarati || client.schoolName || '-'}</p>
+            {readOnly ? (
+              <p className="font-bold mb-4">{formData.declarationData.employeeSignatureLabel || 'કર્મચારીની સહી'}</p>
+            ) : (
+              <input
+                type="text"
+                defaultValue={formData.declarationData.employeeSignatureLabel || 'કર્મચારીની સહી'}
+                onBlur={(e) => updateTextField('employeeSignatureLabel', e.target.value)}
+                className="font-bold mb-4 border-b border-dashed border-gray-400 bg-yellow-50 px-1 focus:outline-none focus:bg-yellow-100 print:bg-transparent print:border-0"
+              />
+            )}
+            <p className="mb-1">
+              {readOnly ? (
+                <span>{formData.declarationData.designationLabel || 'હોદ્દો'}: {client.designationGujarati || client.designation || 'શિક્ષક'}</span>
+              ) : (
+                <>
+                  <input
+                    type="text"
+                    defaultValue={formData.declarationData.designationLabel || 'હોદ્દો'}
+                    onBlur={(e) => updateTextField('designationLabel', e.target.value)}
+                    className="border-b border-dashed border-gray-400 bg-yellow-50 px-1 w-16 focus:outline-none focus:bg-yellow-100 print:bg-transparent print:border-0"
+                  />
+                  : {client.designationGujarati || client.designation || 'શિક્ષક'}
+                </>
+              )}
+            </p>
+            <p className="mb-1">
+              {readOnly ? (
+                <span>{formData.declarationData.placeLabel || 'સ્થળ'}: {client.schoolNameGujarati || client.schoolName || '-'}</span>
+              ) : (
+                <>
+                  <input
+                    type="text"
+                    defaultValue={formData.declarationData.placeLabel || 'સ્થળ'}
+                    onBlur={(e) => updateTextField('placeLabel', e.target.value)}
+                    className="border-b border-dashed border-gray-400 bg-yellow-50 px-1 w-12 focus:outline-none focus:bg-yellow-100 print:bg-transparent print:border-0"
+                  />
+                  : {client.schoolNameGujarati || client.schoolName || '-'}
+                </>
+              )}
+            </p>
             <p>તારીખ: _______________</p>
           </div>
           <div className="text-right">
-            <p className="font-bold mb-4">સંસ્થાના વડાની સહી</p>
-            <p className="mb-1">સિક્કો</p>
+            {readOnly ? (
+              <p className="font-bold mb-4">{formData.declarationData.institutionHeadLabel || 'સંસ્થાના વડાની સહી'}</p>
+            ) : (
+              <input
+                type="text"
+                defaultValue={formData.declarationData.institutionHeadLabel || 'સંસ્થાના વડાની સહી'}
+                onBlur={(e) => updateTextField('institutionHeadLabel', e.target.value)}
+                className="font-bold mb-4 border-b border-dashed border-gray-400 bg-yellow-50 px-1 text-right focus:outline-none focus:bg-yellow-100 print:bg-transparent print:border-0"
+              />
+            )}
+            <p className="mb-1">
+              {readOnly ? (
+                <span>{formData.declarationData.stampLabel || 'સિક્કો'}</span>
+              ) : (
+                <input
+                  type="text"
+                  defaultValue={formData.declarationData.stampLabel || 'સિક્કો'}
+                  onBlur={(e) => updateTextField('stampLabel', e.target.value)}
+                  className="border-b border-dashed border-gray-400 bg-yellow-50 px-1 w-16 text-right focus:outline-none focus:bg-yellow-100 print:bg-transparent print:border-0"
+                />
+              )}
+            </p>
             <p>તારીખ: _______________</p>
           </div>
         </div>
