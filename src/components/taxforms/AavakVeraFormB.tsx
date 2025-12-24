@@ -43,10 +43,10 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false, isManual
   return (
     <div className="tax-form-container tax-form-print page-break aavak-vera-form" id="aavak-vera-form-b">
       {/* Header */}
-      <table className="w-full border-collapse" style={{ fontSize: '9pt' }}>
+      <table className="w-full border-collapse" style={{ fontSize: '7pt' }}>
         <tbody>
           <tr>
-            <td colSpan={8} className="text-center font-bold text-base border border-black py-1">
+            <td colSpan={8} className="text-center font-bold border border-black py-0.5" style={{ fontSize: '10pt' }}>
               આવક વેરા ગણતરી ફોર્મ
             </td>
           </tr>
@@ -54,7 +54,7 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false, isManual
       </table>
 
       {/* Section D - Deductions */}
-      <table className="w-full border-collapse mt-1" style={{ fontSize: '8pt' }}>
+      <table className="w-full border-collapse" style={{ fontSize: '6.5pt' }}>
         <tbody>
           <tr>
             <td colSpan={8} className="border border-black px-1 py-0.5 font-bold bg-gray-100">
@@ -232,7 +232,7 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false, isManual
       </table>
 
       {/* Tax Slabs Table */}
-      <table className="w-full border-collapse mt-1" style={{ fontSize: '7.5pt' }}>
+      <table className="w-full border-collapse" style={{ fontSize: '6pt' }}>
         <tbody>
           <tr>
             <td className="border border-black px-1 py-0.5">1</td>
@@ -294,7 +294,7 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false, isManual
       </table>
 
       {/* Tax Summary */}
-      <table className="w-full border-collapse mt-1" style={{ fontSize: '8pt' }}>
+      <table className="w-full border-collapse" style={{ fontSize: '6.5pt' }}>
         <tbody>
           <tr>
             <td colSpan={4} className="border border-black px-1 py-0.5 font-bold bg-gray-100">TOTAL AMOUNT OF TAX AS PER DIVISION:</td>
@@ -376,7 +376,7 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false, isManual
       </table>
 
       {/* Certification */}
-      <table className="w-full border-collapse mt-1" style={{ fontSize: '7.5pt' }}>
+      <table className="w-full border-collapse" style={{ fontSize: '6pt' }}>
         <tbody>
           <tr>
             <td colSpan={8} className="border border-black px-1 py-0.5 font-bold">કર્મચારી ( શિક્ષક ) બાહેંધરી</td>
@@ -408,7 +408,7 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false, isManual
       </table>
 
       {/* Footer */}
-      <div className="form-footer text-center mt-1" style={{ fontSize: '7pt' }}>
+      <div className="form-footer text-center" style={{ fontSize: '5pt', marginTop: '1mm' }}>
         Developed by - Smart Computer - 9924640689 ,9574031243
       </div>
     </div>
