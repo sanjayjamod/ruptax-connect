@@ -1,5 +1,6 @@
 import { Client } from "@/types/client";
 import { TaxFormData, MonthlySalary } from "@/types/taxForm";
+import { useState } from "react";
 import "./PrintStyles.css";
 
 interface PagarFormProps {
@@ -13,30 +14,73 @@ interface PagarFormProps {
 const months = ['apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec', 'jan', 'feb', 'mar'] as const;
 const monthNames = ['એપ્રિલ', 'મે', 'જુન', 'જુલાઇ', 'ઑગસ્ટ', 'સપ્ટેમ્બર', 'ઓક્ટોબર', 'નવેમ્બર', 'ડિસેમ્બર', 'જાન્યુઆરી', 'ફેબ્રુઆરી', 'માર્ચ'];
 
-// Fields that are manually filled (yellow highlight)
-const manualFields: (keyof MonthlySalary)[] = [
+// First cell (April) - manual entry, yellow highlight - value copies to other months
+const firstCellManualFields: (keyof MonthlySalary)[] = [
   'basic', 'gradePay', 'da', 'hra', 'medical', 'disabilityAllowance', 
-  'principalAllowance', 'daArrears', 'salaryArrears', 'otherIncome1', 'otherIncome2',
-  'gpf', 'cpf', 'professionTax', 'society', 'groupInsurance', 'incomeTax'
+  'principalAllowance', 'gpf', 'cpf', 'professionTax', 'groupInsurance'
 ];
 
-// Fields that are auto-calculated (formula)
+// Fields where each month has independent manual entry (yellow highlight)
+const independentManualFields: (keyof MonthlySalary)[] = [
+  'daArrears', 'salaryArrears', 'otherIncome1', 'otherIncome2', 'society', 'incomeTax'
+];
+
+// Fields that are auto-calculated (formula) - gray/blue
 const autoFields: (keyof MonthlySalary)[] = ['totalSalary', 'totalDeduction', 'netPay'];
 
 const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode = false }: PagarFormProps) => {
-  const updateMonthField = (month: typeof months[number], field: keyof MonthlySalary, value: number) => {
+  // Track which months have been manually edited (to break formula chain)
+  const [manualOverrides, setManualOverrides] = useState<Record<string, Set<typeof months[number]>>>({});
+
+  const hasManualOverride = (field: keyof MonthlySalary, month: typeof months[number]): boolean => {
+    return manualOverrides[field]?.has(month) || false;
+  };
+
+  const calculateMonthTotals = (m: MonthlySalary): MonthlySalary => {
+    const updated = { ...m };
+    updated.totalSalary = (m.basic || 0) + (m.gradePay || 0) + (m.da || 0) + (m.hra || 0) + (m.medical || 0) + 
+                    (m.disabilityAllowance || 0) + (m.principalAllowance || 0) + (m.daArrears || 0) + 
+                    (m.salaryArrears || 0) + (m.otherIncome1 || 0) + (m.otherIncome2 || 0);
+    updated.totalDeduction = (m.gpf || 0) + (m.cpf || 0) + (m.professionTax || 0) + (m.society || 0) + 
+                       (m.groupInsurance || 0) + (m.incomeTax || 0);
+    updated.netPay = updated.totalSalary - updated.totalDeduction;
+    return updated;
+  };
+
+  // Update field for a single month (for independent fields or manual overrides)
+  const updateMonthField = (month: typeof months[number], field: keyof MonthlySalary, value: number, markAsOverride = false) => {
     const newMonths = { ...formData.salaryData.months };
-    newMonths[month] = { ...newMonths[month], [field]: value };
     
-    // Calculate totals for the month (only if not in manual mode or if it's an income/deduction field)
+    // If it's a first-cell-manual field and it's the April cell OR in manual mode
+    if (firstCellManualFields.includes(field) && (month === 'apr' || isManualMode)) {
+      if (month === 'apr' && !isManualMode) {
+        // April value - copy to all subsequent months that don't have manual overrides
+        months.forEach((m) => {
+          if (!hasManualOverride(field, m)) {
+            newMonths[m] = { ...newMonths[m], [field]: value };
+          }
+        });
+      } else {
+        // Manual override mode - only update this specific month
+        newMonths[month] = { ...newMonths[month], [field]: value };
+        if (markAsOverride && month !== 'apr') {
+          setManualOverrides(prev => {
+            const fieldSet = new Set(prev[field] || []);
+            fieldSet.add(month);
+            return { ...prev, [field]: fieldSet };
+          });
+        }
+      }
+    } else {
+      // Independent field or other scenarios - just update this month
+      newMonths[month] = { ...newMonths[month], [field]: value };
+    }
+    
+    // Calculate totals for all affected months
     if (!isManualMode || !autoFields.includes(field)) {
-      const m = newMonths[month];
-      m.totalSalary = (m.basic || 0) + (m.gradePay || 0) + (m.da || 0) + (m.hra || 0) + (m.medical || 0) + 
-                      (m.disabilityAllowance || 0) + (m.principalAllowance || 0) + (m.daArrears || 0) + 
-                      (m.salaryArrears || 0) + (m.otherIncome1 || 0) + (m.otherIncome2 || 0);
-      m.totalDeduction = (m.gpf || 0) + (m.cpf || 0) + (m.professionTax || 0) + (m.society || 0) + 
-                         (m.groupInsurance || 0) + (m.incomeTax || 0);
-      m.netPay = m.totalSalary - m.totalDeduction;
+      months.forEach((m) => {
+        newMonths[m] = calculateMonthTotals(newMonths[m]);
+      });
     }
 
     onChange({
@@ -49,7 +93,51 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
     return months.reduce((sum, month) => sum + (Number(formData.salaryData.months[month][field]) || 0), 0);
   };
 
-  // Manual input cell - yellow background (editable by user)
+  // First cell (April) - yellow with special icon, value copies to other months
+  const renderFirstCellInput = (field: keyof MonthlySalary) => (
+    <td key={`apr-${field}`} className="amount-cell">
+      {readOnly ? (
+        <span>{formData.salaryData.months.apr[field] || ''}</span>
+      ) : (
+        <input
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          value={formData.salaryData.months.apr[field] || ''}
+          onChange={(e) => updateMonthField('apr', field, Number(e.target.value) || 0)}
+          className="w-full h-5 text-[9px] text-right p-0.5 border-0 bg-yellow-200 focus:outline-none focus:bg-yellow-300 print:bg-transparent font-semibold"
+          title="Enter value here - copies to all months / અહીં વેલ્યુ દાખલ કરો - બધા મહિનામાં કોપી થશે"
+        />
+      )}
+    </td>
+  );
+
+  // Formula cell - shows copied value from April (gray background, non-editable unless manual mode)
+  const renderFormulaCellInput = (month: typeof months[number], field: keyof MonthlySalary) => (
+    <td key={`${month}-${field}`} className="amount-cell">
+      {readOnly ? (
+        <span>{formData.salaryData.months[month][field] || ''}</span>
+      ) : isManualMode ? (
+        <input
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          value={formData.salaryData.months[month][field] || ''}
+          onChange={(e) => updateMonthField(month, field, Number(e.target.value) || 0, true)}
+          className={`w-full h-5 text-[9px] text-right p-0.5 border-0 focus:outline-none print:bg-transparent ${
+            hasManualOverride(field, month) ? 'bg-orange-100 focus:bg-orange-200' : 'bg-blue-50 focus:bg-blue-100'
+          }`}
+          title={hasManualOverride(field, month) ? "Manual Override" : "Formula: =April / ફોર્મુલા: =એપ્રિલ (Manual Mode ON)"}
+        />
+      ) : (
+        <span className="text-gray-600 bg-gray-100 block w-full h-5 text-[9px] text-right p-0.5 print:bg-transparent" title="Formula: =April / ફોર્મુલા: =એપ્રિલ">
+          {formData.salaryData.months[month][field] || ''}
+        </span>
+      )}
+    </td>
+  );
+
+  // Independent manual input cell - yellow background (editable by user, each month separate)
   const renderManualInputCell = (month: typeof months[number], field: keyof MonthlySalary) => (
     <td key={`${month}-${field}`} className="amount-cell">
       {readOnly ? (
@@ -59,8 +147,8 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
           type="text"
           inputMode="numeric"
           pattern="[0-9]*"
-          defaultValue={formData.salaryData.months[month][field] || ''}
-          onBlur={(e) => updateMonthField(month, field, Number(e.target.value) || 0)}
+          value={formData.salaryData.months[month][field] || ''}
+          onChange={(e) => updateMonthField(month, field, Number(e.target.value) || 0)}
           className="w-full h-5 text-[9px] text-right p-0.5 border-0 bg-yellow-100 focus:outline-none focus:bg-yellow-200 print:bg-transparent"
           title="Manual Input / હાથે ભરો"
         />
@@ -76,8 +164,8 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
           type="text"
           inputMode="numeric"
           pattern="[0-9]*"
-          defaultValue={formData.salaryData.months[month][field] || ''}
-          onBlur={(e) => updateMonthField(month, field, Number(e.target.value) || 0)}
+          value={formData.salaryData.months[month][field] || ''}
+          onChange={(e) => updateMonthField(month, field, Number(e.target.value) || 0)}
           className="w-full h-5 text-[9px] text-right p-0.5 border-0 bg-blue-50 focus:outline-none focus:bg-blue-100 print:bg-transparent"
           title="Manual Override / હાથે ભરો (Auto mode OFF)"
         />
@@ -98,6 +186,29 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
     </td>
   );
 
+  // Render a row with first-cell formula pattern
+  const renderFormulaCopiedRow = (rowNum: number, label: string, field: keyof MonthlySalary) => (
+    <tr>
+      <td className="text-center">{rowNum}</td>
+      <td className="bg-yellow-50 print:bg-transparent">{label}</td>
+      {renderFirstCellInput(field)}
+      {months.slice(1).map(month => renderFormulaCellInput(month, field))}
+      {renderTotalCell(field)}
+      <td></td>
+    </tr>
+  );
+
+  // Render a row with independent manual entry for each month
+  const renderIndependentRow = (rowNum: number, label: string, field: keyof MonthlySalary) => (
+    <tr>
+      <td className="text-center">{rowNum}</td>
+      <td className="bg-yellow-50 print:bg-transparent">{label}</td>
+      {months.map(month => renderManualInputCell(month, field))}
+      {renderTotalCell(field)}
+      <td></td>
+    </tr>
+  );
+
   return (
     <div className="tax-form-container tax-form-print" id="pagar-form">
       {/* Header */}
@@ -107,19 +218,26 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
       
       {/* Mode Indicator (only in edit mode) */}
       {!readOnly && (
-        <div className="flex items-center gap-4 mb-2 text-[10px] no-print">
+        <div className="flex flex-wrap items-center gap-4 mb-2 text-[10px] no-print">
+          <div className="flex items-center gap-1">
+            <span className="inline-block w-4 h-4 bg-yellow-200 border border-yellow-400 font-bold"></span>
+            <span>એપ્રિલ (બધા મહિનામાં કોપી થશે)</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="inline-block w-4 h-4 bg-gray-100 border border-gray-300"></span>
+            <span className="text-gray-600">Formula =એપ્રિલ</span>
+          </div>
           <div className="flex items-center gap-1">
             <span className="inline-block w-4 h-4 bg-yellow-100 border border-yellow-300"></span>
             <span>Manual Input / હાથે ભરો</span>
           </div>
           <div className="flex items-center gap-1">
-            <span className="inline-block w-4 h-4 bg-gray-50 border border-gray-300"></span>
-            <span className="text-blue-800">Auto Calculated / ઓટો ગણતરી</span>
+            <span className="inline-block w-4 h-4 bg-gray-50 border border-blue-300"></span>
+            <span className="text-blue-800">Auto Calculated / ઓટો</span>
           </div>
           {isManualMode && (
-            <div className="flex items-center gap-1">
-              <span className="inline-block w-4 h-4 bg-blue-50 border border-blue-300"></span>
-              <span className="text-blue-600">Manual Override Enabled</span>
+            <div className="flex items-center gap-1 bg-blue-100 px-2 py-0.5 rounded">
+              <span className="text-blue-700 font-semibold">🔓 Manual Override ON - બધા ફીલ્ડ એડિટ થાય છે</span>
             </div>
           )}
         </div>
@@ -167,84 +285,20 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
           </tr>
         </thead>
         <tbody>
-          {/* Income Rows - Manual Input (Yellow) */}
-          <tr>
-            <td className="text-center">1</td>
-            <td className="bg-yellow-50 print:bg-transparent">બેઝિક પગાર</td>
-            {months.map(month => renderManualInputCell(month, "basic"))}
-            {renderTotalCell('basic')}
-            <td></td>
-          </tr>
-          <tr>
-            <td className="text-center">2</td>
-            <td className="bg-yellow-50 print:bg-transparent">ગ્રેડ પે</td>
-            {months.map(month => renderManualInputCell(month, "gradePay"))}
-            {renderTotalCell('gradePay')}
-            <td></td>
-          </tr>
-          <tr>
-            <td className="text-center">3</td>
-            <td className="bg-yellow-50 print:bg-transparent">મોંઘવારી ભથ્થું</td>
-            {months.map(month => renderManualInputCell(month, "da"))}
-            {renderTotalCell('da')}
-            <td></td>
-          </tr>
-          <tr>
-            <td className="text-center">4</td>
-            <td className="bg-yellow-50 print:bg-transparent">ઘરભાડા ભથ્થું</td>
-            {months.map(month => renderManualInputCell(month, "hra"))}
-            {renderTotalCell('hra')}
-            <td></td>
-          </tr>
-          <tr>
-            <td className="text-center">6</td>
-            <td className="bg-yellow-50 print:bg-transparent">મેડીકલ ભથ્થું</td>
-            {months.map(month => renderManualInputCell(month, "medical"))}
-            {renderTotalCell('medical')}
-            <td></td>
-          </tr>
-          <tr>
-            <td className="text-center">7</td>
-            <td className="bg-yellow-50 print:bg-transparent">અપંગ એલાઉન્સ</td>
-            {months.map(month => renderManualInputCell(month, "disabilityAllowance"))}
-            {renderTotalCell('disabilityAllowance')}
-            <td></td>
-          </tr>
-          <tr>
-            <td className="text-center">8</td>
-            <td className="bg-yellow-50 print:bg-transparent">આચાર્ય એલાઉન્સ</td>
-            {months.map(month => renderManualInputCell(month, "principalAllowance"))}
-            {renderTotalCell('principalAllowance')}
-            <td></td>
-          </tr>
-          <tr>
-            <td className="text-center">9</td>
-            <td className="bg-yellow-50 print:bg-transparent">મોંઘવારી એરિયર્સ</td>
-            {months.map(month => renderManualInputCell(month, "daArrears"))}
-            {renderTotalCell('daArrears')}
-            <td></td>
-          </tr>
-          <tr>
-            <td className="text-center">10</td>
-            <td className="bg-yellow-50 print:bg-transparent">પગાર એરિયર્સ</td>
-            {months.map(month => renderManualInputCell(month, "salaryArrears"))}
-            {renderTotalCell('salaryArrears')}
-            <td></td>
-          </tr>
-          <tr>
-            <td className="text-center">11</td>
-            <td className="bg-yellow-50 print:bg-transparent">અન્ય આવક 1</td>
-            {months.map(month => renderManualInputCell(month, "otherIncome1"))}
-            {renderTotalCell('otherIncome1')}
-            <td></td>
-          </tr>
-          <tr>
-            <td className="text-center">12</td>
-            <td className="bg-yellow-50 print:bg-transparent">અન્ય આવક 2</td>
-            {months.map(month => renderManualInputCell(month, "otherIncome2"))}
-            {renderTotalCell('otherIncome2')}
-            <td></td>
-          </tr>
+          {/* Income Rows - Formula Copied (April value copies to all months) */}
+          {renderFormulaCopiedRow(1, "બેઝિક પગાર", "basic")}
+          {renderFormulaCopiedRow(2, "ગ્રેડ પે", "gradePay")}
+          {renderFormulaCopiedRow(3, "મોંઘવારી ભથ્થું", "da")}
+          {renderFormulaCopiedRow(4, "ઘરભાડા ભથ્થું", "hra")}
+          {renderFormulaCopiedRow(6, "મેડીકલ ભથ્થું", "medical")}
+          {renderFormulaCopiedRow(7, "અપંગ એલાઉન્સ", "disabilityAllowance")}
+          {renderFormulaCopiedRow(8, "આચાર્ય એલાઉન્સ", "principalAllowance")}
+          
+          {/* Independent Manual Entry Rows (each month separate) */}
+          {renderIndependentRow(9, "મોંઘવારી એરિયર્સ", "daArrears")}
+          {renderIndependentRow(10, "પગાર એરિયર્સ", "salaryArrears")}
+          {renderIndependentRow(11, "અન્ય આવક 1", "otherIncome1")}
+          {renderIndependentRow(12, "અન્ય આવક 2", "otherIncome2")}
           
           {/* Total Salary Row - Auto Calculated (Gray/Blue) */}
           <tr className="total-row">
@@ -260,49 +314,17 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
             <td colSpan={16} className="text-center font-bold">કપાત</td>
           </tr>
 
-          {/* Deduction Rows - Manual Input (Yellow) */}
-          <tr>
-            <td className="text-center">14</td>
-            <td className="bg-yellow-50 print:bg-transparent">G.P.F.</td>
-            {months.map(month => renderManualInputCell(month, "gpf"))}
-            {renderTotalCell('gpf')}
-            <td></td>
-          </tr>
-          <tr>
-            <td className="text-center">15</td>
-            <td className="bg-yellow-50 print:bg-transparent">C.P.F.</td>
-            {months.map(month => renderManualInputCell(month, "cpf"))}
-            {renderTotalCell('cpf')}
-            <td></td>
-          </tr>
-          <tr>
-            <td className="text-center">16</td>
-            <td className="bg-yellow-50 print:bg-transparent">વ્યવસાય વેરો</td>
-            {months.map(month => renderManualInputCell(month, "professionTax"))}
-            {renderTotalCell('professionTax')}
-            <td></td>
-          </tr>
-          <tr>
-            <td className="text-center">17</td>
-            <td className="bg-yellow-50 print:bg-transparent">મંડળી</td>
-            {months.map(month => renderManualInputCell(month, "society"))}
-            {renderTotalCell('society')}
-            <td></td>
-          </tr>
-          <tr>
-            <td className="text-center">18</td>
-            <td className="bg-yellow-50 print:bg-transparent">જૂથ વિમા પ્રિમિયમ</td>
-            {months.map(month => renderManualInputCell(month, "groupInsurance"))}
-            {renderTotalCell('groupInsurance')}
-            <td></td>
-          </tr>
-          <tr>
-            <td className="text-center">19</td>
-            <td className="bg-yellow-50 print:bg-transparent">ઇન્કમટેક્ષ કપાત</td>
-            {months.map(month => renderManualInputCell(month, "incomeTax"))}
-            {renderTotalCell('incomeTax')}
-            <td></td>
-          </tr>
+          {/* Deduction Rows - Formula Copied (April value copies to all months) */}
+          {renderFormulaCopiedRow(14, "G.P.F.", "gpf")}
+          {renderFormulaCopiedRow(15, "C.P.F.", "cpf")}
+          {renderFormulaCopiedRow(16, "વ્યવસાય વેરો", "professionTax")}
+          
+          {/* Independent Deduction Rows */}
+          {renderIndependentRow(17, "મંડળી", "society")}
+          
+          {renderFormulaCopiedRow(18, "જૂથ વિમા પ્રિમિયમ", "groupInsurance")}
+          
+          {renderIndependentRow(19, "ઇન્કમટેક્ષ કપાત", "incomeTax")}
           
           {/* Total Deduction Row - Auto Calculated */}
           <tr className="total-row">
