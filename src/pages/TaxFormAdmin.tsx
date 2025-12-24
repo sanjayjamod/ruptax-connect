@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/Header";
 import { getClientById, updateClientStatus } from "@/lib/clientStorage";
 import { getOrCreateTaxForm, saveTaxForm, calculateTax } from "@/lib/taxFormStorage";
+import { getEmptyTaxFormData } from "@/types/taxForm";
 import { fillSampleDataForClient } from "@/lib/sampleTaxData";
 import { importTaxFormFromExcel } from "@/lib/taxFormExcelImport";
 import { Client } from "@/types/client";
@@ -16,7 +17,7 @@ import AavakVeraFormA from "@/components/taxforms/AavakVeraFormA";
 import AavakVeraFormB from "@/components/taxforms/AavakVeraFormB";
 import Form16A from "@/components/taxforms/Form16A";
 import Form16B from "@/components/taxforms/Form16B";
-import { Search, Printer, FileText, FileSpreadsheet, Save, ArrowLeft, Calculator, RefreshCw, Database, Loader2, PanelRightOpen, PanelRightClose, Upload } from "lucide-react";
+import { Search, Printer, FileText, FileSpreadsheet, Save, ArrowLeft, Calculator, RefreshCw, Database, Loader2, PanelRightOpen, PanelRightClose, Upload, RotateCcw } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import TaxChatbot from "@/components/TaxChatbot";
 import SideCalculator from "@/components/admin/SideCalculator";
@@ -127,6 +128,17 @@ const TaxFormAdmin = () => {
       toast({ 
         title: "Sample Data Loaded", 
         description: `Excel data filled for ${client.name}. Click Save to persist.` 
+      });
+    }
+  };
+
+  const handleResetData = () => {
+    if (client) {
+      const emptyData = getEmptyTaxFormData(client.id);
+      setFormData(emptyData);
+      toast({ 
+        title: "Data Reset", 
+        description: "All form data has been cleared. Click Save to persist." 
       });
     }
   };
@@ -413,6 +425,14 @@ const TaxFormAdmin = () => {
                 </Button>
                 <Button onClick={handleCalculate} variant="secondary" size="sm">
                   <Calculator className="h-4 w-4 mr-1" /> Calculate
+                </Button>
+                <Button 
+                  onClick={handleResetData} 
+                  variant="destructive" 
+                  size="sm"
+                  title="Reset all form data / ફોર્મ ડેટા રીસેટ"
+                >
+                  <RotateCcw className="h-4 w-4 mr-1" /> Reset
                 </Button>
                 <Button onClick={handleSave} size="sm">
                   <Save className="h-4 w-4 mr-1" /> Save
