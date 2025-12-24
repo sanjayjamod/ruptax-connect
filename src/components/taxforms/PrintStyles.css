@@ -227,12 +227,13 @@
   #form-16a,
   #form-16b {
     width: 194mm !important; /* 210mm - 16mm margins */
-    min-height: 275mm !important; /* 297mm - 22mm margins */
+    min-height: 277mm !important; /* 297mm - 20mm margins */
     max-width: 194mm !important;
-    padding: 3mm !important;
-    font-size: 9pt !important;
+    padding: 4mm !important;
+    font-size: 10pt !important;
     display: flex !important;
     flex-direction: column !important;
+    box-sizing: border-box !important;
   }
 
   /* Portrait Form Titles */
@@ -241,11 +242,12 @@
   #aavak-vera-form-b > .text-center.font-bold,
   #form-16a > .text-center.font-bold,
   #form-16b > .text-center.font-bold {
-    font-size: 11pt !important;
-    margin-bottom: 2mm !important;
+    font-size: 14pt !important;
+    margin-bottom: 3mm !important;
+    font-weight: bold !important;
   }
 
-  /* Portrait Form Tables */
+  /* Portrait Form Tables - Full width with clear borders */
   #declaration-form table,
   #aavak-vera-form-a table,
   #aavak-vera-form-b table,
@@ -253,7 +255,8 @@
   #form-16b table {
     width: 100% !important;
     border-collapse: collapse !important;
-    margin-bottom: 1.5mm !important;
+    margin-bottom: 2mm !important;
+    border: 1pt solid #000 !important;
   }
 
   #declaration-form table th,
@@ -266,10 +269,10 @@
   #form-16a table td,
   #form-16b table th,
   #form-16b table td {
-    border: 0.3pt solid #000 !important;
-    font-size: 8pt !important;
-    padding: 1.5px 3px !important;
-    line-height: 1.2 !important;
+    border: 0.5pt solid #000 !important;
+    font-size: 9pt !important;
+    padding: 2mm 3mm !important;
+    line-height: 1.3 !important;
     vertical-align: middle !important;
   }
 
@@ -278,30 +281,62 @@
   #aavak-vera-form-b input,
   #form-16a input,
   #form-16b input {
-    font-size: 8pt !important;
+    font-size: 9pt !important;
     border: none !important;
     background: transparent !important;
     padding: 0 !important;
     margin: 0 !important;
   }
 
-  /* Header rows styling */
+  /* Header rows styling - Dark background */
   .header-row td,
   .header-row th {
     background-color: #d0d0d0 !important;
     font-weight: bold !important;
+    border: 0.5pt solid #000 !important;
   }
 
   /* Total rows styling */
   .total-row td {
     background-color: #f0f0f0 !important;
     font-weight: bold !important;
+    border: 0.5pt solid #000 !important;
   }
 
-  /* Amount cells */
+  /* Amount cells - Right aligned with clear borders */
   .amount-cell {
     text-align: right !important;
     font-family: 'Courier New', monospace !important;
+    border: 0.5pt solid #000 !important;
+    min-width: 20mm !important;
+  }
+
+  /* Section titles - Dark header bars */
+  #declaration-form .bg-gray-800,
+  #aavak-vera-form-a .bg-gray-800,
+  #aavak-vera-form-b .bg-gray-800,
+  #form-16a .bg-gray-800,
+  #form-16b .bg-gray-800,
+  #declaration-form .bg-gray-200,
+  #aavak-vera-form-a .bg-gray-200,
+  #aavak-vera-form-b .bg-gray-200,
+  #form-16a .bg-gray-200,
+  #form-16b .bg-gray-200 {
+    font-size: 10pt !important;
+    font-weight: bold !important;
+    padding: 2mm 3mm !important;
+    margin: 2mm 0 !important;
+    border: 0.5pt solid #000 !important;
+  }
+
+  .bg-gray-800 {
+    background: #333 !important;
+    color: #fff !important;
+  }
+
+  .bg-gray-200 {
+    background: #e0e0e0 !important;
+    color: #000 !important;
   }
 
   /* ========================================
@@ -309,11 +344,11 @@
      ======================================== */
   .form-footer {
     display: block !important;
-    font-size: 7pt !important;
+    font-size: 8pt !important;
     text-align: center !important;
     margin-top: auto !important;
-    padding-top: 2mm !important;
-    border-top: 0.3pt dashed #666 !important;
+    padding-top: 3mm !important;
+    border-top: 0.5pt dashed #666 !important;
     color: #333 !important;
     position: relative !important;
     bottom: 0 !important;
@@ -323,13 +358,13 @@
   .signature-box {
     display: flex !important;
     justify-content: space-between !important;
-    margin-top: 3mm !important;
+    margin-top: 4mm !important;
   }
 
   .signature-line {
-    border-top: 0.3pt solid #000 !important;
-    margin-top: 8mm !important;
-    padding-top: 1mm !important;
+    border-top: 0.5pt solid #000 !important;
+    margin-top: 10mm !important;
+    padding-top: 2mm !important;
   }
 
   /* Input styling in print */
@@ -342,12 +377,13 @@
 
   /* Section titles */
   .section-title {
-    font-size: 9pt !important;
+    font-size: 10pt !important;
     font-weight: bold !important;
     background: #333 !important;
     color: #fff !important;
-    padding: 1.5px 3px !important;
-    margin: 1.5mm 0 !important;
+    padding: 2mm 3mm !important;
+    margin: 2mm 0 !important;
+    border: 0.5pt solid #000 !important;
   }
 
   /* Form-specific content should take available space */
@@ -359,14 +395,13 @@
     flex-shrink: 0 !important;
   }
 
-  /* Hide yellow/gray backgrounds in print */
+  /* Hide yellow/gray backgrounds in print - but keep borders */
   .bg-yellow-50,
   .bg-yellow-100,
   .bg-yellow-200,
   .bg-yellow-300,
   .bg-gray-50,
   .bg-gray-100,
-  .bg-gray-200,
   .bg-blue-50,
   .bg-blue-100,
   .bg-blue-200 {
@@ -379,13 +414,34 @@
     justify-content: space-between !important;
   }
 
-  /* Declaration form specific */
+  /* Declaration form specific - border box */
   #declaration-form > .border.border-black {
+    border: 1pt solid #000 !important;
+    padding: 3mm !important;
+    margin-bottom: 3mm !important;
+    font-size: 10pt !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Info tables without borders for header info */
+  #aavak-vera-form-a > table.mb-3,
+  #aavak-vera-form-b > table.mb-3,
+  #form-16a > table.mb-3:first-of-type,
+  #form-16b > table.mb-3:first-of-type {
+    border: none !important;
+  }
+
+  #aavak-vera-form-a > table.mb-3 td,
+  #aavak-vera-form-a > table.mb-3 th,
+  #form-16a > table.mb-3:first-of-type td,
+  #form-16a > table.mb-3:first-of-type th {
+    border: none !important;
+    padding: 1mm 2mm !important;
+  }
+
+  /* Form 16 two-column header table with borders */
+  #form-16a > table.mb-3 td.border {
     border: 0.5pt solid #000 !important;
-    padding: 2mm !important;
-    margin-bottom: 2mm !important;
-    font-size: 9pt !important;
-    line-height: 1.3 !important;
   }
 }
 
