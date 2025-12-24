@@ -68,13 +68,14 @@
     visibility: visible !important;
   }
 
-  /* Base form container - each form = 1 page EXACTLY */
+  /* Base form container - each form = 1 page EXACTLY - NO BLANK PAGES */
   .tax-form-container,
   .tax-form-print {
     width: 100% !important;
     max-width: 100% !important;
     height: auto !important;
-    max-height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
     margin: 0 !important;
     padding: 3mm !important;
     color: #000 !important;
@@ -83,16 +84,22 @@
     page-break-inside: avoid !important;
     break-after: page !important;
     break-inside: avoid !important;
-    overflow: hidden !important;
+    overflow: visible !important;
     display: block !important;
     position: relative !important;
   }
 
-  /* Last form no page break after */
+  /* Last form no page break after - prevents blank page */
   .tax-form-container:last-child,
   .tax-form-print:last-child {
-    page-break-after: auto !important;
-    break-after: auto !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  /* Remove any extra spacing/margins that cause blank pages */
+  .tax-form-container + .tax-form-container,
+  .tax-form-print + .tax-form-print {
+    margin-top: 0 !important;
   }
 
   /* ========================================

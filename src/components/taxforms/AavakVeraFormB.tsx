@@ -10,9 +10,6 @@ interface AavakVeraFormBProps {
   isManualMode?: boolean;
 }
 
-// Manual fields user can edit (yellow highlight)
-const manualFields = ['medicalInsurance80D', 'disabledDependent80DD', 'seriousDisease80DDB', 'disability80U', 'donation80G', 'savingsBankInterest80TTA', 'relief89'];
-
 const AavakVeraFormB = ({ client, formData, onChange, readOnly = false, isManualMode = false }: AavakVeraFormBProps) => {
   const taxB = formData.taxCalculationB;
 
@@ -23,7 +20,6 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false, isManual
     });
   };
 
-  // Manual input field - yellow background
   const renderManualInputField = (field: keyof typeof taxB, value: number) => (
     readOnly ? (
       <span>{value || 0}</span>
@@ -35,227 +31,208 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false, isManual
         defaultValue={value || ''}
         onBlur={(e) => updateField(field, Number(e.target.value) || 0)}
         className="w-20 h-5 text-xs text-right p-1 border-0 bg-yellow-100 inline-block focus:outline-none focus:bg-yellow-200 print:bg-transparent"
-        title="Manual Input / હાથે ભરો"
+        title="Manual Input"
       />
     )
   );
 
-  // Auto-calculated field - gray/blue (editable in manual mode)
-  const renderAutoField = (field: keyof typeof taxB, value: number) => (
-    isManualMode && !readOnly ? (
-      <input
-        type="text"
-        inputMode="numeric"
-        pattern="[0-9]*"
-        defaultValue={value || ''}
-        onBlur={(e) => updateField(field, Number(e.target.value) || 0)}
-        className="w-20 h-5 text-xs text-right p-1 border-0 bg-blue-50 inline-block focus:outline-none focus:bg-blue-100 print:bg-transparent"
-        title="Manual Override / હાથે ભરો"
-      />
-    ) : (
-      <span className="text-blue-800 font-medium">{value || 0}</span>
-    )
+  const renderAutoField = (value: number) => (
+    <span className="text-blue-800 font-medium">{value || 0}</span>
   );
 
   return (
     <div className="tax-form-container tax-form-print page-break" id="aavak-vera-form-b">
-      <div className="text-center font-bold text-lg mb-3 border-b-2 border-black pb-1">
-        આવક વેરા ગણતરી ફોર્મ
+      <div className="text-center font-bold text-lg mb-1">આવક વેરા ગણતરી ફોર્મ</div>
+      <div className="text-center text-xs mb-2">INCOME TAX CALCULATION FORM - PART B</div>
+      <div className="text-center text-[10px] mb-3 border-b border-black pb-2">
+        Assessment Year: {client.assessmentYear || '2026-2027'} | Name: {client.name}
       </div>
 
-      {/* Mode Indicator */}
-      {!readOnly && (
-        <div className="flex items-center gap-4 mb-2 text-[10px] no-print">
-          <div className="flex items-center gap-1">
-            <span className="inline-block w-4 h-4 bg-yellow-100 border border-yellow-300"></span>
-            <span>Manual Input / હાથે ભરો</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="inline-block w-4 h-4 bg-gray-50 border border-gray-300"></span>
-            <span className="text-blue-800">Auto Calculated / ઓટો ગણતરી</span>
-          </div>
-        </div>
-      )}
-
-      {/* Section D - Deductions under 80C */}
-      <div className="font-bold text-[11px] mb-2 bg-gray-800 text-white p-1">
-        વિભાગ (D) સમગ્ર કુલ આવક માંથી કલમ મુજબ બાદ મળતર વિભાગ
+      {/* Section D - Deductions under Chapter VI-A */}
+      <div className="font-bold text-[11px] mb-1 bg-gray-200 p-1">
+        વિભાગ (D) - કલમ 80C મુજબ કપાત / DEDUCTIONS UNDER SECTION 80C
       </div>
-      
       <table style={{ fontSize: '10px' }}>
         <tbody>
           <tr className="header-row">
-            <td className="w-6">1</td>
-            <td colSpan={2}>Under section 80-C</td>
-            <td></td>
-            <td></td>
+            <td className="w-8"></td>
+            <td colSpan={2}>Particulars / વિગત</td>
+            <td className="w-10"></td>
+            <td className="w-24">Amount (RS.)</td>
           </tr>
           <tr>
-            <td></td>
-            <td className="w-8">(i)</td>
-            <td>જી.પી.એફ</td>
-            <td className="text-right w-10">Rs.</td>
-            <td className="amount-cell w-20 bg-gray-50 print:bg-transparent">{renderAutoField('gpf', taxB.gpf)}</td>
+            <td>(i)</td>
+            <td colSpan={2}>G.P.F / જી.પી.એફ</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{renderAutoField(taxB.gpf)}</td>
           </tr>
           <tr>
-            <td></td>
             <td>(ii)</td>
-            <td>સી.પી.એફ</td>
-            <td className="text-right">Rs.</td>
-            <td className="amount-cell bg-gray-50 print:bg-transparent">{renderAutoField('cpf', taxB.cpf)}</td>
+            <td colSpan={2}>C.P.F / સી.પી.એફ</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{renderAutoField(taxB.cpf)}</td>
           </tr>
           <tr>
-            <td></td>
             <td>(iii)</td>
-            <td>એલ.આઈ.સી. પ્રીમિયમ</td>
-            <td className="text-right">Rs.</td>
-            <td className="amount-cell bg-gray-50 print:bg-transparent">{renderAutoField('licPremium', taxB.licPremium)}</td>
+            <td colSpan={2}>L.I.C. Premium / એલ.આઈ.સી. પ્રિમિયમ</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{renderAutoField(taxB.licPremium)}</td>
           </tr>
           <tr>
-            <td></td>
             <td>(iv)</td>
-            <td>પી.એલ.ઈ/આઈ.પ્રીમિયમ</td>
-            <td className="text-right">Rs.</td>
-            <td className="amount-cell bg-gray-50 print:bg-transparent">{renderAutoField('pliPremium', taxB.pliPremium)}</td>
+            <td colSpan={2}>P.L.I Premium / પી.એલ.આઈ. પ્રિમિયમ</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{renderAutoField(taxB.pliPremium)}</td>
           </tr>
           <tr>
-            <td></td>
             <td>(v)</td>
-            <td>જૂથ વીમો</td>
-            <td className="text-right">Rs.</td>
-            <td className="amount-cell bg-gray-50 print:bg-transparent">{renderAutoField('groupInsurance', taxB.groupInsurance)}</td>
+            <td colSpan={2}>Group Insurance / જૂથ વીમો</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{renderAutoField(taxB.groupInsurance)}</td>
           </tr>
           <tr>
-            <td></td>
             <td>(vi)</td>
-            <td>પી.પી.એફ</td>
-            <td className="text-right">Rs.</td>
-            <td className="amount-cell bg-gray-50 print:bg-transparent">{renderAutoField('ppf', taxB.ppf)}</td>
+            <td colSpan={2}>P.P.F / પી.પી.એફ</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{renderAutoField(taxB.ppf)}</td>
           </tr>
           <tr>
-            <td></td>
             <td>(vii)</td>
-            <td>એન.એસ.સી.માં કરેલ રોકાણ</td>
-            <td className="text-right">Rs.</td>
-            <td className="amount-cell bg-gray-50 print:bg-transparent">{renderAutoField('nscInvestment', taxB.nscInvestment)}</td>
+            <td colSpan={2}>N.S.C. Investment / એન.એસ.સી. રોકાણ</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{renderAutoField(taxB.nscInvestment)}</td>
           </tr>
           <tr>
-            <td></td>
             <td>(viii)</td>
-            <td>મકાન લોનના હપ્તાની રકમ (મુદ્દલ)</td>
-            <td className="text-right">Rs.</td>
-            <td className="amount-cell bg-gray-50 print:bg-transparent">{renderAutoField('housingLoanPrincipal', taxB.housingLoanPrincipal)}</td>
+            <td colSpan={2}>Housing Loan Principal / મકાન લોન મુદ્દલ</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{renderAutoField(taxB.housingLoanPrincipal)}</td>
           </tr>
           <tr>
-            <td></td>
             <td>(ix)</td>
-            <td>બાળકોની શિક્ષણ ફી ચુકવેલ</td>
-            <td className="text-right">Rs.</td>
-            <td className="amount-cell bg-gray-50 print:bg-transparent">{renderAutoField('educationFee', taxB.educationFee)}</td>
+            <td colSpan={2}>Education Fee / બાળકોની શિક્ષણ ફી</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{renderAutoField(taxB.educationFee)}</td>
           </tr>
           <tr>
-            <td></td>
             <td>(x)</td>
-            <td>અન્ય રોકાણ ૮૦ સી મુજબ (SSY, FD, etc.)</td>
-            <td className="text-right">Rs.</td>
-            <td className="amount-cell bg-gray-50 print:bg-transparent">{renderAutoField('otherInvestment80C', taxB.otherInvestment80C)}</td>
+            <td colSpan={2}>Other 80C (SSY, FD, etc.) / અન્ય રોકાણ</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell">{renderAutoField(taxB.otherInvestment80C)}</td>
           </tr>
           <tr className="total-row">
             <td></td>
-            <td></td>
-            <td className="font-bold">કુલ રોકાણ</td>
-            <td className="text-right">Rs.</td>
-            <td className="amount-cell font-bold bg-gray-100 print:bg-transparent">{renderAutoField('total80C', taxB.total80C)}</td>
+            <td colSpan={2}>Total 80C / કુલ રોકાણ</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell font-bold">{renderAutoField(taxB.total80C)}</td>
           </tr>
           <tr className="total-row">
             <td></td>
-            <td></td>
-            <td className="font-bold">૧૫૦૦૦૦ની મર્યાદામાં</td>
-            <td className="text-right">Rs.</td>
-            <td className="amount-cell font-bold bg-gray-100 print:bg-transparent">{renderAutoField('max80C', taxB.max80C)}</td>
+            <td colSpan={2}>Maximum Allowed (Rs.1,50,000) / મહત્તમ મર્યાદા</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell font-bold">{renderAutoField(taxB.max80C)}</td>
           </tr>
-          
-          {/* Other Sections - Manual Input (Yellow) */}
+        </tbody>
+      </table>
+
+      {/* Other Deductions */}
+      <div className="font-bold text-[11px] mt-2 mb-1 bg-gray-200 p-1">
+        અન્ય કપાત / OTHER DEDUCTIONS
+      </div>
+      <table style={{ fontSize: '10px' }}>
+        <tbody>
           <tr>
-            <td>2</td>
-            <td colSpan={2} className="bg-yellow-50 print:bg-transparent">મેડીકલેઇમ 80-D (Upto Rs.25000)</td>
-            <td className="text-right">Rs.</td>
-            <td className="amount-cell bg-yellow-100 print:bg-transparent">
+            <td className="w-8">2</td>
+            <td className="bg-yellow-50 print:bg-transparent">Medical Insurance 80D (Max Rs.25000)</td>
+            <td className="text-right w-10">RS.</td>
+            <td className="amount-cell w-24 bg-yellow-100 print:bg-transparent">
               {renderManualInputField("medicalInsurance80D", taxB.medicalInsurance80D)}
             </td>
           </tr>
           <tr>
             <td>3</td>
-            <td colSpan={2} className="bg-yellow-50 print:bg-transparent">વિકલાંગ આશ્રિત 80-DD (Upto Rs.50000)</td>
-            <td className="text-right">Rs.</td>
+            <td className="bg-yellow-50 print:bg-transparent">Disabled Dependent 80DD (Max Rs.50000)</td>
+            <td className="text-right">RS.</td>
             <td className="amount-cell bg-yellow-100 print:bg-transparent">
               {renderManualInputField("disabledDependent80DD", taxB.disabledDependent80DD)}
             </td>
           </tr>
           <tr>
             <td>4</td>
-            <td colSpan={2} className="bg-yellow-50 print:bg-transparent">ગંભીર રોગ 80-DDB (Upto Rs.40000)</td>
-            <td className="text-right">Rs.</td>
+            <td className="bg-yellow-50 print:bg-transparent">Serious Disease 80DDB (Max Rs.40000)</td>
+            <td className="text-right">RS.</td>
             <td className="amount-cell bg-yellow-100 print:bg-transparent">
               {renderManualInputField("seriousDisease80DDB", taxB.seriousDisease80DDB)}
             </td>
           </tr>
           <tr>
             <td>5</td>
-            <td colSpan={2} className="bg-yellow-50 print:bg-transparent">અંધ/અપંગ 80-U (75000-125000)</td>
-            <td className="text-right">Rs.</td>
+            <td className="bg-yellow-50 print:bg-transparent">Disability 80U (Rs.75000-125000)</td>
+            <td className="text-right">RS.</td>
             <td className="amount-cell bg-yellow-100 print:bg-transparent">
               {renderManualInputField("disability80U", taxB.disability80U)}
             </td>
           </tr>
           <tr>
             <td>6</td>
-            <td colSpan={2} className="bg-yellow-50 print:bg-transparent">દાન 80-G (50%)</td>
-            <td className="text-right">Rs.</td>
+            <td className="bg-yellow-50 print:bg-transparent">Donation 80G (50%)</td>
+            <td className="text-right">RS.</td>
             <td className="amount-cell bg-yellow-100 print:bg-transparent">
               {renderManualInputField("donation80G", taxB.donation80G)}
             </td>
           </tr>
           <tr>
             <td>7</td>
-            <td colSpan={2} className="bg-yellow-50 print:bg-transparent">સેવિંગ બેંક વ્યાજ 80TTA (Rs.10000 મર્યાદા)</td>
-            <td className="text-right">Rs.</td>
+            <td className="bg-yellow-50 print:bg-transparent">Savings Bank Interest 80TTA (Max Rs.10000)</td>
+            <td className="text-right">RS.</td>
             <td className="amount-cell bg-yellow-100 print:bg-transparent">
               {renderManualInputField("savingsBankInterest80TTA", taxB.savingsBankInterest80TTA)}
             </td>
           </tr>
           <tr className="total-row">
             <td>8</td>
-            <td colSpan={2} className="font-bold">રોકાણ બાદ મળવા પાત્ર રકમનો સરવાળો</td>
-            <td className="text-right">Rs.</td>
-            <td className="amount-cell font-bold bg-gray-100 print:bg-transparent">{renderAutoField('totalDeductions', taxB.totalDeductions)}</td>
+            <td>Total Deductions / કુલ કપાત</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell font-bold">{renderAutoField(taxB.totalDeductions)}</td>
           </tr>
           <tr className="total-row">
             <td>9</td>
-            <td colSpan={2} className="font-bold">બાકી મળવા પાત્ર આવક</td>
-            <td className="text-right">Rs.</td>
-            <td className="amount-cell font-bold bg-gray-100 print:bg-transparent">{renderAutoField('taxableIncome', taxB.taxableIncome)}</td>
+            <td className="font-bold">Taxable Income / કરપાત્ર આવક</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell font-bold">{renderAutoField(taxB.taxableIncome)}</td>
           </tr>
           <tr className="total-row">
             <td>10</td>
-            <td colSpan={2} className="font-bold">દશનાં રાઉન્ડમાં કરપાત્ર રકમ</td>
-            <td className="text-right">Rs.</td>
-            <td className="amount-cell font-bold bg-gray-100 print:bg-transparent">{renderAutoField('roundedTaxableIncome', taxB.roundedTaxableIncome)}</td>
+            <td className="font-bold">Rounded Taxable Income / રાઉન્ડ કરપાત્ર</td>
+            <td className="text-right">RS.</td>
+            <td className="amount-cell font-bold">{renderAutoField(taxB.roundedTaxableIncome)}</td>
           </tr>
         </tbody>
       </table>
 
-      {/* Tax Slabs - NEW REGIME 2025-26 */}
-      <div className="font-bold text-[11px] mt-3 mb-1 bg-gray-200 p-1">TAX CALCULATION (NEW REGIME 2025-26)</div>
+      {/* Tax Calculation */}
+      <div className="font-bold text-[11px] mt-2 mb-1 bg-gray-200 p-1">
+        TAX CALCULATION (NEW REGIME 2025-26)
+      </div>
       <table style={{ fontSize: '9px' }}>
+        <thead>
+          <tr className="header-row">
+            <th className="w-6">Sr</th>
+            <th>Income Slab</th>
+            <th className="w-10">Rate</th>
+            <th className="w-16">Slab Amt</th>
+            <th className="w-16">Taxable</th>
+            <th className="w-16">Tax</th>
+          </tr>
+        </thead>
         <tbody>
           <tr>
-            <td className="w-6">1</td>
-            <td>Upto Rs.4,00,000 (Male & Female)</td>
-            <td className="text-center w-10">0%</td>
-            <td className="amount-cell w-16">400000</td>
-            <td className="amount-cell w-16">400000</td>
-            <td className="amount-cell w-16">0</td>
+            <td>1</td>
+            <td>Upto Rs.4,00,000</td>
+            <td className="text-center">0%</td>
+            <td className="amount-cell">400000</td>
+            <td className="amount-cell">{Math.min(taxB.roundedTaxableIncome || 0, 400000)}</td>
+            <td className="amount-cell">0</td>
           </tr>
           <tr>
             <td>2</td>
@@ -299,9 +276,9 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false, isManual
           </tr>
           <tr>
             <td>7</td>
-            <td>UP TO Rs.24,00,001+</td>
+            <td>Above Rs.24,00,000</td>
             <td className="text-center">30%</td>
-            <td className="amount-cell"></td>
+            <td className="amount-cell">-</td>
             <td className="amount-cell">{Math.max(0, (taxB.roundedTaxableIncome || 0) - 2400000)}</td>
             <td className="amount-cell">{Math.round(Math.max(0, (taxB.roundedTaxableIncome || 0) - 2400000) * 0.30)}</td>
           </tr>
@@ -309,110 +286,94 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false, isManual
       </table>
 
       {/* Tax Summary */}
-      <div className="font-bold text-[11px] mt-3 mb-1 bg-gray-800 text-white p-1">ઇન્કમટેક્ષ ગણતરી</div>
+      <div className="font-bold text-[11px] mt-2 mb-1 bg-gray-200 p-1">
+        TAX SUMMARY / ટેક્ષ સારાંશ
+      </div>
       <table style={{ fontSize: '10px' }}>
         <tbody>
           <tr>
-            <td colSpan={2}>ભરવાપાત્ર ઇન્કમટેક્ષ</td>
+            <td className="w-8">11</td>
+            <td>Total Tax / કુલ ટેક્ષ</td>
             <td className="text-right w-10">RS.</td>
-            <td className="amount-cell font-bold w-20 bg-gray-100 print:bg-transparent">{renderAutoField('totalTax', taxB.totalTax)}</td>
+            <td className="amount-cell w-24">{renderAutoField(taxB.totalTax)}</td>
           </tr>
           <tr>
-            <td colSpan={2}>Tax Rebate Section 87A (Up To Rs.25,000 if income ≤7L)</td>
+            <td>12</td>
+            <td>Tax Rebate 87A (Max Rs.25000 if income ≤7L)</td>
             <td className="text-right">RS.</td>
-            <td className="amount-cell bg-gray-50 print:bg-transparent">{renderAutoField('taxRebate87A', taxB.taxRebate87A)}</td>
+            <td className="amount-cell">{renderAutoField(taxB.taxRebate87A)}</td>
           </tr>
           <tr>
-            <td colSpan={2}>ટેક્ષ રિબેટ બાદ ભરવા પાત્ર ઇન્કમટેક્ષ</td>
+            <td>13</td>
+            <td>Tax After Rebate / રિબેટ બાદ ટેક્ષ</td>
             <td className="text-right">RS.</td>
-            <td className="amount-cell bg-gray-50 print:bg-transparent">{renderAutoField('taxAfterRebate', taxB.taxAfterRebate)}</td>
+            <td className="amount-cell">{renderAutoField(taxB.taxAfterRebate)}</td>
           </tr>
           <tr>
-            <td colSpan={2}>Education Cess 4%</td>
+            <td>14</td>
+            <td>Education Cess 4%</td>
             <td className="text-right">RS.</td>
-            <td className="amount-cell bg-gray-50 print:bg-transparent">{renderAutoField('educationCess', taxB.educationCess)}</td>
+            <td className="amount-cell">{renderAutoField(taxB.educationCess)}</td>
           </tr>
           <tr className="total-row">
-            <td colSpan={2} className="font-bold">કુલ ભરવા પાત્ર ઈન્કમટેક્ષ</td>
+            <td>15</td>
+            <td className="font-bold">Total Tax Payable / કુલ ભરવાપાત્ર ટેક્ષ</td>
             <td className="text-right">RS.</td>
-            <td className="amount-cell font-bold bg-gray-100 print:bg-transparent">{renderAutoField('totalTaxPayable', taxB.totalTaxPayable)}</td>
+            <td className="amount-cell font-bold">{renderAutoField(taxB.totalTaxPayable)}</td>
           </tr>
           <tr>
-            <td colSpan={2} className="bg-yellow-50 print:bg-transparent">RELIEF UNDER SECTION 89</td>
+            <td>16</td>
+            <td className="bg-yellow-50 print:bg-transparent">Relief u/s 89</td>
             <td className="text-right">RS.</td>
             <td className="amount-cell bg-yellow-100 print:bg-transparent">
               {renderManualInputField("relief89", taxB.relief89)}
             </td>
           </tr>
           <tr className="total-row">
-            <td colSpan={2} className="font-bold">કુલ ભરવાપાત્ર ઇન્કમટેક્સ Net Amount</td>
+            <td>17</td>
+            <td className="font-bold">Net Tax Payable / ચોખ્ખો ભરવાપાત્ર ટેક્ષ</td>
             <td className="text-right">RS.</td>
-            <td className="amount-cell font-bold bg-gray-100 print:bg-transparent">{renderAutoField('netTaxPayable', taxB.netTaxPayable)}</td>
-          </tr>
-        </tbody>
-      </table>
-
-      {/* Tax Payment Summary */}
-      <div className="font-bold text-[11px] mt-3 mb-1 bg-gray-200 p-1">
-        ઇન્કમટેક્ષની વિગત (પગારમાંથી ભરેલ તથા ભરવા પાત્ર)
-      </div>
-      <table style={{ fontSize: '10px' }}>
-        <tbody>
-          <tr>
-            <td className="w-6">1</td>
-            <td>ભરપાઈ કરેલ ઇન્કમટેક્ષ</td>
-            <td className="text-right w-10">RS.</td>
-            <td className="amount-cell w-20 bg-gray-50 print:bg-transparent">{renderAutoField('taxPaid', taxB.taxPaid)}</td>
+            <td className="amount-cell font-bold">{renderAutoField(taxB.netTaxPayable)}</td>
           </tr>
           <tr>
-            <td>2</td>
-            <td>ભરવાપાત્ર બાકી રહેલ ટેક્ષની રકમ</td>
+            <td>18</td>
+            <td>Tax Paid / ભરેલ ટેક્ષ</td>
             <td className="text-right">RS.</td>
-            <td className="amount-cell bg-gray-50 print:bg-transparent">{renderAutoField('balanceTax', taxB.balanceTax)}</td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>
-              Recovered from pay of{' '}
-              {readOnly ? (
-                taxB.recoveredMonth || '___________'
-              ) : (
-                <input
-                  type="text"
-                  defaultValue={taxB.recoveredMonth || ''}
-                  onBlur={(e) => updateField('recoveredMonth', e.target.value)}
-                  className="w-24 h-5 text-xs p-1 border-0 bg-yellow-100 inline-block focus:outline-none focus:bg-yellow-200 print:bg-transparent"
-                  placeholder="Month"
-                  title="Manual Input"
-                />
-              )}
-            </td>
-            <td className="text-right">RS.</td>
-            <td className="amount-cell bg-gray-50 print:bg-transparent">{taxB.balanceTax || 0}</td>
+            <td className="amount-cell">{renderAutoField(taxB.taxPaid)}</td>
           </tr>
           <tr className="total-row">
-            <td>4</td>
-            <td className="font-bold">કુલ ભરપાઈ કરેલ ઇન્કમટેક્ષની રકમ</td>
+            <td>19</td>
+            <td className="font-bold">Balance Tax / બાકી ટેક્ષ</td>
             <td className="text-right">RS.</td>
-            <td className="amount-cell font-bold bg-gray-100 print:bg-transparent">{renderAutoField('totalTaxPaid', taxB.totalTaxPaid)}</td>
+            <td className="amount-cell font-bold">{renderAutoField(taxB.balanceTax)}</td>
           </tr>
         </tbody>
       </table>
 
-      {/* Certificates */}
-      <div className="mt-3 p-2 border border-black text-[10px]">
-        <p className="font-bold">કર્મચારી (શિક્ષક) બાંહેધરી</p>
-        <p>આ પત્રકમાં ભરેલ તમામ વિગતો સાચી અને દોષ રહિત છે. જેની આથી હું ખાત્રી આપું છું.</p>
-        <p className="text-right mt-2">સહી: _______________</p>
+      {/* Certification */}
+      <div className="border border-black p-2 mt-2 text-[9px]">
+        <p className="mb-1">
+          <strong>કર્મચારી બાંહેધરી:</strong> આ ફોર્મમાં ભરેલ તમામ વિગતો સાચી અને દોષરહિત છે જેની હું ખાત્રી આપું છું.
+        </p>
+        <div className="flex justify-between mt-3">
+          <div>
+            <p>Date: _______________</p>
+            <p>Place: {client.schoolName || '_______________'}</p>
+          </div>
+          <div className="text-center">
+            <div className="border-t border-black pt-1 min-w-[120px] mt-4">
+              કર્મચારીની સહી
+            </div>
+          </div>
+          <div className="text-center">
+            <div className="border-t border-black pt-1 min-w-[120px] mt-4">
+              સંસ્થાના વડાની સહી
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="mt-2 p-2 border border-black text-[10px]">
-        <p className="font-bold">સંસ્થાના વડાનું પ્રમાણપત્ર</p>
-        <p>આ પત્રકમાં ભરેલ તમામ પગારદાર વિગતો સંસ્થાના હિસાબી દફતરે પ્રમાણે અને રોકાણોના આધારો અત્રેની ઓફિસમાં કર્મચારીએ રાખેલ છે.</p>
-        <p className="text-right mt-2">Signature and seal of Head of office</p>
-      </div>
-
-      <div className="form-footer text-center text-[8px] mt-4 pt-2 border-t border-dashed border-gray-400">
+      <div className="form-footer text-center text-[8px] mt-2 pt-1 border-t border-dashed border-gray-400">
         Created By: Smart Computer Vinchhiya 9924640689, 9574031243
       </div>
     </div>
