@@ -211,6 +211,118 @@ const TaxFormAdmin = () => {
     window.print();
   };
 
+  // Print only Pagar form in Landscape
+  const handlePrintPagar = () => {
+    // Create a new window with only Pagar form
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      toast({ title: "Error", description: "Please allow popups to print", variant: "destructive" });
+      return;
+    }
+    
+    const pagarForm = document.getElementById('pagar-form-screen');
+    if (!pagarForm) {
+      toast({ title: "Error", description: "Pagar form not found", variant: "destructive" });
+      printWindow.close();
+      return;
+    }
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>પગાર ફોર્મ - ${client?.name || ''}</title>
+        <style>
+          @page {
+            size: A4 landscape;
+            margin: 5mm;
+          }
+          * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+          }
+          body {
+            font-family: 'Noto Sans Gujarati', 'Shruti', Arial, sans-serif;
+            font-size: 9pt;
+            background: #fff;
+            color: #000;
+            width: 287mm;
+            height: 200mm;
+            padding: 3mm;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2mm;
+          }
+          th, td {
+            border: 0.5pt solid #000;
+            padding: 1.5mm 2mm;
+            font-size: 8pt;
+            text-align: center;
+            vertical-align: middle;
+          }
+          th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+          }
+          .title {
+            text-align: center;
+            font-size: 14pt;
+            font-weight: bold;
+            margin-bottom: 3mm;
+            border-bottom: 1pt solid #000;
+            padding-bottom: 2mm;
+          }
+          .info-table td {
+            border: none;
+            text-align: left;
+            font-size: 9pt;
+            padding: 1mm 3mm;
+          }
+          .info-table .bold {
+            font-weight: bold;
+          }
+          .amount {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+          }
+          .header-row td, .header-row th {
+            background-color: #e0e0e0;
+            font-weight: bold;
+          }
+          .total-row td {
+            background-color: #f5f5f5;
+            font-weight: bold;
+          }
+          .signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5mm;
+            font-size: 9pt;
+          }
+          .no-print, input, button {
+            display: none !important;
+          }
+          .print-value {
+            display: inline;
+          }
+        </style>
+      </head>
+      <body>
+        ${pagarForm.innerHTML.replace(/bg-yellow-200|bg-gray-100|bg-gray-200|bg-blue-100|bg-blue-200/g, '').replace(/<input[^>]*value="([^"]*)"[^>]*>/g, '<span class="print-value">$1</span>')}
+      </body>
+      </html>
+    `);
+    
+    printWindow.document.close();
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 500);
+  };
+
   const handleExportExcel = () => {
     if (!client || !formData) return;
     
@@ -474,7 +586,10 @@ const TaxFormAdmin = () => {
                   <Save className="h-4 w-4 mr-1" /> Save
                 </Button>
                 <Button onClick={handlePrint} variant="outline" size="sm">
-                  <Printer className="h-4 w-4 mr-1" /> Print
+                  <Printer className="h-4 w-4 mr-1" /> Print All
+                </Button>
+                <Button onClick={handlePrintPagar} variant="secondary" size="sm" title="Print Pagar Form in A4 Landscape">
+                  <Printer className="h-4 w-4 mr-1" /> Pagar (Landscape)
                 </Button>
                 <Button onClick={handleExportPDF} variant="outline" size="sm">
                   <FileText className="h-4 w-4 mr-1" /> PDF
@@ -660,7 +775,9 @@ const TaxFormAdmin = () => {
                         </div>
                       </TabsContent>
                       <TabsContent value="pagar" className="mt-0">
-                        <PagarForm client={client} formData={formData} onChange={handleFormChange} isManualMode={isManualMode} />
+                        <div id="pagar-form-screen">
+                          <PagarForm client={client} formData={formData} onChange={handleFormChange} isManualMode={isManualMode} />
+                        </div>
                       </TabsContent>
                       <TabsContent value="declaration" className="mt-0">
                         <DeclarationForm client={client} formData={formData} onChange={handleFormChange} isManualMode={isManualMode} />
