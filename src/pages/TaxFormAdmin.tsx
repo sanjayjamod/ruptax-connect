@@ -235,7 +235,7 @@ const TaxFormAdmin = () => {
         <style>
           @page {
             size: A4 landscape;
-            margin: 5mm;
+            margin: 3mm;
           }
           * {
             box-sizing: border-box;
@@ -244,74 +244,88 @@ const TaxFormAdmin = () => {
           }
           body {
             font-family: 'Noto Sans Gujarati', 'Shruti', Arial, sans-serif;
-            font-size: 9pt;
+            font-size: 7pt;
             background: #fff;
             color: #000;
-            width: 287mm;
-            height: 200mm;
-            padding: 3mm;
+            width: 291mm;
+            height: 204mm;
+            max-height: 204mm;
+            padding: 2mm;
+            overflow: hidden;
           }
           table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 2mm;
+            margin-bottom: 1mm;
           }
           th, td {
-            border: 0.5pt solid #000;
-            padding: 1.5mm 2mm;
-            font-size: 8pt;
+            border: 0.3pt solid #000;
+            padding: 0.8mm 1mm;
+            font-size: 6.5pt;
             text-align: center;
             vertical-align: middle;
+            line-height: 1.1;
           }
           th {
             background-color: #f0f0f0;
             font-weight: bold;
           }
-          .title {
+          .text-center.font-bold.text-lg {
             text-align: center;
-            font-size: 14pt;
+            font-size: 11pt;
             font-weight: bold;
-            margin-bottom: 3mm;
-            border-bottom: 1pt solid #000;
-            padding-bottom: 2mm;
+            margin-bottom: 1mm;
+            padding-bottom: 1mm;
+            border-bottom: 0.5pt solid #000;
           }
-          .info-table td {
+          .mb-2 td {
             border: none;
             text-align: left;
-            font-size: 9pt;
-            padding: 1mm 3mm;
+            font-size: 7pt;
+            padding: 0.5mm 2mm;
           }
-          .info-table .bold {
-            font-weight: bold;
-          }
-          .amount {
+          .amount-cell {
             text-align: right;
             font-family: 'Courier New', monospace;
           }
           .header-row td, .header-row th {
             background-color: #e0e0e0;
             font-weight: bold;
+            font-size: 6pt;
           }
           .total-row td {
             background-color: #f5f5f5;
             font-weight: bold;
           }
-          .signature-section {
+          .signature-box, .flex.justify-between {
             display: flex;
             justify-content: space-between;
-            margin-top: 5mm;
-            font-size: 9pt;
+            margin-top: 2mm;
+            font-size: 7pt;
           }
-          .no-print, input, button {
+          .form-footer {
+            text-align: center;
+            font-size: 6pt;
+            margin-top: 1mm;
+            color: #333;
+          }
+          .no-print, button, .flex.flex-wrap.items-center.gap-4 {
             display: none !important;
           }
-          .print-value {
-            display: inline;
+          input {
+            border: none !important;
+            background: transparent !important;
+            font-size: 6.5pt;
+            text-align: right;
+            width: 100%;
+          }
+          span {
+            font-size: 6.5pt;
           }
         </style>
       </head>
       <body>
-        ${pagarForm.innerHTML.replace(/bg-yellow-200|bg-gray-100|bg-gray-200|bg-blue-100|bg-blue-200/g, '').replace(/<input[^>]*value="([^"]*)"[^>]*>/g, '<span class="print-value">$1</span>')}
+        ${pagarForm.innerHTML.replace(/bg-yellow-200|bg-gray-100|bg-gray-200|bg-blue-100|bg-blue-200|bg-blue-300|bg-gray-300/g, '')}
       </body>
       </html>
     `);
