@@ -1,269 +1,274 @@
 /* Print Styles for Tax Forms - A4 Size */
-/* Default page style - Portrait for most forms */
+/* Each form must fit on exactly 1 page */
+
 @media print {
+  /* Default page style - Portrait */
   @page {
     size: A4 portrait;
-    margin: 10mm;
+    margin: 8mm;
   }
 
-  /* Pagar form specific - Landscape for wide table FULL PAGE */
+  /* Pagar form - Landscape */
   @page pagar {
     size: A4 landscape;
     margin: 5mm;
   }
 
+  /* Apply landscape to pagar form */
   #pagar-form {
     page: pagar;
   }
 
+  /* Force exact color printing */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
+    box-sizing: border-box !important;
   }
 
   html, body {
     background: #fff !important;
     margin: 0 !important;
     padding: 0 !important;
+    width: 100% !important;
     height: auto !important;
-    min-height: auto !important;
   }
 
-  /* Hide everything by default except print area */
+  /* Hide everything except print area */
   .no-print,
   header,
-  footer,
+  footer:not(.form-footer),
   nav,
-  main > div > div:not(.print\\:block),
-  .tabs-list,
   button,
+  .fixed,
+  .bg-muted,
   .sidebar-container,
   .sample-templates-sidebar,
   [class*="TabsList"],
   [class*="Header"],
-  [class*="Footer"],
   [class*="SideCalculator"],
   [class*="TaxChatbot"],
   [class*="WhatsApp"],
   [class*="Chatbot"],
-  [class*="MessageCircle"],
   a[href*="whatsapp"],
-  a[href*="wa.me"],
-  .fixed,
-  .bg-muted,
-  .mb-4.flex.flex-wrap,
-  .gap-4 > div:first-child {
+  a[href*="wa.me"] {
     display: none !important;
     visibility: hidden !important;
   }
 
   /* Show print area */
   .print\\:block,
-  .hidden.print\\:block {
+  .hidden.print\\:block,
+  .print-area {
     display: block !important;
     visibility: visible !important;
   }
 
-  .print-only {
-    display: block !important;
-  }
-
-  /* Remove min-height from containers */
-  .flex.min-h-screen,
-  .min-h-screen {
-    min-height: auto !important;
-    height: auto !important;
-  }
-
-  /* Remove padding from main */
-  main {
-    padding: 0 !important;
-  }
-
-  main > div {
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-
+  /* Base form container - each form = 1 page */
+  .tax-form-container,
   .tax-form-print {
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
-    padding: 8mm !important;
-    font-size: 10pt !important;
-    line-height: 1.4 !important;
+    padding: 5mm !important;
     color: #000 !important;
     background: #fff !important;
-    page-break-after: always;
-    page-break-inside: avoid;
+    page-break-after: always !important;
+    page-break-inside: avoid !important;
+    overflow: hidden !important;
   }
 
+  /* Last form no page break after */
+  .tax-form-container:last-child,
   .tax-form-print:last-child {
-    page-break-after: auto;
+    page-break-after: auto !important;
   }
 
-  .tax-form-print table {
-    width: 100% !important;
-    border-collapse: collapse !important;
-    page-break-inside: avoid !important;
-    margin-bottom: 4mm !important;
-  }
-
-  .tax-form-print th,
-  .tax-form-print td {
-    border: 0.5pt solid #000 !important;
-    padding: 3px 5px !important;
-    font-size: 9pt !important;
-    vertical-align: middle !important;
-    background: transparent !important;
-  }
-
-  .tax-form-print th {
-    background-color: #e0e0e0 !important;
-    font-weight: bold !important;
-  }
-
-  .tax-form-print .header-row td,
-  .tax-form-print .header-row th {
-    background-color: #d0d0d0 !important;
-    font-weight: bold !important;
-  }
-
-  .tax-form-print .total-row td {
-    background-color: #f0f0f0 !important;
-    font-weight: bold !important;
-  }
-
-  .tax-form-print .text-right,
-  .tax-form-print .amount-cell {
-    text-align: right !important;
-  }
-
-  .tax-form-print .text-center {
-    text-align: center !important;
-  }
-
-  .tax-form-print .font-bold {
-    font-weight: bold !important;
-  }
-
-  .tax-form-print .form-title {
-    font-size: 13pt !important;
-    font-weight: bold !important;
-    text-align: center !important;
-    margin-bottom: 5mm !important;
-    border-bottom: 1pt solid #000 !important;
-    padding-bottom: 3mm !important;
-  }
-
-  .tax-form-print .section-title {
-    font-size: 11pt !important;
-    font-weight: bold !important;
-    margin: 4mm 0 3mm !important;
-    background: #333 !important;
-    color: #fff !important;
-    padding: 3px 5px !important;
-  }
-
-  .tax-form-print .signature-box {
-    display: flex !important;
-    justify-content: space-between !important;
-    margin-top: 10mm !important;
-    page-break-inside: avoid !important;
-  }
-
-  .tax-form-print .signature-item {
-    text-align: center !important;
-    min-width: 50mm !important;
-  }
-
-  .tax-form-print .signature-line {
-    border-top: 0.5pt solid #000 !important;
-    margin-top: 20mm !important;
-    padding-top: 3mm !important;
-  }
-
-  /* Hide footer from all forms except last */
-  .tax-form-print .form-footer {
-    display: none !important;
-  }
-
-  /* Only show footer on last form (Form16B) */
-  .tax-form-print:last-child .form-footer {
-    display: block !important;
-    font-size: 8pt !important;
-    text-align: center !important;
-    margin-top: 8mm !important;
-    color: #444 !important;
-    border-top: 0.5pt dashed #999 !important;
-    padding-top: 3mm !important;
-  }
-
-  .tax-form-print input {
-    border: none !important;
-    background: transparent !important;
-    font-size: 9pt !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    text-align: right !important;
-  }
-
-  .page-break {
-    page-break-before: always !important;
-  }
-
-  /* Pagar form specific styles - optimized for FULL PAGE landscape */
+  /* ========================================
+     PAGAR FORM - A4 LANDSCAPE FULL PAGE
+     ======================================== */
   #pagar-form {
-    font-size: 8pt !important;
-    padding: 5mm !important;
-    height: calc(100vh - 10mm) !important;
+    font-size: 7pt !important;
+    padding: 3mm !important;
+    height: 190mm !important; /* A4 landscape height minus margins */
+    max-height: 190mm !important;
     display: flex !important;
     flex-direction: column !important;
   }
 
+  #pagar-form > .text-center.font-bold {
+    font-size: 10pt !important;
+    margin-bottom: 2mm !important;
+    padding-bottom: 1mm !important;
+  }
+
   #pagar-form table {
-    flex: 1 !important;
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-bottom: 1mm !important;
   }
 
   #pagar-form table th,
   #pagar-form table td {
-    font-size: 7pt !important;
-    padding: 2px 3px !important;
+    border: 0.3pt solid #000 !important;
+    font-size: 6pt !important;
+    padding: 1px 2px !important;
+    line-height: 1.1 !important;
+    vertical-align: middle !important;
   }
 
   #pagar-form input {
+    font-size: 6pt !important;
+    border: none !important;
+    background: transparent !important;
+  }
+
+  #pagar-form .signature-box,
+  #pagar-form > .flex.justify-between {
+    margin-top: 2mm !important;
     font-size: 7pt !important;
   }
 
-  /* Portrait forms - Declaration, Aavak Vera A/B, Form 16A/B - FULL PAGE */
+  /* ========================================
+     PORTRAIT FORMS - A4 PORTRAIT FULL PAGE
+     Declaration, Aavak Vera A/B, Form 16A/B
+     ======================================== */
   #declaration-form,
-  #aavak-vera-a-form,
-  #aavak-vera-b-form,
+  #aavak-vera-form-a,
+  #aavak-vera-form-b,
   #form-16a,
   #form-16b {
-    font-size: 10pt !important;
-    height: auto !important;
-    min-height: calc(100vh - 20mm) !important;
+    font-size: 9pt !important;
+    padding: 6mm !important;
+    height: 277mm !important; /* A4 portrait height minus margins */
+    max-height: 277mm !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  #declaration-form > .text-center.font-bold,
+  #aavak-vera-form-a > .text-center.font-bold,
+  #aavak-vera-form-b > .text-center.font-bold,
+  #form-16a > .text-center.font-bold,
+  #form-16b > .text-center.font-bold {
+    font-size: 12pt !important;
+    margin-bottom: 3mm !important;
+  }
+
+  #declaration-form table,
+  #aavak-vera-form-a table,
+  #aavak-vera-form-b table,
+  #form-16a table,
+  #form-16b table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-bottom: 2mm !important;
   }
 
   #declaration-form table th,
   #declaration-form table td,
-  #aavak-vera-a-form table th,
-  #aavak-vera-a-form table td,
-  #aavak-vera-b-form table th,
-  #aavak-vera-b-form table td,
+  #aavak-vera-form-a table th,
+  #aavak-vera-form-a table td,
+  #aavak-vera-form-b table th,
+  #aavak-vera-form-b table td,
   #form-16a table th,
   #form-16a table td,
   #form-16b table th,
   #form-16b table td {
+    border: 0.4pt solid #000 !important;
+    font-size: 8pt !important;
+    padding: 2px 4px !important;
+    line-height: 1.2 !important;
+    vertical-align: middle !important;
+  }
+
+  #declaration-form input,
+  #aavak-vera-form-a input,
+  #aavak-vera-form-b input,
+  #form-16a input,
+  #form-16b input {
+    font-size: 8pt !important;
+    border: none !important;
+    background: transparent !important;
+  }
+
+  /* Header rows styling */
+  .header-row td,
+  .header-row th {
+    background-color: #d0d0d0 !important;
+    font-weight: bold !important;
+  }
+
+  /* Total rows styling */
+  .total-row td {
+    background-color: #f0f0f0 !important;
+    font-weight: bold !important;
+  }
+
+  /* Amount cells */
+  .amount-cell {
+    text-align: right !important;
+    font-family: 'Courier New', monospace !important;
+  }
+
+  /* ========================================
+     FOOTER - Only on last page (Form16B)
+     ======================================== */
+  .form-footer {
+    display: none !important;
+  }
+
+  /* Show footer only on last form */
+  .tax-form-container:last-child .form-footer,
+  .tax-form-print:last-child .form-footer,
+  #form-16b .form-footer {
+    display: block !important;
+    font-size: 8pt !important;
+    text-align: center !important;
+    margin-top: auto !important;
+    padding-top: 3mm !important;
+    border-top: 0.5pt dashed #666 !important;
+    color: #333 !important;
+  }
+
+  /* Signature sections */
+  .signature-box {
+    display: flex !important;
+    justify-content: space-between !important;
+    margin-top: 4mm !important;
+  }
+
+  .signature-line {
+    border-top: 0.5pt solid #000 !important;
+    margin-top: 10mm !important;
+    padding-top: 2mm !important;
+  }
+
+  /* Input styling in print */
+  input {
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Section titles */
+  .section-title {
     font-size: 9pt !important;
-    padding: 3px 5px !important;
+    font-weight: bold !important;
+    background: #333 !important;
+    color: #fff !important;
+    padding: 2px 4px !important;
+    margin: 2mm 0 !important;
   }
 }
 
-/* Screen Styles for Tax Form Preview */
-/* Hide number input spinners globally in tax forms */
+/* ==========================================
+   SCREEN STYLES - For preview
+   ========================================== */
+
+/* Hide number input spinners */
 .tax-form-container input[type="number"],
 .tax-form-container input {
   -moz-appearance: textfield !important;
