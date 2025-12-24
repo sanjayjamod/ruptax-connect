@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import { getClientById, updateClientStatus } from "@/lib/clientStorage";
 import { getOrCreateTaxForm, saveTaxForm, calculateTax } from "@/lib/taxFormStorage";
 import { fillSampleDataForClient } from "@/lib/sampleTaxData";
+import { importTaxFormFromExcel } from "@/lib/taxFormExcelImport";
 import { Client } from "@/types/client";
 import { TaxFormData } from "@/types/taxForm";
 import PagarForm from "@/components/taxforms/PagarForm";
@@ -15,7 +16,7 @@ import AavakVeraFormA from "@/components/taxforms/AavakVeraFormA";
 import AavakVeraFormB from "@/components/taxforms/AavakVeraFormB";
 import Form16A from "@/components/taxforms/Form16A";
 import Form16B from "@/components/taxforms/Form16B";
-import { Search, Printer, FileText, FileSpreadsheet, Save, ArrowLeft, Calculator, RefreshCw, Database, Loader2, PanelRightOpen, PanelRightClose } from "lucide-react";
+import { Search, Printer, FileText, FileSpreadsheet, Save, ArrowLeft, Calculator, RefreshCw, Database, Loader2, PanelRightOpen, PanelRightClose, Upload } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import TaxChatbot from "@/components/TaxChatbot";
 import SideCalculator from "@/components/admin/SideCalculator";
@@ -32,7 +33,9 @@ const TaxFormAdmin = () => {
   const [activeTab, setActiveTab] = useState("pagar");
   const [autoCalcEnabled, setAutoCalcEnabled] = useState(true);
   const [showTemplates, setShowTemplates] = useState(true);
+  const [isImporting, setIsImporting] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Check admin authentication via Supabase
   useEffect(() => {
@@ -124,6 +127,34 @@ const TaxFormAdmin = () => {
         title: "Sample Data Loaded", 
         description: `Excel data filled for ${client.name}. Click Save to persist.` 
       });
+    }
+  };
+
+  const handleImportExcel = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !client) return;
+    
+    setIsImporting(true);
+    try {
+      const importedData = await importTaxFormFromExcel(file, client.id);
+      const calculated = calculateTax(importedData);
+      setFormData(calculated);
+      toast({ 
+        title: "Excel Imported", 
+        description: `Form data imported from ${file.name}. All forms mapped automatically.` 
+      });
+    } catch (error) {
+      console.error('Excel import error:', error);
+      toast({ 
+        title: "Import Error", 
+        description: (error as Error).message,
+        variant: "destructive"
+      });
+    } finally {
+      setIsImporting(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -341,10 +372,27 @@ const TaxFormAdmin = () => {
 
             {client && (
               <>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  accept=".xlsx,.xls,.xlsm"
+                  onChange={handleImportExcel}
+                  className="hidden"
+                />
+                <Button 
+                  onClick={() => fileInputRef.current?.click()} 
+                  variant="default" 
+                  size="sm" 
+                  title="Import from Excel file (.xlsm)"
+                  disabled={isImporting}
+                >
+                  {isImporting ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Upload className="h-4 w-4 mr-1" />}
+                  Import Excel
+                </Button>
                 <Button onClick={handleLoadSampleData} variant="secondary" size="sm" title="Load sample data from Excel">
                   <Database className="h-4 w-4 mr-1" /> Sample
                 </Button>
-                <Button 
+                <Button
                   onClick={() => setAutoCalcEnabled(!autoCalcEnabled)} 
                   variant={autoCalcEnabled ? "default" : "outline"} 
                   size="sm"
