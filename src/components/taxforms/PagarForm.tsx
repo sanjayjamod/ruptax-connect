@@ -297,7 +297,7 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
   );
 
   return (
-    <div className="tax-form-container tax-form-print" id="pagar-form">
+    <div className="tax-form-container tax-form-print pagar-page" id="pagar-form">
       {/* Header */}
       <div className="text-center font-bold text-lg mb-2 border-b-2 border-black pb-1">
         {formData.salaryData.financialYear}
