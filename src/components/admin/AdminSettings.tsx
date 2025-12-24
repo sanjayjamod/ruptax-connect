@@ -26,7 +26,10 @@ import {
   RotateCcw, 
   Trash2,
   Shield,
-  Save
+  Save,
+  Mail,
+  Eye,
+  EyeOff
 } from "lucide-react";
 
 interface AdminSettingsProps {
@@ -41,6 +44,19 @@ const AdminSettings = ({ onResetData }: AdminSettingsProps) => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  
+  // Email Settings
+  const [resendApiKey, setResendApiKey] = useState(
+    localStorage.getItem("ruptax_resend_api_key") || ""
+  );
+  const [senderEmail, setSenderEmail] = useState(
+    localStorage.getItem("ruptax_sender_email") || ""
+  );
+  const [senderName, setSenderName] = useState(
+    localStorage.getItem("ruptax_sender_name") || "RupTax"
+  );
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [isSavingEmail, setIsSavingEmail] = useState(false);
 
   const toggleTheme = () => {
     document.documentElement.classList.toggle("dark");
@@ -113,8 +129,112 @@ const AdminSettings = ({ onResetData }: AdminSettingsProps) => {
     }
   };
 
+  const handleSaveEmailSettings = () => {
+    setIsSavingEmail(true);
+    try {
+      localStorage.setItem("ruptax_resend_api_key", resendApiKey);
+      localStorage.setItem("ruptax_sender_email", senderEmail);
+      localStorage.setItem("ruptax_sender_name", senderName);
+      
+      toast({
+        title: "Email Settings Saved",
+        description: "Your email configuration has been saved successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save email settings",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSavingEmail(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* Email Settings */}
+      <Card className="border-border/50 shadow-sm">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Mail className="h-4 w-4" />
+            Email Settings (SMTP)
+          </CardTitle>
+          <CardDescription>
+            Configure email settings for sending forms to clients. 
+            <a 
+              href="https://resend.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-primary hover:underline ml-1"
+            >
+              Get Resend API Key
+            </a>
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="resend-api-key">Resend API Key</Label>
+            <div className="relative">
+              <Input
+                id="resend-api-key"
+                type={showApiKey ? "text" : "password"}
+                value={resendApiKey}
+                onChange={(e) => setResendApiKey(e.target.value)}
+                placeholder="re_xxxxxxxx..."
+                className="pr-10"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                onClick={() => setShowApiKey(!showApiKey)}
+              >
+                {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Create an API key at resend.com/api-keys
+            </p>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="sender-name">Sender Name</Label>
+            <Input
+              id="sender-name"
+              type="text"
+              value={senderName}
+              onChange={(e) => setSenderName(e.target.value)}
+              placeholder="RupTax"
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="sender-email">Sender Email</Label>
+            <Input
+              id="sender-email"
+              type="email"
+              value={senderEmail}
+              onChange={(e) => setSenderEmail(e.target.value)}
+              placeholder="noreply@yourdomain.com"
+            />
+            <p className="text-xs text-muted-foreground">
+              Domain must be verified at resend.com/domains
+            </p>
+          </div>
+
+          <Button 
+            onClick={handleSaveEmailSettings} 
+            disabled={isSavingEmail || !resendApiKey}
+            className="w-full"
+          >
+            <Save className="h-4 w-4 mr-2" />
+            {isSavingEmail ? "Saving..." : "Save Email Settings"}
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* Theme Settings */}
       <Card className="border-border/50 shadow-sm">
         <CardHeader>
