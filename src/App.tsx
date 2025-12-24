@@ -12,6 +12,7 @@ import TaxForm from "./pages/TaxForm";
 import AdminDashboard from "./pages/AdminDashboard";
 import ClientDashboard from "./pages/ClientDashboard";
 import TaxFormAdmin from "./pages/TaxFormAdmin";
+import ClientTaxForm from "./pages/ClientTaxForm";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/client-dashboard" element={<ClientDashboard />} />
             <Route path="/tax-form-admin" element={<TaxFormAdmin />} />
+            <Route path="/client-tax-form" element={<ClientTaxForm />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
