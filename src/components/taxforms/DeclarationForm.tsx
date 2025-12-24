@@ -223,18 +223,20 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false, isManua
         </tbody>
       </table>
 
-      {/* Signature Section */}
-      <div className="flex justify-between mt-6 text-[11px]">
-        <div>
-          <p className="mb-8">કર્મચારીની સહી</p>
-          <p>હોદ્દો: {client.designationGujarati || client.designation || '-'}</p>
-          <p>સ્થળ: {client.schoolNameGujarati || client.schoolName || '-'}</p>
-          <p>તારીખ: _______________</p>
-        </div>
-        <div className="text-right">
-          <p className="mb-8">સંસ્થાના વડાની સહી</p>
-          <p>સિક્કો</p>
-          <p>તારીખ: _______________</p>
+      {/* Signature Section - Paragraph Format */}
+      <div className="mt-8 text-[11px] leading-relaxed">
+        <div className="flex justify-between">
+          <div className="text-left">
+            <p className="font-bold mb-4">કર્મચારીની સહી</p>
+            <p className="mb-1">હોદ્દો: {client.designationGujarati || client.designation || 'શિક્ષક'}</p>
+            <p className="mb-1">સ્થળ: {client.schoolNameGujarati || client.schoolName || '-'}</p>
+            <p>તારીખ: _______________</p>
+          </div>
+          <div className="text-right">
+            <p className="font-bold mb-4">સંસ્થાના વડાની સહી</p>
+            <p className="mb-1">સિક્કો</p>
+            <p>તારીખ: _______________</p>
+          </div>
         </div>
       </div>
 
