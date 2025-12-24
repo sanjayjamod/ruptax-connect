@@ -225,21 +225,22 @@
     break-after: page !important;
   }
 
-  /* આવકવેરા A and B - FULL PAGE with stretched tables */
+  /* આવકવેરા A and B - COMPACT to fit on single page */
   #aavak-vera-form-a,
   #aavak-vera-form-b {
     width: 198mm !important;
     max-width: 198mm !important;
-    min-height: 282mm !important;
-    height: 282mm !important;
-    max-height: 282mm !important;
-    padding: 4mm !important;
-    font-size: 8pt !important;
+    min-height: 280mm !important;
+    height: 280mm !important;
+    max-height: 280mm !important;
+    padding: 3mm !important;
+    font-size: 7pt !important;
     overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column !important;
+    display: block !important;
     page-break-after: always !important;
     break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
     box-sizing: border-box !important;
   }
 
@@ -261,8 +262,8 @@
   /* આવકવેરા Form Titles - Match PDF layout */
   #aavak-vera-form-a table:first-of-type td.text-center.font-bold,
   #aavak-vera-form-b table:first-of-type td.text-center.font-bold {
-    font-size: 11pt !important;
-    padding: 2mm !important;
+    font-size: 10pt !important;
+    padding: 1mm !important;
     font-weight: bold !important;
   }
 
@@ -276,21 +277,14 @@
     border: 0.5pt solid #000 !important;
   }
 
-  /* આવકવેરા Tables - Full width with proper spacing */
+  /* આવકવેરા Tables - COMPACT spacing */
   #aavak-vera-form-a table,
   #aavak-vera-form-b table {
     width: 100% !important;
     border-collapse: collapse !important;
-    margin-bottom: 1mm !important;
-    margin-top: 1mm !important;
-    border: 0.5pt solid #000 !important;
-    flex-shrink: 0 !important;
-  }
-
-  /* Last table in aavak vera forms - stretch to fill remaining space */
-  #aavak-vera-form-a table:last-of-type,
-  #aavak-vera-form-b table:last-of-type {
-    flex-grow: 1 !important;
+    margin-bottom: 0.3mm !important;
+    margin-top: 0.3mm !important;
+    border: 0.4pt solid #000 !important;
   }
 
   #declaration-form table th,
@@ -306,16 +300,24 @@
     vertical-align: middle !important;
   }
 
-  /* આવકવેરા Tables - Proper cell sizing */
+  /* આવકવેરા Tables - COMPACT cells to fit page */
   #aavak-vera-form-a table th,
   #aavak-vera-form-a table td,
   #aavak-vera-form-b table th,
   #aavak-vera-form-b table td {
-    border: 0.5pt solid #000 !important;
-    font-size: 8pt !important;
-    padding: 1.5mm 2mm !important;
-    line-height: 1.3 !important;
+    border: 0.4pt solid #000 !important;
+    font-size: 6.5pt !important;
+    padding: 0.5mm 1mm !important;
+    line-height: 1.1 !important;
     vertical-align: middle !important;
+  }
+
+  /* આવકવેરા footer - compact */
+  #aavak-vera-form-a .form-footer,
+  #aavak-vera-form-b .form-footer {
+    font-size: 5pt !important;
+    margin-top: 1mm !important;
+    padding-top: 0.5mm !important;
   }
 
   #declaration-form input,
