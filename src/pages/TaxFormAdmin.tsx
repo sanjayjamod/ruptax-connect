@@ -479,7 +479,8 @@ const TaxFormAdmin = () => {
               {client && formData ? (
                 <div className="no-print">
                   <Tabs value={activeTab} onValueChange={setActiveTab}>
-                    <TabsList className="grid w-full grid-cols-6 mb-4">
+                    <TabsList className="grid w-full grid-cols-7 mb-4">
+                      <TabsTrigger value="profile" className="text-xs">Profile</TabsTrigger>
                       <TabsTrigger value="pagar" className="text-xs">પગાર</TabsTrigger>
                       <TabsTrigger value="declaration" className="text-xs">Declaration</TabsTrigger>
                       <TabsTrigger value="formA" className="text-xs">આવકવેરા A</TabsTrigger>
@@ -489,6 +490,40 @@ const TaxFormAdmin = () => {
                     </TabsList>
 
                     <div className="border rounded-lg p-4 bg-white dark:bg-card overflow-auto max-h-[70vh]">
+                      <TabsContent value="profile" className="mt-0">
+                        <div className="space-y-4">
+                          <h2 className="text-lg font-bold border-b pb-2">Client Profile / ક્લાયન્ટ પ્રોફાઇલ</h2>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div className="space-y-3">
+                              <p><strong>ID:</strong> {client.id}</p>
+                              <p><strong>Name / નામ:</strong> {client.name}</p>
+                              <p><strong>Name (Gujarati) / નામ (ગુજરાતી):</strong> {client.nameGujarati || '-'}</p>
+                              <p><strong>Designation / હોદ્દો:</strong> {client.designation || '-'}</p>
+                              <p><strong>Designation (Gujarati):</strong> {client.designationGujarati || '-'}</p>
+                              <p><strong>School Name / શાળાનું નામ:</strong> {client.schoolName || '-'}</p>
+                              <p><strong>School Name (Gujarati):</strong> {client.schoolNameGujarati || '-'}</p>
+                              <p><strong>School Address / શાળાનું સરનામું:</strong> {client.schoolAddress || '-'}</p>
+                              <p><strong>Address (Gujarati):</strong> {client.addressGujarati || '-'}</p>
+                            </div>
+                            <div className="space-y-3">
+                              <p><strong>PAN No:</strong> {client.panNo || '-'}</p>
+                              <p><strong>Aadhar No:</strong> {client.aadharNo || '-'}</p>
+                              <p><strong>Mobile No:</strong> {client.mobileNo || '-'}</p>
+                              <p><strong>Email:</strong> {client.email || '-'}</p>
+                              <p><strong>Bank A/C No:</strong> {client.bankAcNo || '-'}</p>
+                              <p><strong>IFSC Code:</strong> {client.ifscCode || '-'}</p>
+                              <p><strong>Date of Birth:</strong> {client.dateOfBirth || '-'}</p>
+                              <p><strong>Pay Center:</strong> {client.payCenterName || '-'}</p>
+                              <p><strong>Pay Center Address:</strong> {client.payCenterAddress || '-'}</p>
+                            </div>
+                          </div>
+                          <div className="border-t pt-3 mt-3">
+                            <p><strong>Head Master Place:</strong> {client.headMasterPlace || '-'}</p>
+                            <p><strong>TDO:</strong> {client.tdo || '-'}</p>
+                            <p><strong>Place:</strong> {client.place || '-'}</p>
+                          </div>
+                        </div>
+                      </TabsContent>
                       <TabsContent value="pagar" className="mt-0">
                         <PagarForm client={client} formData={formData} onChange={handleFormChange} isManualMode={isManualMode} />
                       </TabsContent>
