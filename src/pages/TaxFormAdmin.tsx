@@ -603,18 +603,25 @@ const TaxFormAdmin = () => {
                           </div>
                           
                           <div className="border-t pt-3 mt-3">
+                            <h3 className="text-md font-bold mb-3 text-primary">HEAD MASTER / હેડ માસ્ટર</h3>
                             {isEditingProfile ? (
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                <div><strong>Head Master Place:</strong> <Input value={editedClient.headMasterPlace || ''} onChange={(e) => handleProfileFieldChange('headMasterPlace', e.target.value)} className="mt-1 h-8" /></div>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div><strong>HEAD MASTER:</strong> <Input value={editedClient.headMaster || ''} onChange={(e) => handleProfileFieldChange('headMaster', e.target.value)} className="mt-1 h-8" placeholder="HEAD MASTER નામ" /></div>
+                                <div><strong>HEAD MASTER FATHER:</strong> <Input value={editedClient.headMasterFather || ''} onChange={(e) => handleProfileFieldChange('headMasterFather', e.target.value)} className="mt-1 h-8" placeholder="HEAD MASTER પિતાનું નામ" /></div>
+                                <div><strong>HEAD MASTER PLACE:</strong> <Input value={editedClient.headMasterPlace || ''} onChange={(e) => handleProfileFieldChange('headMasterPlace', e.target.value)} className="mt-1 h-8" placeholder="Place" /></div>
                                 <div><strong>TDO:</strong> <Input value={editedClient.tdo || ''} onChange={(e) => handleProfileFieldChange('tdo', e.target.value)} className="mt-1 h-8" /></div>
+                                <div><strong>TDO FATHER:</strong> <Input value={editedClient.tdf || ''} onChange={(e) => handleProfileFieldChange('tdf', e.target.value)} className="mt-1 h-8" /></div>
                                 <div><strong>Place:</strong> <Input value={editedClient.place || ''} onChange={(e) => handleProfileFieldChange('place', e.target.value)} className="mt-1 h-8" /></div>
                               </div>
                             ) : (
-                              <>
-                                <p><strong>Head Master Place:</strong> {client.headMasterPlace || '-'}</p>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                <p><strong>HEAD MASTER:</strong> <span className="text-primary font-medium">{client.headMaster || '-'}</span></p>
+                                <p><strong>HEAD MASTER FATHER:</strong> <span className="text-primary font-medium">{client.headMasterFather || '-'}</span></p>
+                                <p><strong>HEAD MASTER PLACE:</strong> {client.headMasterPlace || '-'}</p>
                                 <p><strong>TDO:</strong> {client.tdo || '-'}</p>
+                                <p><strong>TDO FATHER:</strong> {client.tdf || '-'}</p>
                                 <p><strong>Place:</strong> {client.place || '-'}</p>
-                              </>
+                              </div>
                             )}
                           </div>
 
