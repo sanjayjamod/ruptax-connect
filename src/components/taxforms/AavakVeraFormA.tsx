@@ -289,7 +289,7 @@ const AavakVeraFormA = ({ client, formData, onChange, readOnly = false, isManual
       </table>
 
       {/* Footer */}
-      <div className="form-footer text-center mt-2 pt-1" style={{ fontSize: '6pt' }}>
+      <div className="form-footer text-center mt-2 pt-1.5" style={{ fontSize: '6pt' }}>
         Developed by - Smart Computer - 9924640689 ,9574031243
       </div>
     </div>
