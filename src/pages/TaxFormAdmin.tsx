@@ -24,6 +24,7 @@ import SideCalculator from "@/components/admin/SideCalculator";
 import SampleTemplates from "@/components/admin/SampleTemplates";
 import WhatsAppShare from "@/components/admin/WhatsAppShare";
 import EmailShare from "@/components/admin/EmailShare";
+import PrintSettings from "@/components/admin/PrintSettings";
 import { useAuth } from "@/hooks/useAuth";
 const TaxFormAdmin = () => {
   const navigate = useNavigate();
@@ -612,6 +613,7 @@ ${generateRow('21', 'ચુકવેલ રકમ', 'netPay')}
                 <Button onClick={handleSave} size="sm">
                   <Save className="h-4 w-4 mr-1" /> Save
                 </Button>
+                <PrintSettings client={client} formData={formData} onChange={handleFormChange} />
                 <Button onClick={handlePrint} variant="outline" size="sm">
                   <Printer className="h-4 w-4 mr-1" /> Print All
                 </Button>
