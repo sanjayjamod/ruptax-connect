@@ -113,6 +113,14 @@ const PrintSettings = ({ client, formData, onChange }: PrintSettingsProps) => {
     };
   });
 
+  // Global page border settings for all forms
+  const [globalBorder, setGlobalBorder] = useState({
+    enabled: false,
+    width: 1,
+    style: "solid" as "solid" | "dashed" | "dotted" | "double",
+    color: "#000000",
+  });
+
   const updateFormSetting = <K extends keyof FormPrintSettings>(
     formKey: keyof AllFormSettings,
     field: K,
@@ -123,6 +131,28 @@ const PrintSettings = ({ client, formData, onChange }: PrintSettingsProps) => {
       [formKey]: { ...prev[formKey], [field]: value },
     }));
   };
+
+  // Apply global border to all forms
+  const applyGlobalBorder = () => {
+    setSettings(prev => {
+      const updated = { ...prev };
+      (Object.keys(updated) as Array<keyof AllFormSettings>).forEach(key => {
+        updated[key] = {
+          ...updated[key],
+          pageBorder: globalBorder.enabled,
+          pageBorderWidth: globalBorder.width,
+          pageBorderStyle: globalBorder.style,
+          pageBorderColor: globalBorder.color,
+        };
+      });
+      return updated;
+    });
+  };
+
+  // Effect to auto-apply global border when changed
+  useEffect(() => {
+    applyGlobalBorder();
+  }, [globalBorder]);
 
   const saveSettings = () => {
     localStorage.setItem("printSettings", JSON.stringify(settings));
@@ -525,25 +555,25 @@ const PrintSettings = ({ client, formData, onChange }: PrintSettingsProps) => {
                       />
                     </div>
                     
-                    {/* Page Border Section */}
+                    {/* Global Page Border Section - Applies to ALL forms */}
                     <div className="border-t pt-4 mt-4">
-                      <Label className="text-sm font-semibold mb-2 block">Page Border - પેજ બોર્ડર</Label>
+                      <Label className="text-sm font-semibold mb-2 block">Page Border - પેજ બોર્ડર (બધા ફોર્મ માટે)</Label>
                       <div className="flex items-center justify-between mb-3">
                         <Label>Enable Page Border - પેજ બોર્ડર ચાલુ</Label>
                         <Switch
-                          checked={currentSettings.pageBorder}
-                          onCheckedChange={(checked) => updateFormSetting(activeForm, "pageBorder", checked)}
+                          checked={globalBorder.enabled}
+                          onCheckedChange={(checked) => setGlobalBorder(prev => ({ ...prev, enabled: checked }))}
                         />
                       </div>
                       
-                      {currentSettings.pageBorder && (
+                      {globalBorder.enabled && (
                         <div className="space-y-3 pl-4 border-l-2 border-primary/20">
                           <div>
                             <Label>Border Style - બોર્ડર ડિઝાઇન</Label>
                             <Select
-                              value={currentSettings.pageBorderStyle}
+                              value={globalBorder.style}
                               onValueChange={(value: "solid" | "dashed" | "dotted" | "double") =>
-                                updateFormSetting(activeForm, "pageBorderStyle", value)
+                                setGlobalBorder(prev => ({ ...prev, style: value }))
                               }
                             >
                               <SelectTrigger>
@@ -561,17 +591,17 @@ const PrintSettings = ({ client, formData, onChange }: PrintSettingsProps) => {
                             <Label>Border Width (pt) - બોર્ડર જાડાઈ</Label>
                             <div className="flex items-center gap-2">
                               <Slider
-                                value={[currentSettings.pageBorderWidth]}
+                                value={[globalBorder.width]}
                                 min={0.5}
                                 max={5}
                                 step={0.5}
-                                onValueChange={([value]) => updateFormSetting(activeForm, "pageBorderWidth", value)}
+                                onValueChange={([value]) => setGlobalBorder(prev => ({ ...prev, width: value }))}
                                 className="flex-1"
                               />
                               <Input
                                 type="number"
-                                value={currentSettings.pageBorderWidth}
-                                onChange={(e) => updateFormSetting(activeForm, "pageBorderWidth", Number(e.target.value))}
+                                value={globalBorder.width}
+                                onChange={(e) => setGlobalBorder(prev => ({ ...prev, width: Number(e.target.value) }))}
                                 className="w-16"
                                 step={0.5}
                               />
@@ -582,14 +612,14 @@ const PrintSettings = ({ client, formData, onChange }: PrintSettingsProps) => {
                             <div className="flex items-center gap-2">
                               <input
                                 type="color"
-                                value={currentSettings.pageBorderColor}
-                                onChange={(e) => updateFormSetting(activeForm, "pageBorderColor", e.target.value)}
+                                value={globalBorder.color}
+                                onChange={(e) => setGlobalBorder(prev => ({ ...prev, color: e.target.value }))}
                                 className="w-10 h-10 rounded border cursor-pointer"
                               />
                               <Input
                                 type="text"
-                                value={currentSettings.pageBorderColor}
-                                onChange={(e) => updateFormSetting(activeForm, "pageBorderColor", e.target.value)}
+                                value={globalBorder.color}
+                                onChange={(e) => setGlobalBorder(prev => ({ ...prev, color: e.target.value }))}
                                 className="flex-1"
                                 placeholder="#000000"
                               />
