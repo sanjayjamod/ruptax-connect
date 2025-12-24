@@ -477,28 +477,6 @@ const AdminDashboard = () => {
               {/* Client List */}
               {(activeSection === "dashboard" || activeSection === "teachers") && (
                 <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden animate-fade-in">
-                  <div className="border-b border-border bg-gradient-to-r from-muted/30 to-muted/10 px-6 py-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="rounded-lg bg-primary/10 p-2">
-                          <Users className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <h2 className="font-display text-lg font-semibold text-foreground">
-                            Teacher Registrations
-                          </h2>
-                          <p className="text-sm text-muted-foreground">
-                            Manage and track all tax registrations
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
-                          {filteredClients.length} of {clients.length}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
                   <div className="p-6">
                     <ClientList
                       clients={filteredClients}
