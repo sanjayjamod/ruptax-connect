@@ -1,17 +1,17 @@
 /* Print Styles for Tax Forms - A4 Size */
-/* Each form must fit on exactly 1 page */
+/* Pagar Form: A4 Landscape, Others: A4 Portrait */
 
 @media print {
-  /* Default page style - Portrait */
+  /* Default page style - Portrait for most forms */
   @page {
     size: A4 portrait;
-    margin: 5mm;
+    margin: 8mm;
   }
 
   /* Pagar form - Landscape A4 */
   @page pagar {
     size: A4 landscape;
-    margin: 3mm;
+    margin: 5mm;
   }
 
   /* Apply landscape to pagar form */
@@ -72,12 +72,14 @@
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
-    padding: 3mm !important;
+    padding: 0 !important;
     color: #000 !important;
     background: #fff !important;
     page-break-after: always !important;
     page-break-inside: avoid !important;
     overflow: visible !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
 
   /* Last form no page break after */
@@ -88,79 +90,79 @@
 
   /* ========================================
      PAGAR FORM - A4 LANDSCAPE FULL PAGE
-     Width: 297mm, Height: 210mm (minus margins)
+     Width: 297mm, Height: 210mm
      ======================================== */
   #pagar-form {
-    width: 291mm !important; /* 297mm - 6mm margins */
-    height: 204mm !important; /* 210mm - 6mm margins */
-    max-height: 204mm !important;
-    max-width: 291mm !important;
-    padding: 2mm !important;
-    display: block !important;
-    overflow: hidden !important;
-    font-size: 8pt !important;
+    width: 287mm !important; /* 297mm - 10mm margins */
+    min-height: 200mm !important; /* 210mm - 10mm margins */
+    max-width: 287mm !important;
+    padding: 3mm !important;
+    display: flex !important;
+    flex-direction: column !important;
+    font-size: 7pt !important;
   }
 
-  /* Title */
+  /* Pagar Title */
   #pagar-form > .text-center.font-bold.text-lg {
-    font-size: 14pt !important;
+    font-size: 12pt !important;
     font-weight: bold !important;
     margin-bottom: 2mm !important;
     padding-bottom: 1mm !important;
     border-bottom: 1pt solid #000 !important;
   }
 
-  /* Info tables */
+  /* Pagar Info tables */
   #pagar-form > table.mb-2 {
     width: 100% !important;
-    margin-bottom: 1.5mm !important;
+    margin-bottom: 1mm !important;
   }
 
   #pagar-form > table.mb-2 td {
     border: none !important;
-    font-size: 9pt !important;
+    font-size: 8pt !important;
     padding: 0.5mm 2mm !important;
-    line-height: 1.3 !important;
+    line-height: 1.2 !important;
   }
 
-  /* Main salary table - full width */
+  /* Pagar Main salary table - full width */
   #pagar-form > table:last-of-type {
     width: 100% !important;
     border-collapse: collapse !important;
     margin-bottom: 2mm !important;
     table-layout: fixed !important;
+    flex: 1 !important;
   }
 
   #pagar-form > table:last-of-type th,
   #pagar-form > table:last-of-type td {
     border: 0.5pt solid #000 !important;
-    font-size: 7pt !important;
-    padding: 1mm !important;
-    line-height: 1.2 !important;
+    font-size: 6.5pt !important;
+    padding: 0.8mm !important;
+    line-height: 1.1 !important;
     vertical-align: middle !important;
     overflow: hidden !important;
     white-space: nowrap !important;
   }
 
   #pagar-form > table:last-of-type th {
-    background-color: #f0f0f0 !important;
+    background-color: #e8e8e8 !important;
     font-weight: bold !important;
   }
 
   /* Column widths for salary table */
   #pagar-form > table:last-of-type th:first-child,
   #pagar-form > table:last-of-type td:first-child {
-    width: 6mm !important; /* ક્રમ */
+    width: 5mm !important;
   }
 
   #pagar-form > table:last-of-type th:nth-child(2),
   #pagar-form > table:last-of-type td:nth-child(2) {
-    width: 28mm !important; /* વેતનની વિગત */
+    width: 22mm !important;
     text-align: left !important;
     white-space: normal !important;
   }
 
-  /* Month columns - 12 months */
+  /* Month columns */
   #pagar-form > table:last-of-type th:nth-child(n+3):nth-child(-n+14),
   #pagar-form > table:last-of-type td:nth-child(n+3):nth-child(-n+14) {
     width: 18mm !important;
@@ -170,7 +172,7 @@
   /* કુલ column */
   #pagar-form > table:last-of-type th:nth-child(15),
   #pagar-form > table:last-of-type td:nth-child(15) {
-    width: 20mm !important;
+    width: 18mm !important;
     text-align: right !important;
     font-weight: bold !important;
   }
@@ -178,41 +180,54 @@
   /* નોંધ column */
   #pagar-form > table:last-of-type th:nth-child(16),
   #pagar-form > table:last-of-type td:nth-child(16) {
-    width: 10mm !important;
+    width: 8mm !important;
   }
 
   #pagar-form input {
-    font-size: 7pt !important;
+    font-size: 6.5pt !important;
     border: none !important;
     background: transparent !important;
     text-align: right !important;
     width: 100% !important;
   }
 
-  /* Signature section */
-  #pagar-form .signature-box,
+  /* Pagar Signature section */
   #pagar-form > .flex.justify-between {
-    margin-top: 3mm !important;
-    font-size: 9pt !important;
+    margin-top: 2mm !important;
+    font-size: 8pt !important;
+  }
+
+  /* Pagar Footer - at bottom */
+  #pagar-form > .form-footer {
+    display: block !important;
+    margin-top: auto !important;
+    padding-top: 2mm !important;
+    font-size: 7pt !important;
+    text-align: center !important;
+    border-top: 0.5pt dashed #666 !important;
+    color: #333 !important;
   }
 
   /* ========================================
      PORTRAIT FORMS - A4 PORTRAIT FULL PAGE
      Declaration, Aavak Vera A/B, Form 16A/B
+     Width: 210mm, Height: 297mm
      ======================================== */
   #declaration-form,
   #aavak-vera-form-a,
   #aavak-vera-form-b,
   #form-16a,
   #form-16b {
+    width: 194mm !important; /* 210mm - 16mm margins */
+    min-height: 281mm !important; /* 297mm - 16mm margins */
+    max-width: 194mm !important;
+    padding: 4mm !important;
     font-size: 9pt !important;
-    padding: 6mm !important;
-    height: 277mm !important; /* A4 portrait height minus margins */
-    max-height: 277mm !important;
     display: flex !important;
     flex-direction: column !important;
   }
 
+  /* Portrait Form Titles */
   #declaration-form > .text-center.font-bold,
   #aavak-vera-form-a > .text-center.font-bold,
   #aavak-vera-form-b > .text-center.font-bold,
@@ -222,6 +237,7 @@
     margin-bottom: 3mm !important;
   }
 
+  /* Portrait Form Tables */
   #declaration-form table,
   #aavak-vera-form-a table,
   #aavak-vera-form-b table,
@@ -245,7 +261,7 @@
     border: 0.4pt solid #000 !important;
     font-size: 8pt !important;
     padding: 2px 4px !important;
-    line-height: 1.2 !important;
+    line-height: 1.3 !important;
     vertical-align: middle !important;
   }
 
@@ -279,18 +295,11 @@
   }
 
   /* ========================================
-     FOOTER - Only on last page (Form16B)
+     FOOTER - Show on ALL pages at bottom
      ======================================== */
   .form-footer {
-    display: none !important;
-  }
-
-  /* Show footer only on last form */
-  .tax-form-container:last-child .form-footer,
-  .tax-form-print:last-child .form-footer,
-  #form-16b .form-footer {
     display: block !important;
-    font-size: 8pt !important;
+    font-size: 7pt !important;
     text-align: center !important;
     margin-top: auto !important;
     padding-top: 3mm !important;
@@ -327,6 +336,15 @@
     color: #fff !important;
     padding: 2px 4px !important;
     margin: 2mm 0 !important;
+  }
+
+  /* Form-specific content should take available space */
+  #declaration-form > table,
+  #aavak-vera-form-a > table,
+  #aavak-vera-form-b > table,
+  #form-16a > table,
+  #form-16b > table {
+    flex-shrink: 0 !important;
   }
 }
 
@@ -467,6 +485,16 @@
   padding-top: 8px;
 }
 
+/* Form footer styling for screen */
+.tax-form-container .form-footer {
+  font-size: 8px;
+  text-align: center;
+  margin-top: auto;
+  padding-top: 8px;
+  color: #666;
+  border-top: 1px dashed #999;
+}
+
 /* Input styling in forms */
 .tax-form-container input[type="number"] {
   width: 100%;
@@ -498,11 +526,7 @@
   
   .tax-form-container th,
   .tax-form-container td {
-    padding: 2px 4px;
     font-size: 8px;
-  }
-  
-  .tax-form-container .form-title {
-    font-size: 14px;
+    padding: 2px 3px;
   }
 }

@@ -412,7 +412,7 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false, isManual
         <p className="text-right mt-2">Signature and seal of Head of office</p>
       </div>
 
-      <div className="text-center text-[8px] mt-4 pt-2 border-t border-dashed border-gray-400 form-footer">
+      <div className="form-footer text-center text-[8px] mt-4 pt-2 border-t border-dashed border-gray-400">
         Created By: Smart Computer Vinchhiya 9924640689, 9574031243
       </div>
     </div>

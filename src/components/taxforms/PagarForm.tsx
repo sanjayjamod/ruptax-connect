@@ -416,7 +416,7 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
         </div>
       </div>
 
-      <div className="text-center text-[8px] mt-4 pt-2 border-t border-dashed border-gray-400 form-footer">
+      <div className="form-footer text-center text-[8px] mt-4 pt-2 border-t border-dashed border-gray-400">
         Created By: Smart Computer Vinchhiya 9924640689, 9574031243
       </div>
     </div>
