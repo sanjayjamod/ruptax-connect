@@ -21,6 +21,7 @@ import {
   updateClient,
   deleteClient,
   getClientStats,
+  clearAllClients,
 } from "@/lib/clientStorage";
 import { importTeachersFromFile, readFileAsText } from "@/lib/excelImport";
 import { toast } from "@/hooks/use-toast";
@@ -274,6 +275,21 @@ const AdminDashboard = () => {
     });
   };
 
+  // Clear all data
+  const handleClearAllData = () => {
+    if (window.confirm('Are you sure you want to delete ALL client data? This cannot be undone!')) {
+      if (window.confirm('FINAL WARNING: This will permanently delete all clients and tax forms. Proceed?')) {
+        clearAllClients();
+        loadData();
+        toast({
+          title: "All Data Cleared",
+          description: "All client data and tax forms have been deleted.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
   // Export data as JSON
   const handleExportJSON = () => {
     const data = JSON.stringify(clients, null, 2);
@@ -389,6 +405,7 @@ const AdminDashboard = () => {
           onImportExcel={triggerFileImport}
           onExportJSON={handleExportJSON}
           onExportCSV={handleExportCSV}
+          onClearAllData={handleClearAllData}
           onOpenNotes={() => setShowNotes(true)}
           activeSection={activeSection}
           onSectionChange={handleSectionChange}
