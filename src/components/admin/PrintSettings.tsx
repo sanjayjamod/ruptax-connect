@@ -37,6 +37,11 @@ interface FormPrintSettings {
   showBorders: boolean;
   showHeader: boolean;
   showFooter: boolean;
+  // Page border options
+  pageBorder: boolean;
+  pageBorderWidth: number;
+  pageBorderStyle: "solid" | "dashed" | "dotted" | "double";
+  pageBorderColor: string;
 }
 
 interface AllFormSettings {
@@ -60,6 +65,10 @@ const defaultSettings: FormPrintSettings = {
   showBorders: true,
   showHeader: true,
   showFooter: true,
+  pageBorder: false,
+  pageBorderWidth: 1,
+  pageBorderStyle: "solid",
+  pageBorderColor: "#000000",
 };
 
 const formNames: { [key: string]: string } = {
@@ -191,10 +200,14 @@ const PrintSettings = ({ client, formData, onChange }: PrintSettingsProps) => {
               form16A: "#form-16a",
               form16B: "#form-16b",
             };
+            const pageBorderStyle = s.pageBorder 
+              ? `border: ${s.pageBorderWidth}pt ${s.pageBorderStyle} ${s.pageBorderColor} !important; box-sizing: border-box !important;` 
+              : '';
             return `
               ${idMap[key]} {
                 padding: ${s.marginTop}mm ${s.marginRight}mm ${s.marginBottom}mm ${s.marginLeft}mm !important;
                 font-size: ${s.fontSize}pt !important;
+                ${pageBorderStyle}
               }
               ${idMap[key]} table th,
               ${idMap[key]} table td {
@@ -228,7 +241,7 @@ const PrintSettings = ({ client, formData, onChange }: PrintSettingsProps) => {
     const s = settings[formKey];
     if (!s.enabled) return null;
 
-    const previewStyle = {
+    const previewStyle: React.CSSProperties = {
       transform: `scale(${previewScale})`,
       transformOrigin: "top left",
       width: s.orientation === "portrait" ? "210mm" : "297mm",
@@ -236,8 +249,11 @@ const PrintSettings = ({ client, formData, onChange }: PrintSettingsProps) => {
       padding: `${s.marginTop}mm ${s.marginRight}mm ${s.marginBottom}mm ${s.marginLeft}mm`,
       fontSize: `${s.fontSize}pt`,
       background: "#fff",
-      border: "1px solid #ccc",
+      border: s.pageBorder 
+        ? `${s.pageBorderWidth}pt ${s.pageBorderStyle} ${s.pageBorderColor}` 
+        : "1px solid #ccc",
       boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+      boxSizing: "border-box",
     };
 
     const formComponents: { [key: string]: JSX.Element } = {
@@ -485,7 +501,7 @@ const PrintSettings = ({ client, formData, onChange }: PrintSettingsProps) => {
                       </div>
                     </div>
                     <div className="flex items-center justify-between">
-                      <Label>Show Borders - બોર્ડર બતાવો</Label>
+                      <Label>Show Table Borders - ટેબલ બોર્ડર બતાવો</Label>
                       <Switch
                         checked={currentSettings.showBorders}
                         onCheckedChange={(checked) => updateFormSetting(activeForm, "showBorders", checked)}
@@ -504,6 +520,80 @@ const PrintSettings = ({ client, formData, onChange }: PrintSettingsProps) => {
                         checked={currentSettings.showFooter}
                         onCheckedChange={(checked) => updateFormSetting(activeForm, "showFooter", checked)}
                       />
+                    </div>
+                    
+                    {/* Page Border Section */}
+                    <div className="border-t pt-4 mt-4">
+                      <Label className="text-sm font-semibold mb-2 block">Page Border - પેજ બોર્ડર</Label>
+                      <div className="flex items-center justify-between mb-3">
+                        <Label>Enable Page Border - પેજ બોર્ડર ચાલુ</Label>
+                        <Switch
+                          checked={currentSettings.pageBorder}
+                          onCheckedChange={(checked) => updateFormSetting(activeForm, "pageBorder", checked)}
+                        />
+                      </div>
+                      
+                      {currentSettings.pageBorder && (
+                        <div className="space-y-3 pl-4 border-l-2 border-primary/20">
+                          <div>
+                            <Label>Border Style - બોર્ડર ડિઝાઇન</Label>
+                            <Select
+                              value={currentSettings.pageBorderStyle}
+                              onValueChange={(value: "solid" | "dashed" | "dotted" | "double") =>
+                                updateFormSetting(activeForm, "pageBorderStyle", value)
+                              }
+                            >
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="solid">Solid (સીધી લાઇન)</SelectItem>
+                                <SelectItem value="dashed">Dashed (ટૂટક લાઇન)</SelectItem>
+                                <SelectItem value="dotted">Dotted (ટપકાં)</SelectItem>
+                                <SelectItem value="double">Double (બેવડી લાઇન)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <Label>Border Width (pt) - બોર્ડર જાડાઈ</Label>
+                            <div className="flex items-center gap-2">
+                              <Slider
+                                value={[currentSettings.pageBorderWidth]}
+                                min={0.5}
+                                max={5}
+                                step={0.5}
+                                onValueChange={([value]) => updateFormSetting(activeForm, "pageBorderWidth", value)}
+                                className="flex-1"
+                              />
+                              <Input
+                                type="number"
+                                value={currentSettings.pageBorderWidth}
+                                onChange={(e) => updateFormSetting(activeForm, "pageBorderWidth", Number(e.target.value))}
+                                className="w-16"
+                                step={0.5}
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <Label>Border Color - બોર્ડર રંગ</Label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="color"
+                                value={currentSettings.pageBorderColor}
+                                onChange={(e) => updateFormSetting(activeForm, "pageBorderColor", e.target.value)}
+                                className="w-10 h-10 rounded border cursor-pointer"
+                              />
+                              <Input
+                                type="text"
+                                value={currentSettings.pageBorderColor}
+                                onChange={(e) => updateFormSetting(activeForm, "pageBorderColor", e.target.value)}
+                                className="flex-1"
+                                placeholder="#000000"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </TabsContent>
                 </Tabs>
