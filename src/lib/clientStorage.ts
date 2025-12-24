@@ -220,3 +220,12 @@ export const importClientsFromJson = (jsonData: string): number => {
     return 0;
   }
 };
+
+// Clear all client data
+export const clearAllClients = (): void => {
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(COUNTER_KEY);
+  localStorage.removeItem(CURRENT_CLIENT_KEY);
+  // Also clear tax forms
+  localStorage.removeItem("ruptax_tax_forms");
+};

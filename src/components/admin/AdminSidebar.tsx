@@ -17,6 +17,7 @@ import {
   Moon,
   Sun,
   ClipboardList,
+  Trash2,
 } from "lucide-react";
 import {
   Sidebar,
@@ -40,6 +41,7 @@ interface AdminSidebarProps {
   onImportExcel?: () => void;
   onExportJSON?: () => void;
   onExportCSV?: () => void;
+  onClearAllData?: () => void;
   onOpenNotes?: () => void;
   activeSection?: string;
   onSectionChange?: (section: string) => void;
@@ -50,6 +52,7 @@ const AdminSidebar = ({
   onImportExcel,
   onExportJSON,
   onExportCSV,
+  onClearAllData,
   onOpenNotes,
   activeSection = "dashboard",
   onSectionChange,
@@ -137,6 +140,12 @@ const AdminSidebar = ({
       icon: Download,
       onClick: onExportCSV,
     },
+    {
+      title: "Clear All Data",
+      icon: Trash2,
+      onClick: onClearAllData,
+      className: "text-destructive hover:bg-destructive/10",
+    },
   ];
 
   return (
@@ -196,7 +205,7 @@ const AdminSidebar = ({
                   <SidebarMenuButton
                     onClick={item.onClick}
                     tooltip={item.title}
-                    className="transition-all duration-200"
+                    className={`transition-all duration-200 ${(item as any).className || ''}`}
                   >
                     <item.icon className="h-4 w-4" />
                     <span>{item.title}</span>
