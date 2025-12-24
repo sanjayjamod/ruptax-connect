@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/Header";
-import { getClientById, updateClientStatus } from "@/lib/clientStorage";
-import { getOrCreateTaxForm, saveTaxForm, calculateTax } from "@/lib/taxFormStorage";
+import { getClientById, updateClientStatus, updateClient } from "@/lib/clientStorage";
+import { getOrCreateTaxForm, saveTaxForm, calculateTax, getAllTaxForms } from "@/lib/taxFormStorage";
 import { getEmptyTaxFormData } from "@/types/taxForm";
 import { fillSampleDataForClient } from "@/lib/sampleTaxData";
 import { importTaxFormFromExcel } from "@/lib/taxFormExcelImport";
-import { Client } from "@/types/client";
+import { Client, ClientFormData } from "@/types/client";
 import { TaxFormData } from "@/types/taxForm";
 import PagarForm from "@/components/taxforms/PagarForm";
 import DeclarationForm from "@/components/taxforms/DeclarationForm";
@@ -17,7 +17,7 @@ import AavakVeraFormA from "@/components/taxforms/AavakVeraFormA";
 import AavakVeraFormB from "@/components/taxforms/AavakVeraFormB";
 import Form16A from "@/components/taxforms/Form16A";
 import Form16B from "@/components/taxforms/Form16B";
-import { Search, Printer, FileText, FileSpreadsheet, Save, ArrowLeft, Calculator, RefreshCw, Database, Loader2, PanelRightOpen, PanelRightClose, Upload, RotateCcw } from "lucide-react";
+import { Search, Printer, FileText, FileSpreadsheet, Save, ArrowLeft, Calculator, RefreshCw, Database, Loader2, PanelRightOpen, PanelRightClose, Upload, RotateCcw, Edit2, X, Check, Clock } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import TaxChatbot from "@/components/TaxChatbot";
 import SideCalculator from "@/components/admin/SideCalculator";
@@ -33,9 +33,12 @@ const TaxFormAdmin = () => {
   const [formData, setFormData] = useState<TaxFormData | null>(null);
   const [activeTab, setActiveTab] = useState("pagar");
   const [autoCalcEnabled, setAutoCalcEnabled] = useState(true);
-  const [isManualMode, setIsManualMode] = useState(false); // Manual mode allows editing auto-calculated fields
+  const [isManualMode, setIsManualMode] = useState(false);
   const [showTemplates, setShowTemplates] = useState(true);
   const [isImporting, setIsImporting] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [editedClient, setEditedClient] = useState<Partial<ClientFormData>>({});
+  const [savedForms, setSavedForms] = useState<TaxFormData[]>([]);
   const printRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -73,12 +76,45 @@ const TaxFormAdmin = () => {
       setClient(foundClient);
       setClientId(id);
       const taxForm = getOrCreateTaxForm(id);
-      // Auto-calculate on load
       const calculated = calculateTax(taxForm);
       setFormData(calculated);
+      // Load saved forms for this client
+      const allForms = getAllTaxForms();
+      const clientForms = allForms.filter(f => f.clientId === id);
+      setSavedForms(clientForms);
     } else {
       toast({ title: "Error", description: "Client not found", variant: "destructive" });
     }
+  };
+
+  const handleStartEditProfile = () => {
+    if (client) {
+      setEditedClient({ ...client });
+      setIsEditingProfile(true);
+    }
+  };
+
+  const handleCancelEditProfile = () => {
+    setIsEditingProfile(false);
+    setEditedClient({});
+  };
+
+  const handleSaveProfile = () => {
+    if (client && editedClient) {
+      const updated = updateClient(client.id, editedClient);
+      if (updated) {
+        setClient(updated);
+        setIsEditingProfile(false);
+        setEditedClient({});
+        toast({ title: "Saved", description: "Profile updated successfully" });
+      } else {
+        toast({ title: "Error", description: "Failed to update profile", variant: "destructive" });
+      }
+    }
+  };
+
+  const handleProfileFieldChange = (field: keyof ClientFormData, value: string) => {
+    setEditedClient(prev => ({ ...prev, [field]: value }));
   };
 
   const handleSearch = () => {
@@ -492,35 +528,127 @@ const TaxFormAdmin = () => {
                     <div className="border rounded-lg p-4 bg-white dark:bg-card overflow-auto max-h-[70vh]">
                       <TabsContent value="profile" className="mt-0">
                         <div className="space-y-4">
-                          <h2 className="text-lg font-bold border-b pb-2">Client Profile / ક્લાયન્ટ પ્રોફાઇલ</h2>
+                          <div className="flex items-center justify-between border-b pb-2">
+                            <h2 className="text-lg font-bold">Client Profile / ક્લાયન્ટ પ્રોફાઇલ</h2>
+                            {!isEditingProfile ? (
+                              <Button onClick={handleStartEditProfile} variant="outline" size="sm">
+                                <Edit2 className="h-4 w-4 mr-1" /> Edit
+                              </Button>
+                            ) : (
+                              <div className="flex gap-2">
+                                <Button onClick={handleSaveProfile} variant="default" size="sm">
+                                  <Check className="h-4 w-4 mr-1" /> Save
+                                </Button>
+                                <Button onClick={handleCancelEditProfile} variant="outline" size="sm">
+                                  <X className="h-4 w-4 mr-1" /> Cancel
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+                          
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                             <div className="space-y-3">
                               <p><strong>ID:</strong> {client.id}</p>
-                              <p><strong>Name / નામ:</strong> {client.name}</p>
-                              <p><strong>Name (Gujarati) / નામ (ગુજરાતી):</strong> {client.nameGujarati || '-'}</p>
-                              <p><strong>Designation / હોદ્દો:</strong> {client.designation || '-'}</p>
-                              <p><strong>Designation (Gujarati):</strong> {client.designationGujarati || '-'}</p>
-                              <p><strong>School Name / શાળાનું નામ:</strong> {client.schoolName || '-'}</p>
-                              <p><strong>School Name (Gujarati):</strong> {client.schoolNameGujarati || '-'}</p>
-                              <p><strong>School Address / શાળાનું સરનામું:</strong> {client.schoolAddress || '-'}</p>
-                              <p><strong>Address (Gujarati):</strong> {client.addressGujarati || '-'}</p>
+                              {isEditingProfile ? (
+                                <>
+                                  <div><strong>Name / નામ:</strong> <Input value={editedClient.name || ''} onChange={(e) => handleProfileFieldChange('name', e.target.value)} className="mt-1 h-8" /></div>
+                                  <div><strong>Name (Gujarati):</strong> <Input value={editedClient.nameGujarati || ''} onChange={(e) => handleProfileFieldChange('nameGujarati', e.target.value)} className="mt-1 h-8" /></div>
+                                  <div><strong>Designation:</strong> <Input value={editedClient.designation || ''} onChange={(e) => handleProfileFieldChange('designation', e.target.value)} className="mt-1 h-8" /></div>
+                                  <div><strong>Designation (Gujarati):</strong> <Input value={editedClient.designationGujarati || ''} onChange={(e) => handleProfileFieldChange('designationGujarati', e.target.value)} className="mt-1 h-8" /></div>
+                                  <div><strong>School Name:</strong> <Input value={editedClient.schoolName || ''} onChange={(e) => handleProfileFieldChange('schoolName', e.target.value)} className="mt-1 h-8" /></div>
+                                  <div><strong>School Name (Gujarati):</strong> <Input value={editedClient.schoolNameGujarati || ''} onChange={(e) => handleProfileFieldChange('schoolNameGujarati', e.target.value)} className="mt-1 h-8" /></div>
+                                  <div><strong>School Address:</strong> <Input value={editedClient.schoolAddress || ''} onChange={(e) => handleProfileFieldChange('schoolAddress', e.target.value)} className="mt-1 h-8" /></div>
+                                  <div><strong>Address (Gujarati):</strong> <Input value={editedClient.addressGujarati || ''} onChange={(e) => handleProfileFieldChange('addressGujarati', e.target.value)} className="mt-1 h-8" /></div>
+                                </>
+                              ) : (
+                                <>
+                                  <p><strong>Name / નામ:</strong> {client.name}</p>
+                                  <p><strong>Name (Gujarati):</strong> {client.nameGujarati || '-'}</p>
+                                  <p><strong>Designation:</strong> {client.designation || '-'}</p>
+                                  <p><strong>Designation (Gujarati):</strong> {client.designationGujarati || '-'}</p>
+                                  <p><strong>School Name:</strong> {client.schoolName || '-'}</p>
+                                  <p><strong>School Name (Gujarati):</strong> {client.schoolNameGujarati || '-'}</p>
+                                  <p><strong>School Address:</strong> {client.schoolAddress || '-'}</p>
+                                  <p><strong>Address (Gujarati):</strong> {client.addressGujarati || '-'}</p>
+                                </>
+                              )}
                             </div>
                             <div className="space-y-3">
-                              <p><strong>PAN No:</strong> {client.panNo || '-'}</p>
-                              <p><strong>Aadhar No:</strong> {client.aadharNo || '-'}</p>
-                              <p><strong>Mobile No:</strong> {client.mobileNo || '-'}</p>
-                              <p><strong>Email:</strong> {client.email || '-'}</p>
-                              <p><strong>Bank A/C No:</strong> {client.bankAcNo || '-'}</p>
-                              <p><strong>IFSC Code:</strong> {client.ifscCode || '-'}</p>
-                              <p><strong>Date of Birth:</strong> {client.dateOfBirth || '-'}</p>
-                              <p><strong>Pay Center:</strong> {client.payCenterName || '-'}</p>
-                              <p><strong>Pay Center Address:</strong> {client.payCenterAddress || '-'}</p>
+                              {isEditingProfile ? (
+                                <>
+                                  <div><strong>PAN No:</strong> <Input value={editedClient.panNo || ''} onChange={(e) => handleProfileFieldChange('panNo', e.target.value)} className="mt-1 h-8" /></div>
+                                  <div><strong>Aadhar No:</strong> <Input value={editedClient.aadharNo || ''} onChange={(e) => handleProfileFieldChange('aadharNo', e.target.value)} className="mt-1 h-8" /></div>
+                                  <div><strong>Mobile No:</strong> <Input value={editedClient.mobileNo || ''} onChange={(e) => handleProfileFieldChange('mobileNo', e.target.value)} className="mt-1 h-8" /></div>
+                                  <div><strong>Email:</strong> <Input value={editedClient.email || ''} onChange={(e) => handleProfileFieldChange('email', e.target.value)} className="mt-1 h-8" /></div>
+                                  <div><strong>Bank A/C No:</strong> <Input value={editedClient.bankAcNo || ''} onChange={(e) => handleProfileFieldChange('bankAcNo', e.target.value)} className="mt-1 h-8" /></div>
+                                  <div><strong>IFSC Code:</strong> <Input value={editedClient.ifscCode || ''} onChange={(e) => handleProfileFieldChange('ifscCode', e.target.value)} className="mt-1 h-8" /></div>
+                                  <div><strong>Date of Birth:</strong> <Input value={editedClient.dateOfBirth || ''} onChange={(e) => handleProfileFieldChange('dateOfBirth', e.target.value)} className="mt-1 h-8" /></div>
+                                  <div><strong>Pay Center:</strong> <Input value={editedClient.payCenterName || ''} onChange={(e) => handleProfileFieldChange('payCenterName', e.target.value)} className="mt-1 h-8" /></div>
+                                  <div><strong>Pay Center Address:</strong> <Input value={editedClient.payCenterAddress || ''} onChange={(e) => handleProfileFieldChange('payCenterAddress', e.target.value)} className="mt-1 h-8" /></div>
+                                </>
+                              ) : (
+                                <>
+                                  <p><strong>PAN No:</strong> {client.panNo || '-'}</p>
+                                  <p><strong>Aadhar No:</strong> {client.aadharNo || '-'}</p>
+                                  <p><strong>Mobile No:</strong> {client.mobileNo || '-'}</p>
+                                  <p><strong>Email:</strong> {client.email || '-'}</p>
+                                  <p><strong>Bank A/C No:</strong> {client.bankAcNo || '-'}</p>
+                                  <p><strong>IFSC Code:</strong> {client.ifscCode || '-'}</p>
+                                  <p><strong>Date of Birth:</strong> {client.dateOfBirth || '-'}</p>
+                                  <p><strong>Pay Center:</strong> {client.payCenterName || '-'}</p>
+                                  <p><strong>Pay Center Address:</strong> {client.payCenterAddress || '-'}</p>
+                                </>
+                              )}
                             </div>
                           </div>
+                          
                           <div className="border-t pt-3 mt-3">
-                            <p><strong>Head Master Place:</strong> {client.headMasterPlace || '-'}</p>
-                            <p><strong>TDO:</strong> {client.tdo || '-'}</p>
-                            <p><strong>Place:</strong> {client.place || '-'}</p>
+                            {isEditingProfile ? (
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div><strong>Head Master Place:</strong> <Input value={editedClient.headMasterPlace || ''} onChange={(e) => handleProfileFieldChange('headMasterPlace', e.target.value)} className="mt-1 h-8" /></div>
+                                <div><strong>TDO:</strong> <Input value={editedClient.tdo || ''} onChange={(e) => handleProfileFieldChange('tdo', e.target.value)} className="mt-1 h-8" /></div>
+                                <div><strong>Place:</strong> <Input value={editedClient.place || ''} onChange={(e) => handleProfileFieldChange('place', e.target.value)} className="mt-1 h-8" /></div>
+                              </div>
+                            ) : (
+                              <>
+                                <p><strong>Head Master Place:</strong> {client.headMasterPlace || '-'}</p>
+                                <p><strong>TDO:</strong> {client.tdo || '-'}</p>
+                                <p><strong>Place:</strong> {client.place || '-'}</p>
+                              </>
+                            )}
+                          </div>
+
+                          {/* Saved Forms History */}
+                          <div className="border-t pt-4 mt-4">
+                            <h3 className="text-md font-bold mb-3 flex items-center gap-2">
+                              <Clock className="h-4 w-4" /> Saved Forms History / સાચવેલ ફોર્મ
+                            </h3>
+                            {savedForms.length > 0 ? (
+                              <div className="space-y-2">
+                                {savedForms.map((form, index) => (
+                                  <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                                    <div>
+                                      <p className="font-medium">{form.salaryData.financialYear}</p>
+                                      <p className="text-xs text-muted-foreground">
+                                        Last Updated: {form.updatedAt ? new Date(form.updatedAt).toLocaleDateString('en-IN') : 'N/A'}
+                                      </p>
+                                      <p className="text-xs text-muted-foreground">
+                                        Total Salary: ₹{form.salaryData.totals?.totalSalary?.toLocaleString('en-IN') || 0}
+                                      </p>
+                                    </div>
+                                    <div className="text-right">
+                                      <span className={`text-xs px-2 py-1 rounded ${
+                                        form.salaryData.totals?.totalSalary > 0 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                                      }`}>
+                                        {form.salaryData.totals?.totalSalary > 0 ? 'Filled' : 'Draft'}
+                                      </span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-muted-foreground text-sm">No saved forms yet. Fill the forms and save.</p>
+                            )}
                           </div>
                         </div>
                       </TabsContent>
