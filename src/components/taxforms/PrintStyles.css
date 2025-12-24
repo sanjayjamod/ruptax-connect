@@ -100,6 +100,21 @@
     page-break-inside: avoid !important;
     break-after: page !important;
     break-inside: avoid !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Page Border Classes - Applied via JavaScript from Print Settings */
+  .print-border-solid {
+    border-style: solid !important;
+  }
+  .print-border-dashed {
+    border-style: dashed !important;
+  }
+  .print-border-dotted {
+    border-style: dotted !important;
+  }
+  .print-border-double {
+    border-style: double !important;
   }
 
   /* CRITICAL: Last form (#form-16b) - NO page break after to prevent blank page */
