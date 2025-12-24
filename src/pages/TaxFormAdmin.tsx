@@ -23,6 +23,7 @@ import TaxChatbot from "@/components/TaxChatbot";
 import SideCalculator from "@/components/admin/SideCalculator";
 import SampleTemplates from "@/components/admin/SampleTemplates";
 import WhatsAppShare from "@/components/admin/WhatsAppShare";
+import EmailShare from "@/components/admin/EmailShare";
 import { useAuth } from "@/hooks/useAuth";
 const TaxFormAdmin = () => {
   const navigate = useNavigate();
@@ -624,6 +625,7 @@ ${generateRow('21', 'ચુકવેલ રકમ', 'netPay')}
                   <FileSpreadsheet className="h-4 w-4 mr-1" /> Excel
                 </Button>
                 <WhatsAppShare client={client} onSharePDF={handleExportPDF} />
+                <EmailShare client={client} formData={formData} />
                 <Button 
                   onClick={() => setShowTemplates(!showTemplates)} 
                   variant="ghost" 
