@@ -15,16 +15,17 @@ const monthNames = ['એપ્રિલ', 'મે', 'જુન', 'જુલા�
 
 // Excel column mapping: C=apr, D=may, E=jun, F=jul, G=aug, H=sep, I=oct, J=nov, K=dec, L=jan, M=feb, N=mar
 // Yellow cells (manual input) - specific cells from Excel
+// IMPORTANT: DA (Row 9) = Basic * 46%, HRA (Row 10) = Basic * 8% - these are FORMULAS not manual!
 const yellowCells: { [key: string]: { field: keyof MonthlySalary; months: (typeof months[number])[] } } = {
-  // Row 7 - Basic: C7 (apr), G7 (aug) are yellow, rest are formula
+  // Row 7 - Basic: C7 (apr), G7 (aug) are yellow, rest are formula =C7 or =G7
   basic: { field: 'basic', months: ['apr', 'aug'] },
   // Row 8 - Grade Pay: C8 (apr), G8 (aug) are yellow
   gradePay: { field: 'gradePay', months: ['apr', 'aug'] },
-  // Row 9 - DA: C9 (apr), G9 (aug), L9 (jan) are yellow
-  da: { field: 'da', months: ['apr', 'aug', 'jan'] },
-  // Row 10 - HRA: formula based on basic
+  // Row 9 - DA: ALL FORMULA! C9=C7*46%, D9=C9, E9=C9, F9=C9, G9=G7*50%, H9-K9=G9, L9=L7*53%, M9-N9=L9
+  da: { field: 'da', months: [] }, // All formula - calculated from Basic
+  // Row 10 - HRA: ALL FORMULA! =Basic*8% for each month
   hra: { field: 'hra', months: [] }, // All formula
-  // Row 11 - Medical: C11 (apr) yellow, rest formula
+  // Row 11 - Medical: C11 (apr) yellow, rest formula =C11
   medical: { field: 'medical', months: ['apr'] },
   // Row 12 - Disability Allowance: all manual
   disabilityAllowance: { field: 'disabilityAllowance', months: months.slice() },
@@ -38,17 +39,17 @@ const yellowCells: { [key: string]: { field: keyof MonthlySalary; months: (typeo
   otherIncome1: { field: 'otherIncome1', months: months.slice() },
   // Row 17 - Other Income 2: all manual
   otherIncome2: { field: 'otherIncome2', months: months.slice() },
-  // Row 20 - GPF: C20 (apr) yellow, rest formula
+  // Row 20 - GPF: C20 (apr) yellow, rest formula =C20
   gpf: { field: 'gpf', months: ['apr'] },
-  // Row 21 - CPF: C21 (apr) yellow, rest formula
+  // Row 21 - CPF: C21 (apr) yellow, rest formula =C21
   cpf: { field: 'cpf', months: ['apr'] },
-  // Row 22 - Profession Tax: C22 (apr) yellow, rest formula
+  // Row 22 - Profession Tax: C22 (apr) yellow, rest formula =C22
   professionTax: { field: 'professionTax', months: ['apr'] },
   // Row 23 - Society: C23, E23, G23 yellow (varies)
   society: { field: 'society', months: ['apr', 'jun', 'aug'] },
-  // Row 24 - Group Insurance: C24 (apr) yellow, rest formula
+  // Row 24 - Group Insurance: C24 (apr) yellow, rest formula =C24
   groupInsurance: { field: 'groupInsurance', months: ['apr'] },
-  // Row 25 - Income Tax: C25, N25 (apr, mar) yellow, rest formula
+  // Row 25 - Income Tax: C25, N25 (apr, mar) yellow, rest formula =C25
   incomeTax: { field: 'incomeTax', months: ['apr', 'mar'] },
 };
 
@@ -84,18 +85,31 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
       updated[m as typeof months[number]].gradePay = gradePayAug;
     });
     
-    // DA: D9-F9 = C9, H9-K9 = G9, M9-N9 = L9
-    const daApr = updated.apr.da || 0;
-    const daAug = updated.aug.da || 0;
-    const daJan = updated.jan.da || 0;
+    // DA: C9=C7*46%, D9-F9=C9, G9=G7*50%, H9-K9=G9, L9=L7*53%, M9-N9=L9
+    // April DA = April Basic * 46%
+    const daApr = Math.round((updated.apr.basic || 0) * 0.46);
+    updated.apr.da = daApr;
     ['may', 'jun', 'jul'].forEach(m => {
       updated[m as typeof months[number]].da = daApr;
     });
+    
+    // August DA = August Basic * 50%
+    const daAug = Math.round((updated.aug.basic || 0) * 0.50);
+    updated.aug.da = daAug;
     ['sep', 'oct', 'nov', 'dec'].forEach(m => {
       updated[m as typeof months[number]].da = daAug;
     });
+    
+    // January DA = January Basic * 53%
+    const daJan = Math.round((updated.jan.basic || 0) * 0.53);
+    updated.jan.da = daJan;
     ['feb', 'mar'].forEach(m => {
       updated[m as typeof months[number]].da = daJan;
+    });
+    
+    // HRA: 8% of Basic for each month
+    months.forEach(m => {
+      updated[m].hra = Math.round((updated[m].basic || 0) * 0.08);
     });
     
     // HRA: 8% of Basic for each month
