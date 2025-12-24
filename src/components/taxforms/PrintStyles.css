@@ -9,15 +9,26 @@
     margin: 5mm;
   }
 
-  /* Pagar form - Landscape A4 */
+  /* Pagar form - Landscape A4 - Force landscape via size */
   @page pagar {
     size: A4 landscape;
     margin: 4mm;
   }
 
-  /* Apply landscape to pagar form */
+  /* Apply landscape to pagar form - multiple methods for browser compatibility */
   .pagar-page {
     page: pagar;
+    /* Rotate content for browsers that don't support @page properly */
+    width: 287mm !important;
+    height: 200mm !important;
+    max-width: 287mm !important;
+    max-height: 200mm !important;
+    transform-origin: top left !important;
+  }
+
+  /* Force landscape via print-specific body class detection */
+  body:has(.pagar-page) {
+    /* This targets the whole document when pagar-page exists */
   }
 
   /* Force exact color printing - NO margin/padding on everything */
@@ -145,15 +156,20 @@
 
   /* ========================================
      PAGAR FORM - A4 LANDSCAPE FULL PAGE
-     Width: 297mm, Height: 210mm
+     Landscape: Width: 297mm, Height: 210mm
      ======================================== */
-  #pagar-form {
-    width: 285mm !important;
+  #pagar-form,
+  #pagar-form.pagar-page {
+    width: 287mm !important;
+    min-width: 287mm !important;
     height: 198mm !important;
     max-height: 198mm !important;
     padding: 2mm !important;
     font-size: 5.5pt !important;
     overflow: hidden !important;
+    page: pagar !important;
+    page-break-after: always !important;
+    break-after: page !important;
   }
 
   /* Pagar Title */

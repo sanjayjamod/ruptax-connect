@@ -210,7 +210,25 @@ const TaxFormAdmin = () => {
   };
 
   const handlePrint = () => {
+    // Add print orientation handling for mixed portrait/landscape
+    const style = document.createElement('style');
+    style.id = 'print-orientation-fix';
+    style.innerHTML = `
+      @media print {
+        @page { size: A4 portrait; margin: 5mm; }
+        @page pagar { size: A4 landscape; margin: 4mm; }
+        .pagar-page { page: pagar; }
+      }
+    `;
+    document.head.appendChild(style);
+    
     window.print();
+    
+    // Clean up
+    setTimeout(() => {
+      const existingStyle = document.getElementById('print-orientation-fix');
+      if (existingStyle) existingStyle.remove();
+    }, 1000);
   };
 
   // Print only Pagar form in Landscape - Clean Professional Layout
