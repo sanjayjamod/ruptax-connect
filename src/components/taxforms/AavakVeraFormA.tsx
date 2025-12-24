@@ -30,213 +30,267 @@ const AavakVeraFormA = ({ client, formData, onChange, readOnly = false, isManual
         pattern="[0-9]*"
         defaultValue={value || ''}
         onBlur={(e) => updateField(field, Number(e.target.value) || 0)}
-        className="w-20 h-5 text-xs text-right p-1 border-0 bg-yellow-100 inline-block focus:outline-none focus:bg-yellow-200 print:bg-transparent"
+        className="w-full h-5 text-xs text-right p-0 border-0 bg-yellow-100 inline-block focus:outline-none focus:bg-yellow-200 print:bg-transparent"
         title="Manual Input"
       />
     )
   );
 
   const renderAutoField = (value: number) => (
-    <span className="text-blue-800 font-medium">{value || 0}</span>
+    <span className="font-medium">{value || 0}</span>
   );
 
   return (
-    <div className="tax-form-container tax-form-print" id="aavak-vera-form-a">
-      <div className="text-center font-bold text-lg mb-1">આવક વેરા ગણતરી ફોર્મ</div>
-      <div className="text-center text-xs mb-2">INCOME TAX CALCULATION FORM - PART A</div>
-      <div className="text-center text-[10px] mb-3 border-b border-black pb-2">
-        Assessment Year: {client.assessmentYear || '2026-2027'} | Financial Year: {formData.salaryData.financialYear}
-      </div>
-
-      {/* Header Info - Two Column Layout like Form 16 */}
-      <table className="mb-3" style={{ fontSize: '10px' }}>
+    <div className="tax-form-container tax-form-print aavak-vera-form" id="aavak-vera-form-a">
+      {/* Header */}
+      <table className="w-full border-collapse" style={{ fontSize: '9pt' }}>
         <tbody>
           <tr>
-            <td className="w-1/2 align-top border border-black p-2">
-              <p className="font-bold mb-1">Employee Details / કર્મચારીની વિગત</p>
-              <p><strong>Name:</strong> {client.name}</p>
-              <p><strong>Designation:</strong> {client.designation || '-'}</p>
-              <p><strong>School:</strong> {client.schoolName || '-'}</p>
-              <p><strong>Place:</strong> {client.place || '-'}</p>
-              <p className="mt-1"><strong>PAN No:</strong> {client.panNo || '-'}</p>
-              <p><strong>Aadhar No:</strong> {client.aadharNo || '-'}</p>
+            <td colSpan={11} className="text-center font-bold text-base border border-black py-1">
+              આવક વેરા ગણતરી ફોર્મ
             </td>
-            <td className="w-1/2 align-top border border-black p-2">
-              <p className="font-bold mb-1">Bank & Contact Details</p>
-              <p><strong>Bank A/C:</strong> {client.bankAcNo || '-'}</p>
-              <p><strong>IFSC Code:</strong> {client.ifscCode || '-'}</p>
-              <p><strong>Mobile:</strong> {client.mobileNo || '-'}</p>
-              <p><strong>DOB:</strong> {client.dateOfBirth || '-'}</p>
-              <p className="mt-1"><strong>Pay Center:</strong> {client.payCenterName || '-'}</p>
-            </td>
+          </tr>
+          <tr>
+            <td className="border border-black px-1 py-0.5 font-bold">NAME</td>
+            <td colSpan={3} className="border border-black px-1 py-0.5">{client.name}</td>
+            <td colSpan={3} className="border border-black px-1 py-0.5"></td>
+            <td colSpan={4} className="border border-black px-1 py-0.5"></td>
+          </tr>
+          <tr>
+            <td className="border border-black px-1 py-0.5 font-bold">INCOME YEAR</td>
+            <td colSpan={3} className="border border-black px-1 py-0.5">{formData.salaryData.financialYear}</td>
+            <td colSpan={3} className="border border-black px-1 py-0.5"></td>
+            <td className="border border-black px-1 py-0.5 font-bold">ASSESSMENT YEAR</td>
+            <td colSpan={3} className="border border-black px-1 py-0.5">{client.assessmentYear || '2026-2027'}</td>
+          </tr>
+          <tr>
+            <td className="border border-black px-1 py-0.5 font-bold">VILLAGE</td>
+            <td colSpan={3} className="border border-black px-1 py-0.5">{client.schoolName || '-'}</td>
+            <td colSpan={3} className="border border-black px-1 py-0.5"></td>
+            <td colSpan={4} className="border border-black px-1 py-0.5"></td>
+          </tr>
+          <tr>
+            <td className="border border-black px-1 py-0.5 font-bold">DESIGNATION</td>
+            <td colSpan={3} className="border border-black px-1 py-0.5">{client.designation || '-'}</td>
+            <td colSpan={3} className="border border-black px-1 py-0.5"></td>
+            <td className="border border-black px-1 py-0.5 font-bold">DATE OF BIRTH</td>
+            <td colSpan={3} className="border border-black px-1 py-0.5">{client.dateOfBirth || '-'}</td>
+          </tr>
+          <tr>
+            <td className="border border-black px-1 py-0.5 font-bold">PAN NO.</td>
+            <td colSpan={3} className="border border-black px-1 py-0.5">{client.panNo || '-'}</td>
+            <td colSpan={3} className="border border-black px-1 py-0.5"></td>
+            <td className="border border-black px-1 py-0.5 font-bold">MOBILE NO</td>
+            <td colSpan={3} className="border border-black px-1 py-0.5">{client.mobileNo || '-'}</td>
+          </tr>
+          <tr>
+            <td className="border border-black px-1 py-0.5 font-bold">BANK ACC.NO</td>
+            <td colSpan={3} className="border border-black px-1 py-0.5">{client.bankAcNo || '-'}</td>
+            <td colSpan={3} className="border border-black px-1 py-0.5"></td>
+            <td className="border border-black px-1 py-0.5 font-bold">AADHAR NO</td>
+            <td colSpan={3} className="border border-black px-1 py-0.5">{client.aadharNo || '-'}</td>
+          </tr>
+          <tr>
+            <td className="border border-black px-1 py-0.5 font-bold">IFSC CODE</td>
+            <td colSpan={3} className="border border-black px-1 py-0.5">{client.ifscCode || '-'}</td>
+            <td colSpan={7} className="border border-black px-1 py-0.5"></td>
           </tr>
         </tbody>
       </table>
 
       {/* Section A - Salary Income */}
-      <div className="font-bold text-[11px] mb-1 bg-gray-200 p-1">
-        વિભાગ (A) - પગાર આવક / SALARY INCOME
-      </div>
-      <table style={{ fontSize: '10px' }}>
+      <table className="w-full border-collapse mt-1" style={{ fontSize: '8pt' }}>
         <tbody>
           <tr>
-            <td className="w-8">1</td>
-            <td>કુલ ગ્રોસ આવક / Gross Salary as per Rule 17</td>
-            <td className="text-right w-10">RS.</td>
-            <td className="amount-cell w-24">{renderAutoField(taxA.grossSalary)}</td>
+            <td colSpan={4} className="border border-black px-1 py-0.5 font-bold">કુલ ગ્રોસ આવક : AS PER RULE 17</td>
+            <td colSpan={5} className="border border-black px-1 py-0.5"></td>
+            <td className="border border-black px-1 py-0.5 text-right font-bold">RS.</td>
+            <td className="border border-black px-1 py-0.5 text-right font-bold">{renderAutoField(taxA.grossSalary)}</td>
           </tr>
           <tr>
-            <td colSpan={4} className="font-bold bg-gray-100">કલમ ૧૦ મુજબ બાદ પાત્ર / Less: Exemptions u/s 10</td>
+            <td colSpan={11} className="border border-black px-1 py-0.5 font-bold bg-gray-100">કલમ ૧૦ મુજબ બાદ પાત કરમુક્ત ભથ્થાઓ</td>
           </tr>
           <tr>
-            <td></td>
-            <td>(a) HRA Exempt / ઘરભાડું બાદ</td>
-            <td className="text-right">RS.</td>
-            <td className="amount-cell">{renderAutoField(taxA.hraExempt)}</td>
+            <td className="border border-black px-1 py-0.5">(a)</td>
+            <td colSpan={8} className="border border-black px-1 py-0.5">ઘરભાડું ભાડાના મકાનમાં રહેતા હોઈ તો જ જે ઓછુ હોય તે RULE 10(13-A)</td>
+            <td className="border border-black px-1 py-0.5"></td>
+            <td className="border border-black px-1 py-0.5"></td>
           </tr>
           <tr>
-            <td></td>
-            <td>(b) Transport Allowance / ટ્રાન્સપોર્ટ ભથ્થું</td>
-            <td className="text-right">RS.</td>
-            <td className="amount-cell">{renderAutoField(taxA.transportAllowance)}</td>
-          </tr>
-          <tr className="total-row">
-            <td></td>
-            <td>(c) Total Exempt / કુલ બાદ પાત્ર</td>
-            <td className="text-right">RS.</td>
-            <td className="amount-cell font-bold">{renderAutoField(taxA.totalExempt)}</td>
-          </tr>
-          <tr className="total-row">
-            <td>2</td>
-            <td>Balance Salary (1-1c) / બાકી પગાર</td>
-            <td className="text-right">RS.</td>
-            <td className="amount-cell font-bold">{renderAutoField(taxA.balanceSalary || taxA.grossSalary)}</td>
+            <td className="border border-black px-1 py-0.5"></td>
+            <td colSpan={6} className="border border-black px-1 py-0.5">( I ) પગાર બીલેથી મળેલ ઘરભાડું</td>
+            <td colSpan={2} className="border border-black px-1 py-0.5 text-right">Rs.</td>
+            <td className="border border-black px-1 py-0.5 text-right">{renderAutoField(0)}</td>
+            <td className="border border-black px-1 py-0.5"></td>
           </tr>
           <tr>
-            <td>3</td>
-            <td>Standard Deduction (New Regime) / સ્ટાન્ડર્ડ ડિડક્શન</td>
-            <td className="text-right">RS.</td>
-            <td className="amount-cell">{renderAutoField(taxA.standardDeduction || 75000)}</td>
+            <td className="border border-black px-1 py-0.5"></td>
+            <td colSpan={6} className="border border-black px-1 py-0.5">( II )ભાડા પેટે ચુકવેલ રકમ જો પગાર અને મોંઘવારી વાર્ષિક</td>
+            <td colSpan={2} className="border border-black px-1 py-0.5 text-right">Rs.</td>
+            <td className="border border-black px-1 py-0.5 text-right"></td>
+            <td className="border border-black px-1 py-0.5"></td>
           </tr>
-          <tr className="total-row">
-            <td>4</td>
-            <td>Net Salary Income (2-3) / ચોખ્ખી પગાર આવક</td>
-            <td className="text-right">RS.</td>
-            <td className="amount-cell font-bold">{renderAutoField(taxA.professionalIncome)}</td>
+          <tr>
+            <td className="border border-black px-1 py-0.5"></td>
+            <td colSpan={6} className="border border-black px-1 py-0.5">(VII) બાદ મળવા પાત્ર ઘરભાડું</td>
+            <td colSpan={2} className="border border-black px-1 py-0.5 text-right">RS.</td>
+            <td className="border border-black px-1 py-0.5 text-right">{renderAutoField(taxA.hraExempt)}</td>
+            <td className="border border-black px-1 py-0.5"></td>
+          </tr>
+          <tr>
+            <td className="border border-black px-1 py-0.5">(b)</td>
+            <td colSpan={8} className="border border-black px-1 py-0.5">ડ્રેસ ધોલાઈ ભથ્થું</td>
+            <td className="border border-black px-1 py-0.5"></td>
+            <td className="border border-black px-1 py-0.5"></td>
+          </tr>
+          <tr>
+            <td className="border border-black px-1 py-0.5">(c)</td>
+            <td colSpan={6} className="border border-black px-1 py-0.5">ટ્રાન્સપોર્ટ એલ્લા.વાર્ષિક રૂ.9600 ની મર્યાદા</td>
+            <td colSpan={2} className="border border-black px-1 py-0.5"></td>
+            <td className="border border-black px-1 py-0.5 text-right">{renderAutoField(taxA.transportAllowance)}</td>
+            <td className="border border-black px-1 py-0.5"></td>
+          </tr>
+          <tr>
+            <td className="border border-black px-1 py-0.5">(d)</td>
+            <td colSpan={6} className="border border-black px-1 py-0.5">કુલ રકમ 10 હેઠળ બાદ મળવા પાત્ર ભથ્થાઓ</td>
+            <td colSpan={2} className="border border-black px-1 py-0.5 text-right">Rs.</td>
+            <td className="border border-black px-1 py-0.5 text-right font-bold">{renderAutoField(taxA.totalExempt)}</td>
+            <td className="border border-black px-1 py-0.5"></td>
+          </tr>
+          <tr>
+            <td colSpan={8} className="border border-black px-1 py-0.5 font-bold">બાકિ પગાર આવક (Column:1-2(d))</td>
+            <td className="border border-black px-1 py-0.5"></td>
+            <td className="border border-black px-1 py-0.5 text-right font-bold">RS.</td>
+            <td className="border border-black px-1 py-0.5 text-right font-bold">{renderAutoField(taxA.balanceSalary || taxA.grossSalary)}</td>
+          </tr>
+          <tr>
+            <td className="border border-black px-1 py-0.5">(a)</td>
+            <td colSpan={7} className="border border-black px-1 py-0.5">STANDERD DIDUCATION</td>
+            <td className="border border-black px-1 py-0.5"></td>
+            <td colSpan={2} className="border border-black px-1 py-0.5 text-right">{renderAutoField(taxA.standardDeduction || 75000)}</td>
+          </tr>
+          <tr>
+            <td colSpan={8} className="border border-black px-1 py-0.5 font-bold">(Column:3-4) PRO INCOME</td>
+            <td className="border border-black px-1 py-0.5"></td>
+            <td className="border border-black px-1 py-0.5 text-right font-bold">RS.</td>
+            <td className="border border-black px-1 py-0.5 text-right font-bold">{renderAutoField(taxA.professionalIncome)}</td>
           </tr>
         </tbody>
       </table>
 
       {/* Section B - Other Income */}
-      <div className="font-bold text-[11px] mt-2 mb-1 bg-gray-200 p-1">
-        વિભાગ (B) - અન્ય આવક / OTHER INCOME
-      </div>
-      <table style={{ fontSize: '10px' }}>
+      <table className="w-full border-collapse mt-1" style={{ fontSize: '8pt' }}>
         <tbody>
           <tr>
-            <td className="w-8">5</td>
-            <td>Interest Income / વ્યાજ આવક</td>
-            <td></td>
-            <td></td>
+            <td colSpan={11} className="border border-black px-1 py-0.5 font-bold bg-gray-100">વિભાગ ( B ) અન્ય આવક વિભાગ</td>
           </tr>
           <tr>
-            <td></td>
-            <td className="bg-yellow-50 print:bg-transparent">(a) Bank Interest (Savings) / બેંક વ્યાજ</td>
-            <td className="text-right w-10">RS.</td>
-            <td className="amount-cell w-24 bg-yellow-100 print:bg-transparent">
-              {renderManualInputField("bankInterest", taxA.bankInterest)}
-            </td>
+            <td className="border border-black px-1 py-0.5">"(1)</td>
+            <td className="border border-black px-1 py-0.5">(a)</td>
+            <td colSpan={4} className="border border-black px-1 py-0.5 bg-yellow-50 print:bg-transparent">બેંક વ્યાજ આવક</td>
+            <td colSpan={2} className="border border-black px-1 py-0.5">SAVING</td>
+            <td className="border border-black px-1 py-0.5 text-right">RS.</td>
+            <td className="border border-black px-1 py-0.5 text-right bg-yellow-100 print:bg-transparent">{renderManualInputField("bankInterest", taxA.bankInterest)}</td>
+            <td className="border border-black px-1 py-0.5"></td>
           </tr>
           <tr>
-            <td></td>
-            <td className="bg-yellow-50 print:bg-transparent">(b) NSC Interest / એન.એસ.સી. વ્યાજ</td>
-            <td className="text-right">RS.</td>
-            <td className="amount-cell bg-yellow-100 print:bg-transparent">
-              {renderManualInputField("nscInterest", taxA.nscInterest)}
-            </td>
+            <td className="border border-black px-1 py-0.5"></td>
+            <td className="border border-black px-1 py-0.5">(b)</td>
+            <td colSpan={5} className="border border-black px-1 py-0.5 bg-yellow-50 print:bg-transparent">એન.એસ.સી. વ્યાજ</td>
+            <td colSpan={2} className="border border-black px-1 py-0.5 text-right">RS.</td>
+            <td className="border border-black px-1 py-0.5 text-right bg-yellow-100 print:bg-transparent">{renderManualInputField("nscInterest", taxA.nscInterest)}</td>
+            <td className="border border-black px-1 py-0.5"></td>
           </tr>
           <tr>
-            <td></td>
-            <td className="bg-yellow-50 print:bg-transparent">(c) FD Interest / ફિક્સ ડિપોઝિટ વ્યાજ</td>
-            <td className="text-right">RS.</td>
-            <td className="amount-cell bg-yellow-100 print:bg-transparent">
-              {renderManualInputField("fdInterest", taxA.fdInterest)}
-            </td>
-          </tr>
-          <tr className="total-row">
-            <td></td>
-            <td>(d) Total Interest Income / કુલ વ્યાજ આવક</td>
-            <td className="text-right">RS.</td>
-            <td className="amount-cell font-bold">{renderAutoField(taxA.totalInterestIncome)}</td>
+            <td className="border border-black px-1 py-0.5"></td>
+            <td className="border border-black px-1 py-0.5">(c)</td>
+            <td colSpan={5} className="border border-black px-1 py-0.5 bg-yellow-50 print:bg-transparent">ફિકસ ડિપૉજીટ વ્યાજ</td>
+            <td colSpan={2} className="border border-black px-1 py-0.5 text-right">RS.</td>
+            <td className="border border-black px-1 py-0.5 text-right bg-yellow-100 print:bg-transparent">{renderManualInputField("fdInterest", taxA.fdInterest)}</td>
+            <td className="border border-black px-1 py-0.5"></td>
           </tr>
           <tr>
-            <td>6</td>
-            <td className="bg-yellow-50 print:bg-transparent">Exam Income / પરીક્ષાનું મહેનતાણું</td>
-            <td className="text-right">RS.</td>
-            <td className="amount-cell bg-yellow-100 print:bg-transparent">
-              {renderManualInputField("examIncome", taxA.examIncome)}
-            </td>
+            <td className="border border-black px-1 py-0.5"></td>
+            <td className="border border-black px-1 py-0.5">(d)</td>
+            <td colSpan={5} className="border border-black px-1 py-0.5 font-bold">કુલ વ્યાજ આવક ( A TO C )</td>
+            <td colSpan={2} className="border border-black px-1 py-0.5 text-right">RS.</td>
+            <td className="border border-black px-1 py-0.5 text-right font-bold">{renderAutoField(taxA.totalInterestIncome)}</td>
+            <td className="border border-black px-1 py-0.5"></td>
           </tr>
           <tr>
-            <td>7</td>
-            <td className="bg-yellow-50 print:bg-transparent">House Property Income / મકાન મિલકત આવક</td>
-            <td className="text-right">RS.</td>
-            <td className="amount-cell bg-yellow-100 print:bg-transparent">
-              {renderManualInputField("housePropertyIncome", taxA.housePropertyIncome)}
-            </td>
+            <td className="border border-black px-1 py-0.5">"(2)</td>
+            <td colSpan={8} className="border border-black px-1 py-0.5">સગીર બાળકની ઉમેરવા પત્ર આવક</td>
+            <td className="border border-black px-1 py-0.5"></td>
+            <td className="border border-black px-1 py-0.5"></td>
           </tr>
-          <tr className="total-row">
-            <td>8</td>
-            <td>Total Other Income (5d+6+7) / કુલ અન્ય આવક</td>
-            <td className="text-right">RS.</td>
-            <td className="amount-cell font-bold">{renderAutoField(taxA.totalOtherIncome)}</td>
+          <tr>
+            <td className="border border-black px-1 py-0.5">"(3)</td>
+            <td colSpan={8} className="border border-black px-1 py-0.5">નીચેનામાંથી મળેલ આવક</td>
+            <td className="border border-black px-1 py-0.5"></td>
+            <td className="border border-black px-1 py-0.5"></td>
+          </tr>
+          <tr>
+            <td className="border border-black px-1 py-0.5"></td>
+            <td className="border border-black px-1 py-0.5">(c)</td>
+            <td colSpan={5} className="border border-black px-1 py-0.5 bg-yellow-50 print:bg-transparent">પરીક્ષાનુ મહેનતાણું</td>
+            <td colSpan={2} className="border border-black px-1 py-0.5"></td>
+            <td className="border border-black px-1 py-0.5 text-right bg-yellow-100 print:bg-transparent">{renderManualInputField("examIncome", taxA.examIncome)}</td>
+            <td className="border border-black px-1 py-0.5"></td>
+          </tr>
+          <tr>
+            <td className="border border-black px-1 py-0.5"></td>
+            <td className="border border-black px-1 py-0.5">(e)</td>
+            <td colSpan={5} className="border border-black px-1 py-0.5 font-bold">કુલ Total(a TO d)</td>
+            <td colSpan={2} className="border border-black px-1 py-0.5 text-right">RS.</td>
+            <td className="border border-black px-1 py-0.5 text-right font-bold">{renderAutoField(taxA.examIncome || 0)}</td>
+            <td className="border border-black px-1 py-0.5"></td>
+          </tr>
+          <tr>
+            <td className="border border-black px-1 py-0.5">"(4)</td>
+            <td colSpan={6} className="border border-black px-1 py-0.5 bg-yellow-50 print:bg-transparent">મકાન મિલકત સંબધિત આવક</td>
+            <td colSpan={2} className="border border-black px-1 py-0.5 text-right">RS.</td>
+            <td className="border border-black px-1 py-0.5 text-right bg-yellow-100 print:bg-transparent">{renderManualInputField("housePropertyIncome", taxA.housePropertyIncome)}</td>
+            <td className="border border-black px-1 py-0.5"></td>
+          </tr>
+          <tr>
+            <td className="border border-black px-1 py-0.5">"(5)</td>
+            <td colSpan={7} className="border border-black px-1 py-0.5 font-bold">કુલ અન્ય આવક [Column (1)(d)+(2)+(3)(e)+(4) ]</td>
+            <td className="border border-black px-1 py-0.5"></td>
+            <td colSpan={2} className="border border-black px-1 py-0.5 text-right font-bold">{renderAutoField(taxA.totalOtherIncome)}</td>
           </tr>
         </tbody>
       </table>
 
       {/* Section C - Gross Total Income */}
-      <div className="font-bold text-[11px] mt-2 mb-1 bg-gray-200 p-1">
-        વિભાગ (C) - કુલ આવક / GROSS TOTAL INCOME
-      </div>
-      <table style={{ fontSize: '10px' }}>
+      <table className="w-full border-collapse mt-1" style={{ fontSize: '8pt' }}>
         <tbody>
-          <tr className="total-row">
-            <td className="w-8">9</td>
-            <td>Gross Total Income (4+8) / કુલ આવક</td>
-            <td className="text-right w-10">RS.</td>
-            <td className="amount-cell font-bold w-24">{renderAutoField(taxA.grossTotalIncome)}</td>
+          <tr>
+            <td colSpan={11} className="border border-black px-1 py-0.5 font-bold bg-gray-100">વિભાગ (c) સમગ્ર કુલ આવક પગાર તથા અન્ય</td>
           </tr>
           <tr>
-            <td>10</td>
-            <td className="bg-yellow-50 print:bg-transparent">Less: Housing Loan Interest u/s 24 / મકાન લોન વ્યાજ</td>
-            <td className="text-right">RS.</td>
-            <td className="amount-cell bg-yellow-100 print:bg-transparent">
-              {renderManualInputField("housingLoanInterest", taxA.housingLoanInterest)}
-            </td>
+            <td className="border border-black px-1 py-0.5">"(1)</td>
+            <td colSpan={7} className="border border-black px-1 py-0.5">PRO. INCOME તથા અન્ય આવક વિભાગ A(5)+B(5)</td>
+            <td colSpan={2} className="border border-black px-1 py-0.5 text-right">RS.</td>
+            <td className="border border-black px-1 py-0.5 text-right font-bold">{renderAutoField(taxA.grossTotalIncome)}</td>
           </tr>
-          <tr className="total-row">
-            <td>11</td>
-            <td className="font-bold">Net Income Before Deductions (9-10) / ચોખ્ખી આવક</td>
-            <td className="text-right">RS.</td>
-            <td className="amount-cell font-bold">{renderAutoField(taxA.proIncome)}</td>
+          <tr>
+            <td className="border border-black px-1 py-0.5">"(2)</td>
+            <td colSpan={7} className="border border-black px-1 py-0.5 bg-yellow-50 print:bg-transparent">મકાન લોનનું વ્યાજ બાદ મળવા પાત્ર રકમ Rule 24(2)</td>
+            <td colSpan={2} className="border border-black px-1 py-0.5 text-right">RS.</td>
+            <td className="border border-black px-1 py-0.5 text-right bg-yellow-100 print:bg-transparent">{renderManualInputField("housingLoanInterest", taxA.housingLoanInterest)}</td>
+          </tr>
+          <tr>
+            <td className="border border-black px-1 py-0.5">"(3)</td>
+            <td colSpan={7} className="border border-black px-1 py-0.5 font-bold">PRO. INCOME (Column 1-2)</td>
+            <td colSpan={2} className="border border-black px-1 py-0.5"></td>
+            <td className="border border-black px-1 py-0.5 text-right font-bold">{renderAutoField(taxA.proIncome)}</td>
           </tr>
         </tbody>
       </table>
 
-      {/* Signature Section */}
-      <div className="flex justify-between mt-4 text-[10px]">
-        <div>
-          <p className="mb-6">કર્મચારીની સહી / Employee Signature</p>
-          <p>Date: _______________</p>
-        </div>
-        <div className="text-right">
-          <p className="mb-6">સંસ્થાના વડાની સહી / Head of Institution</p>
-          <p>Seal & Date: _______________</p>
-        </div>
-      </div>
-
-      <div className="form-footer text-center text-[8px] mt-2 pt-2 border-t border-dashed border-gray-400">
-        Created By: Smart Computer Vinchhiya 9924640689, 9574031243
+      {/* Footer */}
+      <div className="form-footer text-center mt-2 pt-1" style={{ fontSize: '7pt' }}>
+        Developed by - Smart Computer - 9924640689 ,9574031243
       </div>
     </div>
   );
