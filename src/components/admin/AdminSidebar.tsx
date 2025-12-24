@@ -176,8 +176,6 @@ const AdminSidebar = ({
                     onClick={() => {
                       if (item.onClick) {
                         item.onClick();
-                      } else if (item.section === "fill-form") {
-                        navigate("/tax-form-admin");
                       } else if (onSectionChange) {
                         onSectionChange(item.section);
                       }
