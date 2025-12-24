@@ -20,6 +20,9 @@ export interface Client {
   payCenterAddress: string;
   place: string;
   tdo: string;
+  tdf: string; // TDO Father name
+  headMaster: string; // HEAD MASTER name
+  headMasterFather: string; // HEAD MASTER FATHER NAME
   headMasterPlace: string;
   annualIncome: string;
   occupation: string;
@@ -51,6 +54,9 @@ export interface ClientFormData {
   payCenterAddress: string;
   place: string;
   tdo: string;
+  tdf: string;
+  headMaster: string;
+  headMasterFather: string;
   headMasterPlace: string;
   annualIncome: string;
   occupation: string;

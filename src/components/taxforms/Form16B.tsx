@@ -204,7 +204,7 @@ const Form16B = ({ client, formData }: Form16BProps) => {
       {/* Certification */}
       <div className="border border-black p-3 mt-3 text-[10px]">
         <p className="mb-2">
-          I <strong>{form16.headMasterName || client.tdo || '_______________'}</strong> SON OF:- <strong>{form16.headMasterFatherName || '_______________'}</strong>
+          I <strong>{form16.headMasterName || client.headMaster || client.tdo || '_______________'}</strong> SON OF:- <strong>{form16.headMasterFatherName || client.headMasterFather || '_______________'}</strong>
         </p>
         <p className="mb-2">
           Working in the capacity of:- <strong>{form16.headMasterDesignation || 'HEAD MASTER'}</strong> (designation) do hereby certify that a sum of
@@ -222,13 +222,13 @@ const Form16B = ({ client, formData }: Form16BProps) => {
         <div className="flex justify-between mt-6">
           <div>
             <p>DATE:- {form16.certificationDate || '_______________'}</p>
-            <p>PLACE: {form16.certificationPlace || client.payCenterName || '_______________'}</p>
+            <p>PLACE: {form16.certificationPlace || client.headMasterPlace || client.payCenterName || '_______________'}</p>
           </div>
           <div className="text-center">
             <div className="border-t border-black pt-1 min-w-[150px]">
               Signature
             </div>
-            <p className="mt-1">Full Name: {form16.headMasterName || client.tdo || '_______________'}</p>
+            <p className="mt-1">Full Name: {form16.headMasterName || client.headMaster || client.tdo || '_______________'}</p>
             <p>Designation: {form16.headMasterDesignation || 'HEAD MASTER'}</p>
           </div>
         </div>

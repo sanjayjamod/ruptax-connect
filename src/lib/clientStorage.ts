@@ -83,12 +83,15 @@ export const registerClient = (
     payCenterAddress: "",
     place: "",
     tdo: "",
+    tdf: "",
+    headMaster: "",
+    headMasterFather: "",
     headMasterPlace: "",
     annualIncome: "",
     occupation: "salaried",
     assessmentYear: "2026-27",
     formStatus: "pending",
-    password: password, // Store password for login
+    password: password,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
