@@ -25,6 +25,8 @@ export type Database = {
           designation: string | null
           email: string | null
           form_status: string | null
+          head_master: string | null
+          head_master_father: string | null
           id: string
           ifsc_code: string | null
           mobile: string | null
@@ -46,6 +48,8 @@ export type Database = {
           designation?: string | null
           email?: string | null
           form_status?: string | null
+          head_master?: string | null
+          head_master_father?: string | null
           id: string
           ifsc_code?: string | null
           mobile?: string | null
@@ -67,6 +71,8 @@ export type Database = {
           designation?: string | null
           email?: string | null
           form_status?: string | null
+          head_master?: string | null
+          head_master_father?: string | null
           id?: string
           ifsc_code?: string | null
           mobile?: string | null

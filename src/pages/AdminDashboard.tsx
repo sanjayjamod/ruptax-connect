@@ -126,7 +126,7 @@ const AdminDashboard = () => {
       }
 
       let imported = 0;
-      let skipped = 0;
+      let updated = 0;
       
       teachers.forEach((teacherData) => {
         const existing = clients.find(c => c.enterNo === teacherData.enterNo);
@@ -134,14 +134,18 @@ const AdminDashboard = () => {
           addClient(teacherData);
           imported++;
         } else {
-          skipped++;
+          // Update existing client with new data (e.g., headMaster, headMasterFather)
+          updateClient(existing.id, {
+            ...teacherData,
+          });
+          updated++;
         }
       });
       
       loadData();
       toast({
         title: "Import Successful",
-        description: `${imported} teachers imported, ${skipped} skipped (already exist).`,
+        description: `${imported} teachers imported, ${updated} updated.`,
       });
     } catch (error) {
       toast({
