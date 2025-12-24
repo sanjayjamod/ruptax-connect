@@ -43,63 +43,63 @@ const AavakVeraFormA = ({ client, formData, onChange, readOnly = false, isManual
   return (
     <div className="tax-form-container tax-form-print aavak-vera-form page-break" id="aavak-vera-form-a">
       {/* Header */}
-      <table className="w-full border-collapse" style={{ fontSize: '9pt' }}>
+      <table className="w-full border-collapse" style={{ fontSize: '10pt' }}>
         <tbody>
           <tr>
-            <td colSpan={11} className="text-center font-bold border border-black py-2" style={{ fontSize: '14pt' }}>
+            <td colSpan={11} className="text-center font-bold border border-black py-3" style={{ fontSize: '16pt' }}>
               આવક વેરા ગણતરી ફોર્મ
             </td>
           </tr>
           <tr>
-            <td className="border border-black px-2 py-1.5 font-bold" style={{ width: '15%' }}>NAME</td>
-            <td colSpan={3} className="border border-black px-2 py-1.5" style={{ width: '35%' }}>{client.name}</td>
-            <td colSpan={3} className="border border-black px-2 py-1.5" style={{ width: '25%' }}></td>
-            <td colSpan={4} className="border border-black px-2 py-1.5" style={{ width: '25%' }}></td>
+            <td className="border border-black px-2 py-2 font-bold" style={{ width: '15%' }}>NAME</td>
+            <td colSpan={3} className="border border-black px-2 py-2" style={{ width: '35%' }}>{client.name}</td>
+            <td colSpan={3} className="border border-black px-2 py-2" style={{ width: '25%' }}></td>
+            <td colSpan={4} className="border border-black px-2 py-2" style={{ width: '25%' }}></td>
           </tr>
           <tr>
-            <td className="border border-black px-2 py-1.5 font-bold">INCOME YEAR</td>
-            <td colSpan={3} className="border border-black px-2 py-1.5">{formData.salaryData.financialYear}</td>
-            <td colSpan={3} className="border border-black px-2 py-1.5"></td>
-            <td className="border border-black px-2 py-1.5 font-bold">ASSESSMENT YEAR</td>
-            <td colSpan={3} className="border border-black px-2 py-1.5">{client.assessmentYear || '2026-2027'}</td>
+            <td className="border border-black px-2 py-2 font-bold">INCOME YEAR</td>
+            <td colSpan={3} className="border border-black px-2 py-2">{formData.salaryData.financialYear}</td>
+            <td colSpan={3} className="border border-black px-2 py-2"></td>
+            <td className="border border-black px-2 py-2 font-bold">ASSESSMENT YEAR</td>
+            <td colSpan={3} className="border border-black px-2 py-2">{client.assessmentYear || '2026-2027'}</td>
           </tr>
           <tr>
-            <td className="border border-black px-2 py-1.5 font-bold">VILLAGE</td>
-            <td colSpan={3} className="border border-black px-2 py-1.5">{client.schoolName || '-'}</td>
-            <td colSpan={3} className="border border-black px-2 py-1.5"></td>
-            <td colSpan={4} className="border border-black px-2 py-1.5"></td>
+            <td className="border border-black px-2 py-2 font-bold">VILLAGE</td>
+            <td colSpan={3} className="border border-black px-2 py-2">{client.schoolName || '-'}</td>
+            <td colSpan={3} className="border border-black px-2 py-2"></td>
+            <td colSpan={4} className="border border-black px-2 py-2"></td>
           </tr>
           <tr>
-            <td className="border border-black px-2 py-1.5 font-bold">DESIGNATION</td>
-            <td colSpan={3} className="border border-black px-2 py-1.5">{client.designation || '-'}</td>
-            <td colSpan={3} className="border border-black px-2 py-1.5"></td>
-            <td className="border border-black px-2 py-1.5 font-bold">DATE OF BIRTH</td>
-            <td colSpan={3} className="border border-black px-2 py-1.5">{client.dateOfBirth || '-'}</td>
+            <td className="border border-black px-2 py-2 font-bold">DESIGNATION</td>
+            <td colSpan={3} className="border border-black px-2 py-2">{client.designation || '-'}</td>
+            <td colSpan={3} className="border border-black px-2 py-2"></td>
+            <td className="border border-black px-2 py-2 font-bold">DATE OF BIRTH</td>
+            <td colSpan={3} className="border border-black px-2 py-2">{client.dateOfBirth || '-'}</td>
           </tr>
           <tr>
-            <td className="border border-black px-2 py-1.5 font-bold">PAN NO.</td>
-            <td colSpan={3} className="border border-black px-2 py-1.5">{client.panNo || '-'}</td>
-            <td colSpan={3} className="border border-black px-2 py-1.5"></td>
-            <td className="border border-black px-2 py-1.5 font-bold">MOBILE NO</td>
-            <td colSpan={3} className="border border-black px-2 py-1.5">{client.mobileNo || '-'}</td>
+            <td className="border border-black px-2 py-2 font-bold">PAN NO.</td>
+            <td colSpan={3} className="border border-black px-2 py-2">{client.panNo || '-'}</td>
+            <td colSpan={3} className="border border-black px-2 py-2"></td>
+            <td className="border border-black px-2 py-2 font-bold">MOBILE NO</td>
+            <td colSpan={3} className="border border-black px-2 py-2">{client.mobileNo || '-'}</td>
           </tr>
           <tr>
-            <td className="border border-black px-2 py-1.5 font-bold">BANK ACC.NO</td>
-            <td colSpan={3} className="border border-black px-2 py-1.5">{client.bankAcNo || '-'}</td>
-            <td colSpan={3} className="border border-black px-2 py-1.5"></td>
-            <td className="border border-black px-2 py-1.5 font-bold">AADHAR NO</td>
-            <td colSpan={3} className="border border-black px-2 py-1.5">{client.aadharNo || '-'}</td>
+            <td className="border border-black px-2 py-2 font-bold">BANK ACC.NO</td>
+            <td colSpan={3} className="border border-black px-2 py-2">{client.bankAcNo || '-'}</td>
+            <td colSpan={3} className="border border-black px-2 py-2"></td>
+            <td className="border border-black px-2 py-2 font-bold">AADHAR NO</td>
+            <td colSpan={3} className="border border-black px-2 py-2">{client.aadharNo || '-'}</td>
           </tr>
           <tr>
-            <td className="border border-black px-2 py-1.5 font-bold">IFSC CODE</td>
-            <td colSpan={3} className="border border-black px-2 py-1.5">{client.ifscCode || '-'}</td>
-            <td colSpan={7} className="border border-black px-2 py-1.5"></td>
+            <td className="border border-black px-2 py-2 font-bold">IFSC CODE</td>
+            <td colSpan={3} className="border border-black px-2 py-2">{client.ifscCode || '-'}</td>
+            <td colSpan={7} className="border border-black px-2 py-2"></td>
           </tr>
         </tbody>
       </table>
 
       {/* Section A - Salary Income */}
-      <table className="w-full border-collapse mt-3" style={{ fontSize: '9pt' }}>
+      <table className="w-full border-collapse mt-4" style={{ fontSize: '10pt' }}>
         <tbody>
           <tr>
             <td colSpan={4} className="border border-black px-1 py-0.5 font-bold">કુલ ગ્રોસ આવક : AS PER RULE 17</td>
@@ -179,7 +179,7 @@ const AavakVeraFormA = ({ client, formData, onChange, readOnly = false, isManual
       </table>
 
       {/* Section B - Other Income */}
-      <table className="w-full border-collapse mt-3" style={{ fontSize: '9pt' }}>
+      <table className="w-full border-collapse mt-4" style={{ fontSize: '10pt' }}>
         <tbody>
           <tr>
             <td colSpan={11} className="border border-black px-1 py-0.5 font-bold bg-gray-100">વિભાગ ( B ) અન્ય આવક વિભાગ</td>
@@ -262,7 +262,7 @@ const AavakVeraFormA = ({ client, formData, onChange, readOnly = false, isManual
       </table>
 
       {/* Section C - Gross Total Income */}
-      <table className="w-full border-collapse mt-3" style={{ fontSize: '9pt' }}>
+      <table className="w-full border-collapse mt-4" style={{ fontSize: '10pt' }}>
         <tbody>
           <tr>
             <td colSpan={11} className="border border-black px-1 py-0.5 font-bold bg-gray-100">વિભાગ (c) સમગ્ર કુલ આવક પગાર તથા અન્ય</td>
@@ -289,7 +289,7 @@ const AavakVeraFormA = ({ client, formData, onChange, readOnly = false, isManual
       </table>
 
       {/* Footer */}
-      <div className="form-footer text-center mt-6 pt-2" style={{ fontSize: '8pt' }}>
+      <div className="form-footer text-center mt-8 pt-3" style={{ fontSize: '9pt' }}>
         Developed by - Smart Computer - 9924640689 ,9574031243
       </div>
     </div>
