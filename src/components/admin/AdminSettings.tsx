@@ -29,7 +29,9 @@ import {
   Save,
   Mail,
   Eye,
-  EyeOff
+  EyeOff,
+  Send,
+  Loader2
 } from "lucide-react";
 
 interface AdminSettingsProps {
@@ -69,6 +71,8 @@ const AdminSettings = ({ onResetData }: AdminSettingsProps) => {
   );
   const [showPassword, setShowPassword] = useState(false);
   const [isSavingEmail, setIsSavingEmail] = useState(false);
+  const [isSendingTest, setIsSendingTest] = useState(false);
+  const [testEmailAddress, setTestEmailAddress] = useState("");
 
   const toggleTheme = () => {
     document.documentElement.classList.toggle("dark");
@@ -164,6 +168,66 @@ const AdminSettings = ({ onResetData }: AdminSettingsProps) => {
       });
     } finally {
       setIsSavingEmail(false);
+    }
+  };
+
+  const handleSendTestEmail = async () => {
+    if (!testEmailAddress) {
+      toast({
+        title: "Error",
+        description: "Please enter a test email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!smtpHost || !smtpUsername || !smtpPassword || !senderEmail) {
+      toast({
+        title: "Error",
+        description: "Please fill all SMTP settings first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSendingTest(true);
+    try {
+      const response = await supabase.functions.invoke('send-test-email', {
+        body: {
+          smtpHost,
+          smtpPort,
+          smtpUsername,
+          smtpPassword,
+          smtpSecure,
+          senderEmail,
+          senderName,
+          testEmail: testEmailAddress,
+        },
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
+
+      const data = response.data;
+      
+      if (data.success) {
+        toast({
+          title: "Test Email Sent! ✅",
+          description: data.message,
+        });
+      } else {
+        throw new Error(data.error || "Failed to send test email");
+      }
+    } catch (error: any) {
+      console.error("Test email error:", error);
+      toast({
+        title: "Test Email Failed",
+        description: error.message || "Failed to send test email. Check SMTP settings.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSendingTest(false);
     }
   };
 
@@ -288,14 +352,45 @@ const AdminSettings = ({ onResetData }: AdminSettingsProps) => {
             </div>
           </div>
 
-          <Button 
-            onClick={handleSaveEmailSettings} 
-            disabled={isSavingEmail || !smtpHost || !smtpUsername || !smtpPassword}
-            className="w-full"
-          >
-            <Save className="h-4 w-4 mr-2" />
-            {isSavingEmail ? "Saving..." : "Save SMTP Settings"}
-          </Button>
+          {/* Test Email Section */}
+          <div className="border-t pt-4 mt-4">
+            <p className="text-sm font-medium mb-3">Test SMTP Connection</p>
+            <div className="flex gap-2">
+              <Input
+                type="email"
+                value={testEmailAddress}
+                onChange={(e) => setTestEmailAddress(e.target.value)}
+                placeholder="Enter test email address..."
+                className="flex-1"
+              />
+              <Button 
+                onClick={handleSendTestEmail} 
+                disabled={isSendingTest || !smtpHost || !smtpUsername || !smtpPassword || !testEmailAddress}
+                variant="secondary"
+              >
+                {isSendingTest ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4 mr-2" />
+                )}
+                {isSendingTest ? "Sending..." : "Send Test"}
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Send a test email to verify your SMTP configuration is working
+            </p>
+          </div>
+
+          <div className="flex gap-2 mt-4">
+            <Button 
+              onClick={handleSaveEmailSettings} 
+              disabled={isSavingEmail || !smtpHost || !smtpUsername || !smtpPassword}
+              className="flex-1"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              {isSavingEmail ? "Saving..." : "Save SMTP Settings"}
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
