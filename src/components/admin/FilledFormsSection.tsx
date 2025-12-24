@@ -93,38 +93,66 @@ const FilledFormsSection = () => {
   };
 
   return (
-    <Card className="border-border/50 shadow-sm">
-      <CardHeader className="pb-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <CardTitle className="flex items-center gap-2 text-base font-medium">
-            <FileText className="h-4 w-4 text-primary" />
-            Filled Tax Forms ({filteredForms.length})
-          </CardTitle>
-          <div className="flex gap-2">
-            <Select value={yearFilter} onValueChange={setYearFilter}>
-              <SelectTrigger className="w-[150px]">
-                <Calendar className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="All Years" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Years</SelectItem>
-                {financialYears.map((year) => (
-                  <SelectItem key={year} value={year}>{year}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+    <div className="space-y-4">
+      {/* Header Section */}
+      <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+        <div className="border-b border-border bg-gradient-to-r from-muted/30 to-muted/10 px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="rounded-lg bg-primary/10 p-2">
+                <FileText className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h2 className="font-display text-lg font-semibold text-foreground">
+                  Teacher Registrations
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Manage and track all tax registrations
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+                {filteredForms.length} forms
+              </span>
+            </div>
           </div>
         </div>
-        <div className="relative mt-2">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search by client ID, name, PAN..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-      </CardHeader>
+      </div>
+
+      {/* Forms Card */}
+      <Card className="border-border/50 shadow-sm">
+        <CardHeader className="pb-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <CardTitle className="flex items-center gap-2 text-base font-medium">
+              <FileText className="h-4 w-4 text-primary" />
+              Filled Tax Forms ({filteredForms.length})
+            </CardTitle>
+            <div className="flex gap-2">
+              <Select value={yearFilter} onValueChange={setYearFilter}>
+                <SelectTrigger className="w-[150px]">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="All Years" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Years</SelectItem>
+                  {financialYears.map((year) => (
+                    <SelectItem key={year} value={year}>{year}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="relative mt-2">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search by client ID, name, PAN..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        </CardHeader>
       <CardContent className="p-0">
         {yearFilter === "all" ? (
           // Grouped view
@@ -263,6 +291,7 @@ const FilledFormsSection = () => {
         )}
       </CardContent>
     </Card>
+    </div>
   );
 };
 
