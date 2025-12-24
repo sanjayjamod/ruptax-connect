@@ -461,8 +461,8 @@ const AdminDashboard = () => {
                 </div>
               )}
 
-              {/* Client List */}
-              {(activeSection === "dashboard" || activeSection === "teachers") && (
+              {/* Client List - Only on dashboard/teachers */}
+              {activeSection === "dashboard" && (
                 <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden animate-fade-in">
                   <div className="p-6">
                     <ClientList
@@ -496,7 +496,7 @@ const AdminDashboard = () => {
                 </div>
               )}
 
-              {/* Filled Forms Section */}
+              {/* Filled Forms Section - With Filters and Client List */}
               {activeSection === "filled-forms" && (
                 <div className="animate-fade-in space-y-6">
                   <AdvancedFilters
@@ -506,7 +506,36 @@ const AdminDashboard = () => {
                     groupBy={groupBy}
                     onGroupByChange={setGroupBy}
                   />
-                  <FilledFormsSection />
+                  <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+                    <div className="p-6">
+                      <ClientList
+                        clients={filteredClients}
+                        searchQuery={searchQuery}
+                        onSearchChange={setSearchQuery}
+                        onEdit={handleEditClient}
+                        onDelete={handleDeleteClient}
+                        onViewForm={handleViewForm}
+                        onPasswordUpdate={handlePasswordUpdate}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Teachers Section - Simple list without filters */}
+              {activeSection === "teachers" && (
+                <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden animate-fade-in">
+                  <div className="p-6">
+                    <ClientList
+                      clients={filteredClients}
+                      searchQuery={searchQuery}
+                      onSearchChange={setSearchQuery}
+                      onEdit={handleEditClient}
+                      onDelete={handleDeleteClient}
+                      onViewForm={handleViewForm}
+                      onPasswordUpdate={handlePasswordUpdate}
+                    />
+                  </div>
                 </div>
               )}
 
