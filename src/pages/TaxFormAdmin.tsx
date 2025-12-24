@@ -211,130 +211,142 @@ const TaxFormAdmin = () => {
     window.print();
   };
 
-  // Print only Pagar form in Landscape
+  // Print only Pagar form in Landscape - Clean Professional Layout
   const handlePrintPagar = () => {
-    // Create a new window with only Pagar form
+    if (!client || !formData) {
+      toast({ title: "Error", description: "Please load client data first", variant: "destructive" });
+      return;
+    }
+
     const printWindow = window.open('', '_blank');
     if (!printWindow) {
       toast({ title: "Error", description: "Please allow popups to print", variant: "destructive" });
       return;
     }
-    
-    const pagarForm = document.getElementById('pagar-form-screen');
-    if (!pagarForm) {
-      toast({ title: "Error", description: "Pagar form not found", variant: "destructive" });
-      printWindow.close();
-      return;
-    }
 
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>પગાર ફોર્મ - ${client?.name || ''}</title>
-        <style>
-          @page {
-            size: A4 landscape;
-            margin: 3mm;
-          }
-          * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-          }
-          body {
-            font-family: 'Noto Sans Gujarati', 'Shruti', Arial, sans-serif;
-            font-size: 7pt;
-            background: #fff;
-            color: #000;
-            width: 291mm;
-            height: 204mm;
-            max-height: 204mm;
-            padding: 2mm;
-            overflow: hidden;
-          }
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 1mm;
-          }
-          th, td {
-            border: 0.3pt solid #000;
-            padding: 0.8mm 1mm;
-            font-size: 6.5pt;
-            text-align: center;
-            vertical-align: middle;
-            line-height: 1.1;
-          }
-          th {
-            background-color: #f0f0f0;
-            font-weight: bold;
-          }
-          .text-center.font-bold.text-lg {
-            text-align: center;
-            font-size: 11pt;
-            font-weight: bold;
-            margin-bottom: 1mm;
-            padding-bottom: 1mm;
-            border-bottom: 0.5pt solid #000;
-          }
-          .mb-2 td {
-            border: none;
-            text-align: left;
-            font-size: 7pt;
-            padding: 0.5mm 2mm;
-          }
-          .amount-cell {
-            text-align: right;
-            font-family: 'Courier New', monospace;
-          }
-          .header-row td, .header-row th {
-            background-color: #e0e0e0;
-            font-weight: bold;
-            font-size: 6pt;
-          }
-          .total-row td {
-            background-color: #f5f5f5;
-            font-weight: bold;
-          }
-          .signature-box, .flex.justify-between {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 2mm;
-            font-size: 7pt;
-          }
-          .form-footer {
-            text-align: center;
-            font-size: 6pt;
-            margin-top: 1mm;
-            color: #333;
-          }
-          .no-print, button, .flex.flex-wrap.items-center.gap-4 {
-            display: none !important;
-          }
-          input {
-            border: none !important;
-            background: transparent !important;
-            font-size: 6.5pt;
-            text-align: right;
-            width: 100%;
-          }
-          span {
-            font-size: 6.5pt;
-          }
-        </style>
-      </head>
-      <body>
-        ${pagarForm.innerHTML.replace(/bg-yellow-200|bg-gray-100|bg-gray-200|bg-blue-100|bg-blue-200|bg-blue-300|bg-gray-300/g, '')}
-      </body>
-      </html>
-    `);
-    
+    const months = ['apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec', 'jan', 'feb', 'mar'] as const;
+    const monthNames = ['એપ્રિલ', 'મે', 'જુન', 'જુલાઇ', 'ઑગસ્ટ', 'સપ્ટેમ્બર', 'ઓક્ટોબર', 'નવેમ્બર', 'ડિસેમ્બર', 'જાન્યુઆરી', 'ફેબ્રુઆરી', 'માર્ચ'];
+    const salaryData = formData.salaryData;
+
+    const calculateTotal = (field: string) => {
+      return months.reduce((sum, m) => sum + (Number((salaryData.months[m] as any)[field]) || 0), 0);
+    };
+
+    const formatNum = (num: number) => num > 0 ? num.toString() : '';
+
+    const generateRow = (num: string, label: string, field: string) => {
+      let cells = months.map(m => `<td class="amt">${formatNum((salaryData.months[m] as any)[field] || 0)}</td>`).join('');
+      return `<tr><td>${num}</td><td class="label">${label}</td>${cells}<td class="amt total">${formatNum(calculateTotal(field))}</td><td></td></tr>`;
+    };
+
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>પગાર ફોર્મ - ${client.name}</title>
+<style>
+@page { size: A4 landscape; margin: 4mm; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { 
+  font-family: 'Noto Sans Gujarati', 'Shruti', Arial, sans-serif; 
+  font-size: 8pt; 
+  background: #fff; 
+  color: #000;
+  width: 289mm;
+  height: 202mm;
+  padding: 2mm;
+}
+.title { text-align: center; font-size: 12pt; font-weight: bold; border-bottom: 1px solid #000; padding-bottom: 2mm; margin-bottom: 2mm; }
+.info { display: flex; justify-content: space-between; margin-bottom: 1mm; font-size: 8pt; }
+.info-row { display: flex; gap: 5mm; margin-bottom: 1mm; }
+.info-row span { }
+.info-row strong { font-weight: bold; }
+table { width: 100%; border-collapse: collapse; font-size: 7pt; }
+th, td { border: 0.5pt solid #000; padding: 1mm; text-align: center; vertical-align: middle; }
+th { background: #e8e8e8; font-weight: bold; font-size: 6.5pt; }
+.label { text-align: left; white-space: nowrap; }
+.amt { text-align: right; font-family: 'Courier New', monospace; font-size: 6.5pt; }
+.total { font-weight: bold; background: #f5f5f5; }
+.section-header td { background: #d0d0d0; font-weight: bold; text-align: center; }
+.signature { display: flex; justify-content: space-between; margin-top: 3mm; font-size: 8pt; }
+.sig-right { text-align: right; }
+.sig-line { border-top: 1px solid #000; margin-top: 8mm; padding-top: 1mm; }
+.footer { text-align: center; font-size: 7pt; margin-top: 2mm; border-top: 1px dashed #999; padding-top: 1mm; color: #555; }
+</style>
+</head>
+<body>
+<div class="title">${salaryData.financialYear}</div>
+
+<div class="info">
+  <div><strong>હિસાબી વર્ષ તા:</strong> ${salaryData.accountingYear}</div>
+  <div style="font-size:7pt">નોંધ :- માર્ચ પેઈડ ઇન અપ્રિલનું વર્ષ ગણવું</div>
+</div>
+
+<div class="info-row">
+  <span><strong>શાળાનું નામ:</strong> ${client.schoolNameGujarati || client.schoolName || '-'}</span>
+  <span><strong>કર્મચારીનું નામ:</strong> ${client.nameGujarati || client.name}</span>
+</div>
+<div class="info-row">
+  <span><strong>સરનામું:</strong> ${client.addressGujarati || client.schoolAddress || '-'}</span>
+  <span><strong>હોદ્દો:</strong> ${client.designationGujarati || client.designation || '-'}</span>
+</div>
+
+<table>
+<thead>
+<tr>
+  <th style="width:5mm">ક્રમ</th>
+  <th style="width:25mm">વેતનની વિગત</th>
+  ${monthNames.map(n => `<th style="width:16mm">${n}</th>`).join('')}
+  <th style="width:18mm">કુલ</th>
+  <th style="width:8mm">નોંધ</th>
+</tr>
+</thead>
+<tbody>
+${generateRow('1', 'બેઝિક પગાર', 'basic')}
+${generateRow('2', 'ગ્રેડ પે', 'gradePay')}
+${generateRow('3', 'મોંઘવારી ભથ્થું', 'da')}
+${generateRow('4', 'ઘરભાડા ભથ્થું', 'hra')}
+${generateRow('6', 'મેડીકલ ભથ્થું', 'medical')}
+${generateRow('7', 'અપંગ એલાઉન્સ', 'disabilityAllowance')}
+${generateRow('8', 'આચાર્ય એલાઉન્સ', 'principalAllowance')}
+${generateRow('9', 'મોંઘવારી એરિયર્સ', 'daArrears')}
+${generateRow('10', 'પગાર એરિયર્સ', 'salaryArrears')}
+${generateRow('11', 'અન્ય આવક 1', 'otherIncome1')}
+${generateRow('12', 'અન્ય આવક 2', 'otherIncome2')}
+${generateRow('13', 'કુલ પગાર', 'totalSalary')}
+<tr class="section-header"><td colspan="16">કપાત</td></tr>
+${generateRow('14', 'G.P.F.', 'gpf')}
+${generateRow('15', 'C.P.F.', 'cpf')}
+${generateRow('16', 'વ્યવસાય વેરો', 'professionTax')}
+${generateRow('17', 'મંડળી', 'society')}
+${generateRow('18', 'જૂથ વિમા પ્રિમિયમ', 'groupInsurance')}
+${generateRow('19', 'ઇન્કમટેક્ષ કપાત', 'incomeTax')}
+${generateRow('20', 'કુલ કપાત', 'totalDeduction')}
+${generateRow('21', 'ચુકવેલ રકમ', 'netPay')}
+</tbody>
+</table>
+
+<div class="signature">
+  <div>
+    <p>સ્થળ: ${client.schoolNameGujarati || client.schoolName || '_____________'}</p>
+    <p>તારીખ: _______________</p>
+  </div>
+  <div class="sig-right">
+    <div class="sig-line">સંસ્થાના વડાની સહી</div>
+  </div>
+</div>
+
+<div class="footer">Created By: Smart Computer Vinchhiya 9924640689, 9574031243</div>
+</body>
+</html>`;
+
+    printWindow.document.write(html);
     printWindow.document.close();
+    
     setTimeout(() => {
       printWindow.print();
       printWindow.close();
-    }, 500);
+    }, 300);
   };
 
   const handleExportExcel = () => {
