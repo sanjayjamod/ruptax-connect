@@ -461,19 +461,6 @@ const AdminDashboard = () => {
                 </div>
               )}
 
-              {/* Advanced Filters */}
-              {(activeSection === "dashboard" || activeSection === "teachers") && (
-                <div className="animate-fade-in">
-                  <AdvancedFilters
-                    clients={clients}
-                    filters={filters}
-                    onFilterChange={handleFilterChange}
-                    groupBy={groupBy}
-                    onGroupByChange={setGroupBy}
-                  />
-                </div>
-              )}
-
               {/* Client List */}
               {(activeSection === "dashboard" || activeSection === "teachers") && (
                 <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden animate-fade-in">
@@ -511,7 +498,14 @@ const AdminDashboard = () => {
 
               {/* Filled Forms Section */}
               {activeSection === "filled-forms" && (
-                <div className="animate-fade-in">
+                <div className="animate-fade-in space-y-6">
+                  <AdvancedFilters
+                    clients={clients}
+                    filters={filters}
+                    onFilterChange={handleFilterChange}
+                    groupBy={groupBy}
+                    onGroupByChange={setGroupBy}
+                  />
                   <FilledFormsSection />
                 </div>
               )}

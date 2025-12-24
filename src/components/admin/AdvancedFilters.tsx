@@ -172,23 +172,7 @@ const AdvancedFilters = ({ clients, filters, onFilterChange, groupBy, onGroupByC
         </div>
         <div className="p-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {/* School Filter */}
-            <div className="space-y-2">
-              <Label className="text-xs font-medium text-muted-foreground">શાળા નું નામ (School)</Label>
-              <Select value={filters.school} onValueChange={(v) => onFilterChange("school", v)}>
-                <SelectTrigger className="h-10 rounded-lg bg-background">
-                  <SelectValue placeholder="All Schools" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Schools</SelectItem>
-                  {uniqueSchools.map((school) => (
-                    <SelectItem key={school} value={school}>{school}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Pay School Filter */}
+            {/* Pay School Filter - First */}
             <div className="space-y-2">
               <Label className="text-xs font-medium text-muted-foreground">પગાર શાળા (Pay School)</Label>
               <Select value={filters.paySchool} onValueChange={(v) => onFilterChange("paySchool", v)}>
@@ -199,6 +183,22 @@ const AdvancedFilters = ({ clients, filters, onFilterChange, groupBy, onGroupByC
                   <SelectItem value="all">All Pay Schools</SelectItem>
                   {uniquePaySchools.map((ps) => (
                     <SelectItem key={ps} value={ps}>{ps}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* School Filter - Second */}
+            <div className="space-y-2">
+              <Label className="text-xs font-medium text-muted-foreground">શાળા નું નામ (School)</Label>
+              <Select value={filters.school} onValueChange={(v) => onFilterChange("school", v)}>
+                <SelectTrigger className="h-10 rounded-lg bg-background">
+                  <SelectValue placeholder="All Schools" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Schools</SelectItem>
+                  {uniqueSchools.map((school) => (
+                    <SelectItem key={school} value={school}>{school}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
