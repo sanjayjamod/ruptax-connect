@@ -12,6 +12,7 @@ import AdminSidebar from "@/components/admin/AdminSidebar";
 import SideCalculator from "@/components/admin/SideCalculator";
 import ClientProfilesSection from "@/components/admin/ClientProfilesSection";
 import FilledFormsSection from "@/components/admin/FilledFormsSection";
+import TeachersSection from "@/components/admin/TeachersSection";
 import AdminSettings from "@/components/admin/AdminSettings";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { Client, ClientFormData } from "@/types/client";
@@ -31,7 +32,8 @@ import {
   Shield,
   Users,
   RefreshCw,
-  Menu
+  Menu,
+  FileCheck
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -216,6 +218,11 @@ const AdminDashboard = () => {
     
     return result;
   }, [clients, searchQuery, filters]);
+
+  // Completed clients only (for Filled Forms section)
+  const completedClients = useMemo(() => {
+    return clients.filter(c => c.formStatus === 'completed' || c.formStatus === 'submitted');
+  }, [clients]);
 
   // Handle add/edit client
   const handleSaveClient = (formData: ClientFormData) => {
@@ -423,6 +430,7 @@ const AdminDashboard = () => {
                   {activeSection === "dashboard" && "Dashboard"}
                   {activeSection === "teachers" && "Teachers"}
                   {activeSection === "profiles" && "Client Profiles"}
+                  {activeSection === "fill-form" && "Fill Form"}
                   {activeSection === "filled-forms" && "Filled Forms"}
                   {activeSection === "calculator" && "Calculator"}
                   {activeSection === "notes" && "Notes"}
@@ -454,27 +462,10 @@ const AdminDashboard = () => {
           {/* Main Content */}
           <main className="flex-1 p-4 lg:p-6">
             <div className="mx-auto max-w-7xl space-y-6">
-              {/* Stats Cards - Always visible */}
+              {/* Stats Cards - Dashboard only */}
               {activeSection === "dashboard" && (
                 <div className="animate-fade-in">
                   <StatsCards {...stats} />
-                </div>
-              )}
-
-              {/* Client List - Only on dashboard/teachers */}
-              {activeSection === "dashboard" && (
-                <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden animate-fade-in">
-                  <div className="p-6">
-                    <ClientList
-                      clients={filteredClients}
-                      searchQuery={searchQuery}
-                      onSearchChange={setSearchQuery}
-                      onEdit={handleEditClient}
-                      onDelete={handleDeleteClient}
-                      onViewForm={handleViewForm}
-                      onPasswordUpdate={handlePasswordUpdate}
-                    />
-                  </div>
                 </div>
               )}
 
@@ -496,8 +487,8 @@ const AdminDashboard = () => {
                 </div>
               )}
 
-              {/* Filled Forms Section - With Filters and Client List */}
-              {activeSection === "filled-forms" && (
+              {/* Fill Form Section - ALL clients with filters for filling forms */}
+              {activeSection === "fill-form" && (
                 <div className="animate-fade-in space-y-6">
                   <AdvancedFilters
                     clients={clients}
@@ -522,20 +513,44 @@ const AdminDashboard = () => {
                 </div>
               )}
 
-              {/* Teachers Section - Simple list without filters */}
-              {activeSection === "teachers" && (
-                <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden animate-fade-in">
-                  <div className="p-6">
-                    <ClientList
-                      clients={filteredClients}
-                      searchQuery={searchQuery}
-                      onSearchChange={setSearchQuery}
-                      onEdit={handleEditClient}
-                      onDelete={handleDeleteClient}
-                      onViewForm={handleViewForm}
-                      onPasswordUpdate={handlePasswordUpdate}
-                    />
+              {/* Filled Forms Section - Only COMPLETED forms */}
+              {activeSection === "filled-forms" && (
+                <div className="animate-fade-in space-y-6">
+                  <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
+                    <div className="border-b border-border bg-gradient-to-r from-emerald-500/10 to-emerald-600/5 px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="rounded-lg bg-emerald-500/20 p-2">
+                          <FileCheck className="h-5 w-5 text-emerald-600" />
+                        </div>
+                        <div>
+                          <h2 className="font-display text-lg font-semibold text-foreground">
+                            Completed Forms
+                          </h2>
+                          <p className="text-sm text-muted-foreground">
+                            {completedClients.length} forms completed/submitted
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-6">
+                      <ClientList
+                        clients={completedClients}
+                        searchQuery={searchQuery}
+                        onSearchChange={setSearchQuery}
+                        onEdit={handleEditClient}
+                        onDelete={handleDeleteClient}
+                        onViewForm={handleViewForm}
+                        onPasswordUpdate={handlePasswordUpdate}
+                      />
+                    </div>
                   </div>
+                </div>
+              )}
+
+              {/* Teachers Section - Grouped by Pay School and School */}
+              {activeSection === "teachers" && (
+                <div className="animate-fade-in">
+                  <TeachersSection clients={clients} />
                 </div>
               )}
 
