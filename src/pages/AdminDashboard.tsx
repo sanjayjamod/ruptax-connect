@@ -22,7 +22,7 @@ import {
   deleteClient,
   getClientStats,
 } from "@/lib/clientStorage";
-import { importTeachersFromHTML, readFileAsText } from "@/lib/excelImport";
+import { importTeachersFromFile, readFileAsText } from "@/lib/excelImport";
 import { toast } from "@/hooks/use-toast";
 import { 
   Loader2, 
@@ -113,8 +113,9 @@ const AdminDashboard = () => {
 
     try {
       setIsLoading(true);
-      const content = await readFileAsText(file);
-      const teachers = importTeachersFromHTML(content);
+      
+      // Use the unified import function that handles both Excel and HTML
+      const teachers = await importTeachersFromFile(file);
       
       if (teachers.length === 0) {
         toast({
@@ -134,9 +135,12 @@ const AdminDashboard = () => {
           addClient(teacherData);
           imported++;
         } else {
-          // Update existing client with new data (e.g., headMaster, headMasterFather)
+          // Update existing client with ALL new data including headMaster, headMasterFather, headMasterPlace
           updateClient(existing.id, {
             ...teacherData,
+            headMaster: teacherData.headMaster,
+            headMasterFather: teacherData.headMasterFather,
+            headMasterPlace: teacherData.headMasterPlace,
           });
           updated++;
         }
