@@ -65,6 +65,12 @@ export interface DeclarationData {
   fiveYearFD: number;
   otherDeduction: number;
   totalDeduction: number;
+  // Signature section editable text
+  employeeSignatureLabel?: string;
+  designationLabel?: string;
+  placeLabel?: string;
+  institutionHeadLabel?: string;
+  stampLabel?: string;
 }
 
 export interface TaxCalculationA {
@@ -240,6 +246,11 @@ export const getEmptyTaxFormData = (clientId: string): TaxFormData => ({
     fiveYearFD: 0,
     otherDeduction: 0,
     totalDeduction: 0,
+    employeeSignatureLabel: 'કર્મચારીની સહી',
+    designationLabel: 'હોદ્દો',
+    placeLabel: 'સ્થળ',
+    institutionHeadLabel: 'સંસ્થાના વડાની સહી',
+    stampLabel: 'સિક્કો',
   },
   taxCalculationA: {
     grossSalary: 0,
