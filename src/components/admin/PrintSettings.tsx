@@ -170,20 +170,21 @@ const PrintSettings = ({ client, formData, onChange }: PrintSettingsProps) => {
       .filter(([_, s]) => s.enabled)
       .map(([key, _]) => key);
 
+    const idMap: { [key: string]: string } = {
+      pagar: "#pagar-form",
+      declaration: "#declaration-form",
+      aavakVeraA: "#aavak-vera-form-a",
+      aavakVeraB: "#aavak-vera-form-b",
+      form16A: "#form-16a",
+      form16B: "#form-16b",
+    };
+
     let customStyles = `
       @media print {
         /* Hide disabled forms */
         ${Object.entries(settings)
           .filter(([_, s]) => !s.enabled)
           .map(([key, _]) => {
-            const idMap: { [key: string]: string } = {
-              pagar: "#pagar-form",
-              declaration: "#declaration-form",
-              aavakVeraA: "#aavak-vera-form-a",
-              aavakVeraB: "#aavak-vera-form-b",
-              form16A: "#form-16a",
-              form16B: "#form-16b",
-            };
             return `${idMap[key]} { display: none !important; }`;
           })
           .join("\n")}
@@ -192,22 +193,24 @@ const PrintSettings = ({ client, formData, onChange }: PrintSettingsProps) => {
         ${Object.entries(settings)
           .filter(([_, s]) => s.enabled)
           .map(([key, s]) => {
-            const idMap: { [key: string]: string } = {
-              pagar: "#pagar-form",
-              declaration: "#declaration-form",
-              aavakVeraA: "#aavak-vera-form-a",
-              aavakVeraB: "#aavak-vera-form-b",
-              form16A: "#form-16a",
-              form16B: "#form-16b",
-            };
-            const pageBorderStyle = s.pageBorder 
-              ? `border: ${s.pageBorderWidth}pt ${s.pageBorderStyle} ${s.pageBorderColor} !important; box-sizing: border-box !important;` 
-              : '';
+            // Build page border CSS separately for clarity
+            let pageBorderCSS = '';
+            if (s.pageBorder) {
+              pageBorderCSS = `
+                border-width: ${s.pageBorderWidth}pt !important;
+                border-style: ${s.pageBorderStyle} !important;
+                border-color: ${s.pageBorderColor} !important;
+                box-sizing: border-box !important;
+              `;
+            } else {
+              pageBorderCSS = 'border: none !important;';
+            }
+            
             return `
               ${idMap[key]} {
                 padding: ${s.marginTop}mm ${s.marginRight}mm ${s.marginBottom}mm ${s.marginLeft}mm !important;
                 font-size: ${s.fontSize}pt !important;
-                ${pageBorderStyle}
+                ${pageBorderCSS}
               }
               ${idMap[key]} table th,
               ${idMap[key]} table td {
