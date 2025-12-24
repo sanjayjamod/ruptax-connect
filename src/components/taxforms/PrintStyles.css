@@ -1,11 +1,12 @@
 /* Print Styles for Tax Forms - A4 Size */
-/* Form A: EXACT 1 PAGE FIT - No overflow, No cut-off */
+/* Pagar Form: A4 Landscape, Others: A4 Portrait */
+/* 6 Forms = 6 Pages EXACTLY (1 form per page) */
 
 @media print {
-  /* A4 Portrait page */
+  /* Default page style - Portrait for most forms */
   @page {
     size: A4 portrait;
-    margin: 8mm;
+    margin: 5mm;
   }
 
   /* Pagar form - Landscape A4 */
@@ -14,11 +15,12 @@
     margin: 4mm;
   }
 
+  /* Apply landscape to pagar form */
   .pagar-page {
     page: pagar;
   }
 
-  /* Force exact color printing */
+  /* Force exact color printing - NO margin/padding on everything */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
@@ -33,9 +35,10 @@
     width: 100% !important;
     height: auto !important;
     overflow: visible !important;
+    font-size: 8pt !important;
   }
 
-  /* Hide everything except print area */
+  /* Hide EVERYTHING except print area */
   .no-print,
   header,
   footer:not(.form-footer),
@@ -55,9 +58,14 @@
   a[href*="wa.me"] {
     display: none !important;
     visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
-  /* Print area container */
+  /* Print area container - NO extra spacing */
   .print-area {
     display: block !important;
     visibility: visible !important;
@@ -65,193 +73,79 @@
     padding: 0 !important;
   }
 
-  /* Base form container - 1 page exactly */
+  /* Show print area */
+  .print\:block,
+  .hidden.print\:block {
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  /* Base form container - each form = 1 page EXACTLY */
   .tax-form-container,
   .tax-form-print,
   .page-break {
     width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
     margin: 0 !important;
-    padding: 0 !important;
+    padding: 2mm !important;
     color: #000 !important;
     background: #fff !important;
+    overflow: hidden !important;
+    display: block !important;
+    position: relative !important;
     page-break-after: always !important;
     page-break-inside: avoid !important;
     break-after: page !important;
     break-inside: avoid !important;
+    box-sizing: border-box !important;
   }
 
-  /* Last form - no page break */
+  /* Page Border Classes - Applied via JavaScript from Print Settings */
+  .print-border-solid {
+    border-style: solid !important;
+  }
+  .print-border-dashed {
+    border-style: dashed !important;
+  }
+  .print-border-dotted {
+    border-style: dotted !important;
+  }
+  .print-border-double {
+    border-style: double !important;
+  }
+
+  /* CRITICAL: Last form (#form-16b) - NO page break after to prevent blank page */
   .tax-form-container:last-child,
-  #form-16b {
+  .tax-form-print:last-child,
+  #form-16b,
+  #form-16b.page-break {
     page-break-after: avoid !important;
     break-after: avoid !important;
   }
 
-  /* ========================================
-     આવકવેરા FORM A - EXACT A4 FIT
-     ======================================== */
-  #aavak-vera-form-a {
-    width: 194mm !important;
-    height: 277mm !important;
-    max-height: 277mm !important;
-    padding: 3mm !important;
-    font-family: Arial, sans-serif !important;
-    font-size: 9pt !important;
-    overflow: hidden !important;
-    display: block !important;
+  /* Remove any gaps between forms - prevents extra blank pages */
+  .tax-form-container + .tax-form-container,
+  .tax-form-print + .tax-form-print,
+  .page-break + .page-break {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    border-top: none !important;
   }
 
-  #aavak-vera-form-a .form-title {
-    text-align: center !important;
-    font-size: 16pt !important;
-    font-weight: bold !important;
-    border: 1px solid #000 !important;
-    padding: 4mm 2mm !important;
-    margin-bottom: 1mm !important;
-  }
-
-  #aavak-vera-form-a .info-table {
-    width: 100% !important;
-    border-collapse: collapse !important;
-    margin-bottom: 1mm !important;
-  }
-
-  #aavak-vera-form-a .info-table td {
-    border: 0.5pt solid #000 !important;
-    padding: 1.5mm 2mm !important;
-    font-size: 9pt !important;
-    line-height: 1.2 !important;
-  }
-
-  #aavak-vera-form-a .info-table .label-cell {
-    font-weight: bold !important;
-    background: #f0f0f0 !important;
-    width: 15% !important;
-  }
-
-  #aavak-vera-form-a .info-table .value-cell {
-    width: 35% !important;
-  }
-
-  #aavak-vera-form-a .data-table {
-    width: 100% !important;
-    border-collapse: collapse !important;
-    margin-bottom: 1mm !important;
-  }
-
-  #aavak-vera-form-a .data-table td {
-    border: 0.5pt solid #000 !important;
-    padding: 1.2mm 2mm !important;
-    font-size: 9pt !important;
-    line-height: 1.2 !important;
-    vertical-align: middle !important;
-  }
-
-  #aavak-vera-form-a .section-header td {
-    background: #d0d0d0 !important;
-    font-weight: bold !important;
-    font-size: 11pt !important;
-    padding: 2mm !important;
-  }
-
-  #aavak-vera-form-a .highlight-row td {
-    background: #fffde7 !important;
-    font-weight: bold !important;
-    font-size: 10pt !important;
-  }
-
-  #aavak-vera-form-a .section-label {
-    font-weight: bold !important;
-  }
-
-  #aavak-vera-form-a .sn-cell {
-    width: 5% !important;
-    text-align: center !important;
-  }
-
-  #aavak-vera-form-a .rs-cell {
-    width: 5% !important;
-    text-align: right !important;
-  }
-
-  #aavak-vera-form-a .amount-cell {
-    width: 12% !important;
-    text-align: right !important;
-    font-weight: bold !important;
-  }
-
-  #aavak-vera-form-a .input-cell {
-    width: 12% !important;
-    text-align: right !important;
-    background: transparent !important;
-  }
-
-  #aavak-vera-form-a .sub-item {
-    padding-left: 8mm !important;
-  }
-
-  #aavak-vera-form-a .input-label {
-    background: transparent !important;
-  }
-
-  #aavak-vera-form-a .print-input,
-  #aavak-vera-form-a input {
-    border: none !important;
-    background: transparent !important;
-    font-size: 9pt !important;
-    text-align: right !important;
-    width: 100% !important;
-  }
-
-  #aavak-vera-form-a .print-value {
-    font-size: 9pt !important;
-  }
-
-  #aavak-vera-form-a .form-footer {
-    text-align: center !important;
-    font-size: 8pt !important;
-    margin-top: 2mm !important;
-    padding-top: 2mm !important;
-    border-top: 0.5pt dashed #666 !important;
+  /* Ensure print-area doesn't add extra spacing */
+  .print-area > *:last-child {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
   }
 
   /* ========================================
-     આવકવેરા FORM B - EXACT A4 FIT
-     ======================================== */
-  #aavak-vera-form-b {
-    width: 194mm !important;
-    height: 277mm !important;
-    max-height: 277mm !important;
-    padding: 3mm !important;
-    font-family: Arial, sans-serif !important;
-    font-size: 8pt !important;
-    overflow: hidden !important;
-    display: block !important;
-  }
-
-  #aavak-vera-form-b table {
-    width: 100% !important;
-    border-collapse: collapse !important;
-    margin-bottom: 1mm !important;
-  }
-
-  #aavak-vera-form-b td,
-  #aavak-vera-form-b th {
-    border: 0.5pt solid #000 !important;
-    padding: 1mm 1.5mm !important;
-    font-size: 8pt !important;
-    line-height: 1.2 !important;
-    vertical-align: middle !important;
-  }
-
-  #aavak-vera-form-b input {
-    border: none !important;
-    background: transparent !important;
-    font-size: 8pt !important;
-  }
-
-  /* ========================================
-     PAGAR FORM - A4 LANDSCAPE
+     PAGAR FORM - A4 LANDSCAPE FULL PAGE
+     Width: 297mm, Height: 210mm
      ======================================== */
   #pagar-form {
     width: 285mm !important;
@@ -262,83 +156,366 @@
     overflow: hidden !important;
   }
 
-  #pagar-form table {
-    width: 100% !important;
-    border-collapse: collapse !important;
+  /* Pagar Title */
+  #pagar-form > .text-center.font-bold.text-lg {
+    font-size: 9pt !important;
+    font-weight: bold !important;
+    margin-bottom: 0.5mm !important;
+    padding-bottom: 0.5mm !important;
+    border-bottom: 0.5pt solid #000 !important;
   }
 
-  #pagar-form th,
-  #pagar-form td {
+  /* Pagar Info tables */
+  #pagar-form > table.mb-2 {
+    width: 100% !important;
+    margin-bottom: 0.5mm !important;
+  }
+
+  #pagar-form > table.mb-2 td {
+    border: none !important;
+    font-size: 6pt !important;
+    padding: 0.2mm 0.5mm !important;
+    line-height: 1 !important;
+  }
+
+  /* Pagar Main salary table */
+  #pagar-form > table:last-of-type {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-bottom: 0.5mm !important;
+    table-layout: fixed !important;
+  }
+
+  #pagar-form > table:last-of-type th,
+  #pagar-form > table:last-of-type td {
     border: 0.3pt solid #000 !important;
     font-size: 5pt !important;
     padding: 0.3mm !important;
     line-height: 1 !important;
     vertical-align: middle !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
   }
 
-  #pagar-form th {
+  #pagar-form > table:last-of-type th {
     background-color: #e8e8e8 !important;
     font-weight: bold !important;
     font-size: 4.5pt !important;
   }
 
-  #pagar-form input {
+  #pagar-form input, #pagar-form span {
     font-size: 5pt !important;
     border: none !important;
     background: transparent !important;
   }
 
+  #pagar-form > .flex.justify-between {
+    margin-top: 0.5mm !important;
+    font-size: 6pt !important;
+  }
+
+  #pagar-form > .form-footer {
+    font-size: 5pt !important;
+    margin-top: 0.5mm !important;
+    padding-top: 0.5mm !important;
+  }
+
   /* ========================================
-     OTHER PORTRAIT FORMS
+     PORTRAIT FORMS - A4 PORTRAIT FIT TO PAGE
+     Width: 210mm, Height: 297mm
+     Each form MUST fit on exactly 1 page
      ======================================== */
   #declaration-form,
   #form-16a,
   #form-16b {
-    width: 194mm !important;
-    max-height: 277mm !important;
-    padding: 3mm !important;
-    font-size: 9pt !important;
+    width: 198mm !important;
+    max-width: 198mm !important;
+    height: auto !important;
+    max-height: 282mm !important;
+    padding: 2mm !important;
+    font-size: 8pt !important;
     overflow: hidden !important;
+    display: block !important;
+    page-break-after: always !important;
+    break-after: page !important;
   }
 
+  /* આવકવેરા A - FULL PAGE A4 Portrait */
+  #aavak-vera-form-a {
+    width: 200mm !important;
+    max-width: 200mm !important;
+    min-height: 287mm !important;
+    height: 287mm !important;
+    max-height: 287mm !important;
+    padding: 5mm !important;
+    font-size: 10pt !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    box-sizing: border-box !important;
+  }
+
+  /* આવકવેરા A Tables - Full width with proper spacing */
+  #aavak-vera-form-a table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    flex-grow: 1 !important;
+  }
+
+  #aavak-vera-form-a table th,
+  #aavak-vera-form-a table td {
+    border: 0.5pt solid #000 !important;
+    font-size: 10pt !important;
+    padding: 2mm 2.5mm !important;
+    line-height: 1.4 !important;
+    vertical-align: middle !important;
+  }
+
+  /* Title row - larger */
+  #aavak-vera-form-a table:first-of-type td {
+    font-size: 16pt !important;
+    padding: 4mm !important;
+  }
+
+  /* Section headers - 12pt */
+  #aavak-vera-form-a .bg-gray-200 td,
+  #aavak-vera-form-a td[style*="13pt"] {
+    font-size: 12pt !important;
+    padding: 2.5mm 3mm !important;
+    background: #e0e0e0 !important;
+  }
+
+  /* આવકવેરા B - FULL PAGE A4 Portrait */
+  #aavak-vera-form-b {
+    width: 200mm !important;
+    max-width: 200mm !important;
+    min-height: 287mm !important;
+    height: 287mm !important;
+    max-height: 287mm !important;
+    padding: 5mm !important;
+    font-size: 10pt !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    box-sizing: border-box !important;
+  }
+
+  /* આવકવેરા B Tables - Full width with proper spacing */
+  #aavak-vera-form-b table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    flex-grow: 1 !important;
+  }
+
+  #aavak-vera-form-b table th,
+  #aavak-vera-form-b table td {
+    border: 0.5pt solid #000 !important;
+    font-size: 10pt !important;
+    padding: 2mm 2.5mm !important;
+    line-height: 1.4 !important;
+    vertical-align: middle !important;
+  }
+
+  /* FORM 16B is the last form - NO page break after */
+  #form-16b {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  /* Portrait Form Titles - Compact */
+  #declaration-form > .text-center.font-bold,
+  #form-16a > .text-center.font-bold,
+  #form-16b > .text-center.font-bold {
+    font-size: 11pt !important;
+    margin-bottom: 1.5mm !important;
+    font-weight: bold !important;
+  }
+
+  /* આવકવેરા Form Titles - Match PDF layout */
+  #aavak-vera-form-a table:first-of-type td.text-center.font-bold,
+  #aavak-vera-form-b table:first-of-type td.text-center.font-bold {
+    font-size: 11pt !important;
+    padding: 1.5mm !important;
+    font-weight: bold !important;
+  }
+
+  /* Portrait Form Tables - Compact with borders */
   #declaration-form table,
   #form-16a table,
   #form-16b table {
     width: 100% !important;
     border-collapse: collapse !important;
     margin-bottom: 1mm !important;
-  }
-
-  #declaration-form td,
-  #declaration-form th,
-  #form-16a td,
-  #form-16a th,
-  #form-16b td,
-  #form-16b th {
     border: 0.5pt solid #000 !important;
-    padding: 1.5mm 2mm !important;
-    font-size: 9pt !important;
-    line-height: 1.2 !important;
   }
 
-  /* Hide backgrounds in print */
+  /* આવકવેરા Tables - COMPACT with minimal spacing */
+  #aavak-vera-form-a table,
+  #aavak-vera-form-b table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-bottom: 1mm !important;
+    margin-top: 1mm !important;
+    border: 0.5pt solid #000 !important;
+  }
+
+  #declaration-form table th,
+  #declaration-form table td,
+  #form-16a table th,
+  #form-16a table td,
+  #form-16b table th,
+  #form-16b table td {
+    border: 0.5pt solid #000 !important;
+    font-size: 7.5pt !important;
+    padding: 1mm 1.5mm !important;
+    line-height: 1.2 !important;
+    vertical-align: middle !important;
+  }
+
+  /* આવકવેરા A footer - at bottom */
+  #aavak-vera-form-a .text-center.mt-4 {
+    font-size: 8pt !important;
+    margin-top: auto !important;
+    padding-top: 3mm !important;
+  }
+
+  /* આવકવેરા B footer - at bottom */
+  #aavak-vera-form-b .text-center.mt-4 {
+    font-size: 8pt !important;
+    margin-top: auto !important;
+    padding-top: 3mm !important;
+  }
+
+  #declaration-form input,
+  #aavak-vera-form-a input,
+  #aavak-vera-form-b input,
+  #form-16a input,
+  #form-16b input {
+    font-size: 7.5pt !important;
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Header rows styling */
+  .header-row td,
+  .header-row th {
+    background-color: #d0d0d0 !important;
+    font-weight: bold !important;
+    border: 0.5pt solid #000 !important;
+  }
+
+  /* Total rows styling */
+  .total-row td {
+    background-color: #f0f0f0 !important;
+    font-weight: bold !important;
+    border: 0.5pt solid #000 !important;
+  }
+
+  /* Amount cells */
+  .amount-cell {
+    text-align: right !important;
+    font-family: 'Courier New', monospace !important;
+    border: 0.5pt solid #000 !important;
+  }
+
+  /* Section titles - Compact */
+  .bg-gray-800 {
+    font-size: 8pt !important;
+    font-weight: bold !important;
+    padding: 1mm 2mm !important;
+    margin: 1mm 0 !important;
+    background: #333 !important;
+    color: #fff !important;
+    border: 0.5pt solid #000 !important;
+  }
+
+  .bg-gray-200 {
+    font-size: 8pt !important;
+    font-weight: bold !important;
+    padding: 1mm 2mm !important;
+    margin: 1mm 0 !important;
+    background: #e0e0e0 !important;
+    color: #000 !important;
+    border: 0.5pt solid #000 !important;
+  }
+
+  /* FOOTER - Compact */
+  .form-footer {
+    display: block !important;
+    font-size: 6pt !important;
+    text-align: center !important;
+    margin-top: 1mm !important;
+    padding-top: 1mm !important;
+    border-top: 0.3pt dashed #666 !important;
+    color: #333 !important;
+  }
+
+  /* Signature sections - Compact */
+  .flex.justify-between {
+    display: flex !important;
+    justify-content: space-between !important;
+    margin-top: 2mm !important;
+    font-size: 7pt !important;
+  }
+
+  /* Input styling in print */
+  input {
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Hide yellow/gray backgrounds in print */
   .bg-yellow-50,
   .bg-yellow-100,
   .bg-yellow-200,
+  .bg-yellow-300,
   .bg-gray-50,
-  .bg-gray-100 {
+  .bg-gray-100,
+  .bg-blue-50,
+  .bg-blue-100,
+  .bg-blue-200 {
     background: transparent !important;
   }
 
-  /* Footer styling */
-  .form-footer {
-    display: block !important;
+  /* Declaration form text box - compact */
+  #declaration-form > .border.border-black {
+    border: 0.5pt solid #000 !important;
+    padding: 2mm !important;
+    margin-bottom: 2mm !important;
+    font-size: 8pt !important;
+    line-height: 1.3 !important;
+  }
+
+  /* Info tables without borders */
+  #aavak-vera-form-a > table.mb-3,
+  #form-16a > table.mb-3:first-of-type {
+    border: none !important;
+  }
+
+  #aavak-vera-form-a > table.mb-3 td,
+  #aavak-vera-form-a > table.mb-3 th {
+    border: none !important;
+    padding: 0.5mm 1mm !important;
     font-size: 7pt !important;
-    text-align: center !important;
-    margin-top: auto !important;
-    padding-top: 2mm !important;
-    border-top: 0.3pt dashed #666 !important;
-    color: #333 !important;
+  }
+
+  /* Form 16 header table with borders */
+  #form-16a > table.mb-3 td.border {
+    border: 0.5pt solid #000 !important;
   }
 }
 
@@ -346,135 +523,181 @@
    SCREEN STYLES - For preview
    ========================================== */
 
-/* Form Title */
-.form-title {
-  text-align: center;
-  font-size: 18pt;
-  font-weight: bold;
-  border: 1px solid #000;
-  padding: 8px;
-  margin-bottom: 4px;
-  background: #fff;
-}
-
-/* Info Table */
-.info-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 4px;
-}
-
-.info-table td {
-  border: 1px solid #000;
-  padding: 4px 8px;
-  font-size: 11pt;
-}
-
-.info-table .label-cell {
-  font-weight: bold;
-  background: #f5f5f5;
-  width: 15%;
-}
-
-.info-table .value-cell {
-  width: 35%;
-}
-
-.info-table .empty-cell {
-  width: 25%;
-}
-
-/* Data Table */
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 4px;
-}
-
-.data-table td {
-  border: 1px solid #000;
-  padding: 4px 8px;
-  font-size: 11pt;
-  vertical-align: middle;
-}
-
-.section-header td {
-  background: #e0e0e0;
-  font-weight: bold;
-  font-size: 13pt;
-  padding: 6px 8px;
-}
-
-.highlight-row td {
-  background: #fffde7;
-  font-weight: bold;
-  font-size: 12pt;
-}
-
-.section-label {
-  font-weight: bold;
-}
-
-.sn-cell {
-  width: 5%;
-  text-align: center;
-}
-
-.rs-cell {
-  width: 5%;
-  text-align: right;
-}
-
-.amount-cell {
-  width: 12%;
-  text-align: right;
-  font-weight: bold;
-}
-
-.input-cell {
-  width: 12%;
-  text-align: right;
-  background: #fff9c4;
-}
-
-.empty-cell {
-  background: transparent;
-}
-
-.sub-item {
-  padding-left: 24px;
-}
-
-.input-label {
-  background: #fffde7;
-}
-
-/* Form Footer */
-.form-footer {
-  text-align: center;
-  font-size: 10pt;
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px dashed #999;
-  color: #666;
-}
-
 /* Hide number input spinners */
 .tax-form-container input[type="number"],
 .tax-form-container input {
   -moz-appearance: textfield !important;
   appearance: textfield !important;
+  -webkit-appearance: textfield !important;
 }
 
+.tax-form-container input[type="number"]::-webkit-outer-spin-button,
+.tax-form-container input[type="number"]::-webkit-inner-spin-button,
 .tax-form-container input::-webkit-outer-spin-button,
 .tax-form-container input::-webkit-inner-spin-button {
   -webkit-appearance: none !important;
+  appearance: none !important;
   margin: 0 !important;
+  display: none !important;
 }
 
-/* Aavak Vera Form container */
-.aavak-vera-form {
+.tax-form-container {
   background: #fff;
-  padding: 10px;
-  font-family: Arial, sans-serif;
+  color: #000;
+  padding: 16px;
+  font-family: 'Noto Sans Gujarati', 'Shruti', 'Arial', sans-serif;
+  font-size: 11px;
+  line-height: 1.4;
+  max-width: 210mm;
+  margin: 0 auto;
+}
+
+.tax-form-container input,
+.tax-form-container textarea,
+.tax-form-container select {
+  font-family: 'Noto Sans Gujarati', 'Shruti', 'Arial', sans-serif;
+}
+
+.tax-form-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 12px;
+}
+
+.tax-form-container th,
+.tax-form-container td {
+  border: 1px solid #333;
+  padding: 4px 6px;
+  font-size: 10px;
+  vertical-align: middle;
+}
+
+.tax-form-container th {
+  background-color: #e8e8e8;
+  font-weight: bold;
+}
+
+.tax-form-container .header-row {
+  background-color: #d0d0d0;
+}
+
+.tax-form-container .header-row td,
+.tax-form-container .header-row th {
+  font-weight: bold;
+  background-color: #d0d0d0;
+}
+
+.tax-form-container .total-row {
+  background-color: #f5f5f5;
+}
+
+.tax-form-container .total-row td {
+  font-weight: bold;
+  background-color: #f5f5f5;
+}
+
+.tax-form-container .amount-cell {
+  text-align: right;
+  font-family: 'Courier New', monospace;
+  white-space: nowrap;
+}
+
+.tax-form-container .label-cell {
+  background-color: #f8f8f8;
+  font-weight: 500;
+}
+
+.tax-form-container .form-title {
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  border-bottom: 2px solid #000;
+  padding-bottom: 6px;
+}
+
+.tax-form-container .section-title {
+  font-size: 12px;
+  font-weight: bold;
+  margin: 10px 0 6px;
+  background: #333;
+  color: #fff;
+  padding: 4px 8px;
+}
+
+.tax-form-container .gujarati-text {
+  font-family: 'Noto Sans Gujarati', 'Shruti', 'Arial', sans-serif;
+}
+
+.tax-form-container .signature-box {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+  padding-top: 16px;
+}
+
+.tax-form-container .signature-item {
+  text-align: center;
+  min-width: 150px;
+}
+
+.tax-form-container .signature-line {
+  border-top: 1px solid #000;
+  margin-top: 40px;
+  padding-top: 4px;
+}
+
+.tax-form-container .footer-note {
+  font-size: 8px;
+  text-align: center;
+  margin-top: 16px;
+  color: #666;
+  border-top: 1px dashed #999;
+  padding-top: 8px;
+}
+
+/* Form footer styling for screen */
+.tax-form-container .form-footer {
+  font-size: 8px;
+  text-align: center;
+  margin-top: auto;
+  padding-top: 8px;
+  color: #666;
+  border-top: 1px dashed #999;
+}
+
+/* Input styling in forms */
+.tax-form-container input[type="number"] {
+  width: 100%;
+  text-align: right;
+  border: none;
+  background: transparent;
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  padding: 2px;
+}
+
+.tax-form-container input[type="number"]:focus {
+  outline: 1px solid #0066cc;
+  background: #ffffd0;
+}
+
+.tax-form-container input[type="number"]:disabled {
+  color: #000;
+  -webkit-text-fill-color: #000;
+  opacity: 1;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  .tax-form-container {
+    padding: 8px;
+    font-size: 9px;
+  }
+  
+  .tax-form-container th,
+  .tax-form-container td {
+    font-size: 8px;
+    padding: 2px 3px;
+  }
 }
