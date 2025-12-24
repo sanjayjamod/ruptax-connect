@@ -41,12 +41,12 @@ const AavakVeraFormA = ({ client, formData, onChange, readOnly = false, isManual
   );
 
   return (
-    <div className="tax-form-container tax-form-print aavak-vera-form" id="aavak-vera-form-a">
+    <div className="tax-form-container tax-form-print aavak-vera-form page-break" id="aavak-vera-form-a">
       {/* Header */}
-      <table className="w-full border-collapse" style={{ fontSize: '9pt' }}>
+      <table className="w-full border-collapse" style={{ fontSize: '7pt' }}>
         <tbody>
           <tr>
-            <td colSpan={11} className="text-center font-bold text-base border border-black py-1">
+            <td colSpan={11} className="text-center font-bold border border-black py-0.5" style={{ fontSize: '10pt' }}>
               આવક વેરા ગણતરી ફોર્મ
             </td>
           </tr>
@@ -99,7 +99,7 @@ const AavakVeraFormA = ({ client, formData, onChange, readOnly = false, isManual
       </table>
 
       {/* Section A - Salary Income */}
-      <table className="w-full border-collapse mt-1" style={{ fontSize: '8pt' }}>
+      <table className="w-full border-collapse" style={{ fontSize: '7pt' }}>
         <tbody>
           <tr>
             <td colSpan={4} className="border border-black px-1 py-0.5 font-bold">કુલ ગ્રોસ આવક : AS PER RULE 17</td>
@@ -179,7 +179,7 @@ const AavakVeraFormA = ({ client, formData, onChange, readOnly = false, isManual
       </table>
 
       {/* Section B - Other Income */}
-      <table className="w-full border-collapse mt-1" style={{ fontSize: '8pt' }}>
+      <table className="w-full border-collapse" style={{ fontSize: '7pt' }}>
         <tbody>
           <tr>
             <td colSpan={11} className="border border-black px-1 py-0.5 font-bold bg-gray-100">વિભાગ ( B ) અન્ય આવક વિભાગ</td>
@@ -262,7 +262,7 @@ const AavakVeraFormA = ({ client, formData, onChange, readOnly = false, isManual
       </table>
 
       {/* Section C - Gross Total Income */}
-      <table className="w-full border-collapse mt-1" style={{ fontSize: '8pt' }}>
+      <table className="w-full border-collapse" style={{ fontSize: '7pt' }}>
         <tbody>
           <tr>
             <td colSpan={11} className="border border-black px-1 py-0.5 font-bold bg-gray-100">વિભાગ (c) સમગ્ર કુલ આવક પગાર તથા અન્ય</td>
@@ -289,7 +289,7 @@ const AavakVeraFormA = ({ client, formData, onChange, readOnly = false, isManual
       </table>
 
       {/* Footer */}
-      <div className="form-footer text-center mt-2 pt-1" style={{ fontSize: '7pt' }}>
+      <div className="form-footer text-center mt-1" style={{ fontSize: '6pt' }}>
         Developed by - Smart Computer - 9924640689 ,9574031243
       </div>
     </div>
