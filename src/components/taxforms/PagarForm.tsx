@@ -7,24 +7,37 @@ interface PagarFormProps {
   formData: TaxFormData;
   onChange: (data: TaxFormData) => void;
   readOnly?: boolean;
+  isManualMode?: boolean; // Manual mode allows editing auto-calculated fields too
 }
 
 const months = ['apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec', 'jan', 'feb', 'mar'] as const;
 const monthNames = ['એપ્રિલ', 'મે', 'જુન', 'જુલાઇ', 'ઑગસ્ટ', 'સપ્ટેમ્બર', 'ઓક્ટોબર', 'નવેમ્બર', 'ડિસેમ્બર', 'જાન્યુઆરી', 'ફેબ્રુઆરી', 'માર્ચ'];
 
-const PagarForm = ({ client, formData, onChange, readOnly = false }: PagarFormProps) => {
+// Fields that are manually filled (yellow highlight)
+const manualFields: (keyof MonthlySalary)[] = [
+  'basic', 'gradePay', 'da', 'hra', 'medical', 'disabilityAllowance', 
+  'principalAllowance', 'daArrears', 'salaryArrears', 'otherIncome1', 'otherIncome2',
+  'gpf', 'cpf', 'professionTax', 'society', 'groupInsurance', 'incomeTax'
+];
+
+// Fields that are auto-calculated (formula)
+const autoFields: (keyof MonthlySalary)[] = ['totalSalary', 'totalDeduction', 'netPay'];
+
+const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode = false }: PagarFormProps) => {
   const updateMonthField = (month: typeof months[number], field: keyof MonthlySalary, value: number) => {
     const newMonths = { ...formData.salaryData.months };
     newMonths[month] = { ...newMonths[month], [field]: value };
     
-    // Calculate totals for the month
-    const m = newMonths[month];
-    m.totalSalary = (m.basic || 0) + (m.gradePay || 0) + (m.da || 0) + (m.hra || 0) + (m.medical || 0) + 
-                    (m.disabilityAllowance || 0) + (m.principalAllowance || 0) + (m.daArrears || 0) + 
-                    (m.salaryArrears || 0) + (m.otherIncome1 || 0) + (m.otherIncome2 || 0);
-    m.totalDeduction = (m.gpf || 0) + (m.cpf || 0) + (m.professionTax || 0) + (m.society || 0) + 
-                       (m.groupInsurance || 0) + (m.incomeTax || 0);
-    m.netPay = m.totalSalary - m.totalDeduction;
+    // Calculate totals for the month (only if not in manual mode or if it's an income/deduction field)
+    if (!isManualMode || !autoFields.includes(field)) {
+      const m = newMonths[month];
+      m.totalSalary = (m.basic || 0) + (m.gradePay || 0) + (m.da || 0) + (m.hra || 0) + (m.medical || 0) + 
+                      (m.disabilityAllowance || 0) + (m.principalAllowance || 0) + (m.daArrears || 0) + 
+                      (m.salaryArrears || 0) + (m.otherIncome1 || 0) + (m.otherIncome2 || 0);
+      m.totalDeduction = (m.gpf || 0) + (m.cpf || 0) + (m.professionTax || 0) + (m.society || 0) + 
+                         (m.groupInsurance || 0) + (m.incomeTax || 0);
+      m.netPay = m.totalSalary - m.totalDeduction;
+    }
 
     onChange({
       ...formData,
@@ -36,7 +49,8 @@ const PagarForm = ({ client, formData, onChange, readOnly = false }: PagarFormPr
     return months.reduce((sum, month) => sum + (Number(formData.salaryData.months[month][field]) || 0), 0);
   };
 
-  const renderInputCell = (month: typeof months[number], field: keyof MonthlySalary) => (
+  // Manual input cell - yellow background (editable by user)
+  const renderManualInputCell = (month: typeof months[number], field: keyof MonthlySalary) => (
     <td key={`${month}-${field}`} className="amount-cell">
       {readOnly ? (
         <span>{formData.salaryData.months[month][field] || ''}</span>
@@ -47,8 +61,39 @@ const PagarForm = ({ client, formData, onChange, readOnly = false }: PagarFormPr
           pattern="[0-9]*"
           defaultValue={formData.salaryData.months[month][field] || ''}
           onBlur={(e) => updateMonthField(month, field, Number(e.target.value) || 0)}
-          className="w-full h-5 text-[9px] text-right p-0.5 border-0 bg-transparent focus:outline-none focus:bg-yellow-50"
+          className="w-full h-5 text-[9px] text-right p-0.5 border-0 bg-yellow-100 focus:outline-none focus:bg-yellow-200 print:bg-transparent"
+          title="Manual Input / હાથે ભરો"
         />
+      )}
+    </td>
+  );
+
+  // Auto-calculated cell - shows formula result (not editable by default)
+  const renderAutoCell = (month: typeof months[number], field: keyof MonthlySalary) => (
+    <td key={`${month}-${field}`} className="amount-cell font-bold bg-gray-50 print:bg-transparent">
+      {isManualMode && !readOnly ? (
+        <input
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          defaultValue={formData.salaryData.months[month][field] || ''}
+          onBlur={(e) => updateMonthField(month, field, Number(e.target.value) || 0)}
+          className="w-full h-5 text-[9px] text-right p-0.5 border-0 bg-blue-50 focus:outline-none focus:bg-blue-100 print:bg-transparent"
+          title="Manual Override / હાથે ભરો (Auto mode OFF)"
+        />
+      ) : (
+        <span className="text-blue-800">{formData.salaryData.months[month][field] || 0}</span>
+      )}
+    </td>
+  );
+
+  // Total column cell - always auto-calculated
+  const renderTotalCell = (field: keyof MonthlySalary) => (
+    <td className="amount-cell font-bold bg-gray-100 print:bg-transparent">
+      {isManualMode && !readOnly ? (
+        <span className="text-purple-800">{calculateColumnTotal(field)}</span>
+      ) : (
+        <span>{calculateColumnTotal(field)}</span>
       )}
     </td>
   );
@@ -59,6 +104,26 @@ const PagarForm = ({ client, formData, onChange, readOnly = false }: PagarFormPr
       <div className="text-center font-bold text-lg mb-2 border-b-2 border-black pb-1">
         {formData.salaryData.financialYear}
       </div>
+      
+      {/* Mode Indicator (only in edit mode) */}
+      {!readOnly && (
+        <div className="flex items-center gap-4 mb-2 text-[10px] no-print">
+          <div className="flex items-center gap-1">
+            <span className="inline-block w-4 h-4 bg-yellow-100 border border-yellow-300"></span>
+            <span>Manual Input / હાથે ભરો</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="inline-block w-4 h-4 bg-gray-50 border border-gray-300"></span>
+            <span className="text-blue-800">Auto Calculated / ઓટો ગણતરી</span>
+          </div>
+          {isManualMode && (
+            <div className="flex items-center gap-1">
+              <span className="inline-block w-4 h-4 bg-blue-50 border border-blue-300"></span>
+              <span className="text-blue-600">Manual Override Enabled</span>
+            </div>
+          )}
+        </div>
+      )}
       
       {/* Info Row */}
       <table className="mb-2" style={{ fontSize: '10px' }}>
@@ -102,93 +167,91 @@ const PagarForm = ({ client, formData, onChange, readOnly = false }: PagarFormPr
           </tr>
         </thead>
         <tbody>
-          {/* Income Rows */}
+          {/* Income Rows - Manual Input (Yellow) */}
           <tr>
             <td className="text-center">1</td>
-            <td>બેઝિક પગાર</td>
-            {months.map(month => renderInputCell(month, "basic"))}
-            <td className="amount-cell font-bold">{calculateColumnTotal('basic')}</td>
+            <td className="bg-yellow-50 print:bg-transparent">બેઝિક પગાર</td>
+            {months.map(month => renderManualInputCell(month, "basic"))}
+            {renderTotalCell('basic')}
             <td></td>
           </tr>
           <tr>
             <td className="text-center">2</td>
-            <td>ગ્રેડ પે</td>
-            {months.map(month => renderInputCell(month, "gradePay"))}
-            <td className="amount-cell font-bold">{calculateColumnTotal('gradePay')}</td>
+            <td className="bg-yellow-50 print:bg-transparent">ગ્રેડ પે</td>
+            {months.map(month => renderManualInputCell(month, "gradePay"))}
+            {renderTotalCell('gradePay')}
             <td></td>
           </tr>
           <tr>
             <td className="text-center">3</td>
-            <td>મોંઘવારી ભથ્થું</td>
-            {months.map(month => renderInputCell(month, "da"))}
-            <td className="amount-cell font-bold">{calculateColumnTotal('da')}</td>
+            <td className="bg-yellow-50 print:bg-transparent">મોંઘવારી ભથ્થું</td>
+            {months.map(month => renderManualInputCell(month, "da"))}
+            {renderTotalCell('da')}
             <td></td>
           </tr>
           <tr>
             <td className="text-center">4</td>
-            <td>ઘરભાડા ભથ્થું</td>
-            {months.map(month => renderInputCell(month, "hra"))}
-            <td className="amount-cell font-bold">{calculateColumnTotal('hra')}</td>
+            <td className="bg-yellow-50 print:bg-transparent">ઘરભાડા ભથ્થું</td>
+            {months.map(month => renderManualInputCell(month, "hra"))}
+            {renderTotalCell('hra')}
             <td></td>
           </tr>
           <tr>
             <td className="text-center">6</td>
-            <td>મેડીકલ ભથ્થું</td>
-            {months.map(month => renderInputCell(month, "medical"))}
-            <td className="amount-cell font-bold">{calculateColumnTotal('medical')}</td>
+            <td className="bg-yellow-50 print:bg-transparent">મેડીકલ ભથ્થું</td>
+            {months.map(month => renderManualInputCell(month, "medical"))}
+            {renderTotalCell('medical')}
             <td></td>
           </tr>
           <tr>
             <td className="text-center">7</td>
-            <td>અપંગ એલાઉન્સ</td>
-            {months.map(month => renderInputCell(month, "disabilityAllowance"))}
-            <td className="amount-cell font-bold">{calculateColumnTotal('disabilityAllowance')}</td>
+            <td className="bg-yellow-50 print:bg-transparent">અપંગ એલાઉન્સ</td>
+            {months.map(month => renderManualInputCell(month, "disabilityAllowance"))}
+            {renderTotalCell('disabilityAllowance')}
             <td></td>
           </tr>
           <tr>
             <td className="text-center">8</td>
-            <td>આચાર્ય એલાઉન્સ</td>
-            {months.map(month => renderInputCell(month, "principalAllowance"))}
-            <td className="amount-cell font-bold">{calculateColumnTotal('principalAllowance')}</td>
+            <td className="bg-yellow-50 print:bg-transparent">આચાર્ય એલાઉન્સ</td>
+            {months.map(month => renderManualInputCell(month, "principalAllowance"))}
+            {renderTotalCell('principalAllowance')}
             <td></td>
           </tr>
           <tr>
             <td className="text-center">9</td>
-            <td>મોંઘવારી એરિયર્સ</td>
-            {months.map(month => renderInputCell(month, "daArrears"))}
-            <td className="amount-cell font-bold">{calculateColumnTotal('daArrears')}</td>
+            <td className="bg-yellow-50 print:bg-transparent">મોંઘવારી એરિયર્સ</td>
+            {months.map(month => renderManualInputCell(month, "daArrears"))}
+            {renderTotalCell('daArrears')}
             <td></td>
           </tr>
           <tr>
             <td className="text-center">10</td>
-            <td>પગાર એરિયર્સ</td>
-            {months.map(month => renderInputCell(month, "salaryArrears"))}
-            <td className="amount-cell font-bold">{calculateColumnTotal('salaryArrears')}</td>
+            <td className="bg-yellow-50 print:bg-transparent">પગાર એરિયર્સ</td>
+            {months.map(month => renderManualInputCell(month, "salaryArrears"))}
+            {renderTotalCell('salaryArrears')}
             <td></td>
           </tr>
           <tr>
             <td className="text-center">11</td>
-            <td>અન્ય આવક 1</td>
-            {months.map(month => renderInputCell(month, "otherIncome1"))}
-            <td className="amount-cell font-bold">{calculateColumnTotal('otherIncome1')}</td>
+            <td className="bg-yellow-50 print:bg-transparent">અન્ય આવક 1</td>
+            {months.map(month => renderManualInputCell(month, "otherIncome1"))}
+            {renderTotalCell('otherIncome1')}
             <td></td>
           </tr>
           <tr>
             <td className="text-center">12</td>
-            <td>અન્ય આવક 2</td>
-            {months.map(month => renderInputCell(month, "otherIncome2"))}
-            <td className="amount-cell font-bold">{calculateColumnTotal('otherIncome2')}</td>
+            <td className="bg-yellow-50 print:bg-transparent">અન્ય આવક 2</td>
+            {months.map(month => renderManualInputCell(month, "otherIncome2"))}
+            {renderTotalCell('otherIncome2')}
             <td></td>
           </tr>
+          
+          {/* Total Salary Row - Auto Calculated (Gray/Blue) */}
           <tr className="total-row">
-            <td className="text-center"></td>
+            <td className="text-center">13</td>
             <td className="font-bold">કુલ પગાર</td>
-            {months.map(month => (
-              <td key={month} className="amount-cell font-bold">
-                {formData.salaryData.months[month].totalSalary || 0}
-              </td>
-            ))}
-            <td className="amount-cell font-bold">{calculateColumnTotal('totalSalary')}</td>
+            {months.map(month => renderAutoCell(month, "totalSalary"))}
+            {renderTotalCell('totalSalary')}
             <td></td>
           </tr>
 
@@ -197,69 +260,65 @@ const PagarForm = ({ client, formData, onChange, readOnly = false }: PagarFormPr
             <td colSpan={16} className="text-center font-bold">કપાત</td>
           </tr>
 
-          {/* Deduction Rows */}
+          {/* Deduction Rows - Manual Input (Yellow) */}
           <tr>
             <td className="text-center">14</td>
-            <td>G.P.F.</td>
-            {months.map(month => renderInputCell(month, "gpf"))}
-            <td className="amount-cell font-bold">{calculateColumnTotal('gpf')}</td>
+            <td className="bg-yellow-50 print:bg-transparent">G.P.F.</td>
+            {months.map(month => renderManualInputCell(month, "gpf"))}
+            {renderTotalCell('gpf')}
             <td></td>
           </tr>
           <tr>
             <td className="text-center">15</td>
-            <td>C.P.F.</td>
-            {months.map(month => renderInputCell(month, "cpf"))}
-            <td className="amount-cell font-bold">{calculateColumnTotal('cpf')}</td>
+            <td className="bg-yellow-50 print:bg-transparent">C.P.F.</td>
+            {months.map(month => renderManualInputCell(month, "cpf"))}
+            {renderTotalCell('cpf')}
             <td></td>
           </tr>
           <tr>
             <td className="text-center">16</td>
-            <td>વ્યવસાય વેરો</td>
-            {months.map(month => renderInputCell(month, "professionTax"))}
-            <td className="amount-cell font-bold">{calculateColumnTotal('professionTax')}</td>
+            <td className="bg-yellow-50 print:bg-transparent">વ્યવસાય વેરો</td>
+            {months.map(month => renderManualInputCell(month, "professionTax"))}
+            {renderTotalCell('professionTax')}
             <td></td>
           </tr>
           <tr>
             <td className="text-center">17</td>
-            <td>મંડળી</td>
-            {months.map(month => renderInputCell(month, "society"))}
-            <td className="amount-cell font-bold">{calculateColumnTotal('society')}</td>
+            <td className="bg-yellow-50 print:bg-transparent">મંડળી</td>
+            {months.map(month => renderManualInputCell(month, "society"))}
+            {renderTotalCell('society')}
             <td></td>
           </tr>
           <tr>
             <td className="text-center">18</td>
-            <td>જૂથ વિમા પ્રિમિયમ</td>
-            {months.map(month => renderInputCell(month, "groupInsurance"))}
-            <td className="amount-cell font-bold">{calculateColumnTotal('groupInsurance')}</td>
+            <td className="bg-yellow-50 print:bg-transparent">જૂથ વિમા પ્રિમિયમ</td>
+            {months.map(month => renderManualInputCell(month, "groupInsurance"))}
+            {renderTotalCell('groupInsurance')}
             <td></td>
           </tr>
           <tr>
             <td className="text-center">19</td>
-            <td>ઇન્કમટેક્ષ કપાત</td>
-            {months.map(month => renderInputCell(month, "incomeTax"))}
-            <td className="amount-cell font-bold">{calculateColumnTotal('incomeTax')}</td>
+            <td className="bg-yellow-50 print:bg-transparent">ઇન્કમટેક્ષ કપાત</td>
+            {months.map(month => renderManualInputCell(month, "incomeTax"))}
+            {renderTotalCell('incomeTax')}
             <td></td>
           </tr>
+          
+          {/* Total Deduction Row - Auto Calculated */}
           <tr className="total-row">
             <td className="text-center">20</td>
             <td className="font-bold">કુલ કપાત</td>
-            {months.map(month => (
-              <td key={month} className="amount-cell font-bold">
-                {formData.salaryData.months[month].totalDeduction || 0}
-              </td>
-            ))}
-            <td className="amount-cell font-bold">{calculateColumnTotal('totalDeduction')}</td>
+            {months.map(month => renderAutoCell(month, "totalDeduction"))}
+            {renderTotalCell('totalDeduction')}
             <td></td>
           </tr>
+          
+          {/* Net Pay Row - Auto Calculated */}
           <tr className="total-row">
             <td className="text-center">21</td>
             <td className="font-bold">ચુકવેલ રકમ</td>
-            {months.map(month => (
-              <td key={month} className="amount-cell font-bold">
-                {formData.salaryData.months[month].netPay || 0}
-              </td>
-            ))}
-            <td className="amount-cell font-bold">{calculateColumnTotal('netPay')}</td>
+            {months.map(month => renderAutoCell(month, "netPay"))}
+            {renderTotalCell('netPay')}
             <td></td>
           </tr>
         </tbody>

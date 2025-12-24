@@ -7,25 +7,29 @@ interface DeclarationFormProps {
   formData: TaxFormData;
   onChange: (data: TaxFormData) => void;
   readOnly?: boolean;
+  isManualMode?: boolean;
 }
 
-const DeclarationForm = ({ client, formData, onChange, readOnly = false }: DeclarationFormProps) => {
+const DeclarationForm = ({ client, formData, onChange, readOnly = false, isManualMode = false }: DeclarationFormProps) => {
   const updateField = (field: keyof typeof formData.declarationData, value: number) => {
     const newData = { ...formData.declarationData, [field]: value };
     
-    // Calculate totals
-    newData.totalIncome = (newData.bankInterest || 0) + (newData.nscInterest || 0) + 
-                          (newData.examIncome || 0) + (newData.fdInterest || 0) + (newData.otherIncome || 0);
-    newData.totalDeduction = (newData.licPremium || 0) + (newData.postInsurance || 0) + (newData.ppf || 0) + 
-                             (newData.nscInvestment || 0) + (newData.housingLoanInterest || 0) + 
-                             (newData.housingLoanPrincipal || 0) + (newData.educationFee || 0) + 
-                             (newData.sbiLife || 0) + (newData.sukanyaSamridhi || 0) + 
-                             (newData.medicalInsurance || 0) + (newData.fiveYearFD || 0) + (newData.otherDeduction || 0);
+    // Calculate totals (unless in manual mode and editing total fields)
+    if (!isManualMode || (field !== 'totalIncome' && field !== 'totalDeduction')) {
+      newData.totalIncome = (newData.bankInterest || 0) + (newData.nscInterest || 0) + 
+                            (newData.examIncome || 0) + (newData.fdInterest || 0) + (newData.otherIncome || 0);
+      newData.totalDeduction = (newData.licPremium || 0) + (newData.postInsurance || 0) + (newData.ppf || 0) + 
+                               (newData.nscInvestment || 0) + (newData.housingLoanInterest || 0) + 
+                               (newData.housingLoanPrincipal || 0) + (newData.educationFee || 0) + 
+                               (newData.sbiLife || 0) + (newData.sukanyaSamridhi || 0) + 
+                               (newData.medicalInsurance || 0) + (newData.fiveYearFD || 0) + (newData.otherDeduction || 0);
+    }
 
     onChange({ ...formData, declarationData: newData });
   };
 
-  const renderInputCell = (field: keyof typeof formData.declarationData) => (
+  // Manual input cell - yellow background
+  const renderManualInputCell = (field: keyof typeof formData.declarationData) => (
     <td className="amount-cell">
       {readOnly ? (
         <span>{formData.declarationData[field] || 0}</span>
@@ -36,8 +40,28 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false }: Decla
           pattern="[0-9]*"
           defaultValue={formData.declarationData[field] || ''}
           onBlur={(e) => updateField(field, Number(e.target.value) || 0)}
-          className="w-full h-6 text-xs text-right p-1 border-0 bg-transparent focus:outline-none focus:bg-yellow-50"
+          className="w-full h-6 text-xs text-right p-1 border-0 bg-yellow-100 focus:outline-none focus:bg-yellow-200 print:bg-transparent"
+          title="Manual Input / હાથે ભરો"
         />
+      )}
+    </td>
+  );
+
+  // Auto-calculated cell
+  const renderAutoCell = (value: number, field?: keyof typeof formData.declarationData) => (
+    <td className="amount-cell font-bold bg-gray-50 print:bg-transparent">
+      {isManualMode && !readOnly && field ? (
+        <input
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
+          defaultValue={value || ''}
+          onBlur={(e) => updateField(field, Number(e.target.value) || 0)}
+          className="w-full h-6 text-xs text-right p-1 border-0 bg-blue-50 focus:outline-none focus:bg-blue-100 print:bg-transparent"
+          title="Manual Override / હાથે ભરો"
+        />
+      ) : (
+        <span className="text-blue-800">{value || 0}</span>
       )}
     </td>
   );
@@ -46,6 +70,20 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false }: Decla
     <div className="tax-form-container tax-form-print" id="declaration-form">
       <div className="text-center font-bold text-lg mb-1">ડેકલેરેશન ફોર્મ</div>
       <div className="text-center text-sm mb-3 font-bold">ઈન્કમટેક્ષ પરિશિષ્ટ મુજબ</div>
+
+      {/* Mode Indicator */}
+      {!readOnly && (
+        <div className="flex items-center gap-4 mb-2 text-[10px] no-print">
+          <div className="flex items-center gap-1">
+            <span className="inline-block w-4 h-4 bg-yellow-100 border border-yellow-300"></span>
+            <span>Manual Input / હાથે ભરો</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="inline-block w-4 h-4 bg-gray-50 border border-gray-300"></span>
+            <span className="text-blue-800">Auto Calculated / ઓટો ગણતરી</span>
+          </div>
+        </div>
+      )}
 
       {/* Declaration Text */}
       <div className="border border-black p-3 mb-4 text-[11px] leading-relaxed">
@@ -80,107 +118,107 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false }: Decla
         <tbody>
           <tr>
             <td className="text-center">1</td>
-            <td>બેંક વ્યાજ (સેવિંગ્સ)</td>
-            {renderInputCell("bankInterest")}
+            <td className="bg-yellow-50 print:bg-transparent">બેંક વ્યાજ (સેવિંગ્સ)</td>
+            {renderManualInputCell("bankInterest")}
             <td className="text-center">1</td>
-            <td>જીવન વિમાનું પ્રિમિયમ</td>
-            {renderInputCell("licPremium")}
+            <td className="bg-yellow-50 print:bg-transparent">જીવન વિમાનું પ્રિમિયમ</td>
+            {renderManualInputCell("licPremium")}
           </tr>
           <tr>
             <td className="text-center">2</td>
-            <td>N.S.C. શ્રેણીનું વ્યાજ</td>
-            {renderInputCell("nscInterest")}
+            <td className="bg-yellow-50 print:bg-transparent">N.S.C. શ્રેણીનું વ્યાજ</td>
+            {renderManualInputCell("nscInterest")}
             <td className="text-center">2</td>
-            <td>પોસ્ટ વિમાનું પ્રિમિયમ</td>
-            {renderInputCell("postInsurance")}
+            <td className="bg-yellow-50 print:bg-transparent">પોસ્ટ વિમાનું પ્રિમિયમ</td>
+            {renderManualInputCell("postInsurance")}
           </tr>
           <tr>
             <td className="text-center">3</td>
-            <td>પરીક્ષાનું મહેનતાણું</td>
-            {renderInputCell("examIncome")}
+            <td className="bg-yellow-50 print:bg-transparent">પરીક્ષાનું મહેનતાણું</td>
+            {renderManualInputCell("examIncome")}
             <td className="text-center">3</td>
-            <td>P.P.F</td>
-            {renderInputCell("ppf")}
+            <td className="bg-yellow-50 print:bg-transparent">P.P.F</td>
+            {renderManualInputCell("ppf")}
           </tr>
           <tr>
             <td className="text-center">4</td>
-            <td>ફિકસ ડિપૉઝીટ વ્યાજ</td>
-            {renderInputCell("fdInterest")}
+            <td className="bg-yellow-50 print:bg-transparent">ફિકસ ડિપૉઝીટ વ્યાજ</td>
+            {renderManualInputCell("fdInterest")}
             <td className="text-center">4</td>
-            <td>N.S.C ભરેલ રકમ</td>
-            {renderInputCell("nscInvestment")}
+            <td className="bg-yellow-50 print:bg-transparent">N.S.C ભરેલ રકમ</td>
+            {renderManualInputCell("nscInvestment")}
           </tr>
           <tr>
             <td className="text-center">5</td>
             <td></td>
             <td></td>
             <td className="text-center">5</td>
-            <td>હાઉસીંગ બિલ્ડીંગ લોનનું વ્યાજ</td>
-            {renderInputCell("housingLoanInterest")}
+            <td className="bg-yellow-50 print:bg-transparent">હાઉસીંગ બિલ્ડીંગ લોનનું વ્યાજ</td>
+            {renderManualInputCell("housingLoanInterest")}
           </tr>
           <tr>
             <td className="text-center">6</td>
             <td></td>
             <td></td>
             <td className="text-center">6</td>
-            <td>હાઉસીંગ બિલ્ડીંગ લોનના હપ્તાની રકમ</td>
-            {renderInputCell("housingLoanPrincipal")}
+            <td className="bg-yellow-50 print:bg-transparent">હાઉસીંગ બિલ્ડીંગ લોનના હપ્તાની રકમ</td>
+            {renderManualInputCell("housingLoanPrincipal")}
           </tr>
           <tr>
             <td className="text-center">7</td>
             <td></td>
             <td></td>
             <td className="text-center">7</td>
-            <td>શિક્ષણ ખર્ચ ટ્યુશન ફી</td>
-            {renderInputCell("educationFee")}
+            <td className="bg-yellow-50 print:bg-transparent">શિક્ષણ ખર્ચ ટ્યુશન ફી</td>
+            {renderManualInputCell("educationFee")}
           </tr>
           <tr>
             <td className="text-center">8</td>
             <td></td>
             <td></td>
             <td className="text-center">8</td>
-            <td>S.B.I.</td>
-            {renderInputCell("sbiLife")}
+            <td className="bg-yellow-50 print:bg-transparent">S.B.I.</td>
+            {renderManualInputCell("sbiLife")}
           </tr>
           <tr>
             <td className="text-center">9</td>
             <td></td>
             <td></td>
             <td className="text-center">9</td>
-            <td>સુકન્યા સમૃદ્ધિ યોજના</td>
-            {renderInputCell("sukanyaSamridhi")}
+            <td className="bg-yellow-50 print:bg-transparent">સુકન્યા સમૃદ્ધિ યોજના</td>
+            {renderManualInputCell("sukanyaSamridhi")}
           </tr>
           <tr>
             <td className="text-center">10</td>
             <td></td>
             <td></td>
             <td className="text-center">10</td>
-            <td>મેડીકલેઇમમાં ભરેલ પ્રિમિયમ</td>
-            {renderInputCell("medicalInsurance")}
+            <td className="bg-yellow-50 print:bg-transparent">મેડીકલેઇમમાં ભરેલ પ્રિમિયમ</td>
+            {renderManualInputCell("medicalInsurance")}
           </tr>
           <tr>
             <td className="text-center">11</td>
             <td></td>
             <td></td>
             <td className="text-center">11</td>
-            <td>પંચ વર્ષીય ટાઇમમાં રોકાણ</td>
-            {renderInputCell("fiveYearFD")}
+            <td className="bg-yellow-50 print:bg-transparent">પંચ વર્ષીય ટાઇમમાં રોકાણ</td>
+            {renderManualInputCell("fiveYearFD")}
           </tr>
           <tr>
             <td className="text-center">12</td>
             <td></td>
             <td></td>
             <td className="text-center">12</td>
-            <td>અન્ય</td>
-            {renderInputCell("otherDeduction")}
+            <td className="bg-yellow-50 print:bg-transparent">અન્ય</td>
+            {renderManualInputCell("otherDeduction")}
           </tr>
           <tr className="total-row">
             <td className="text-center">21</td>
             <td className="font-bold">કુલ</td>
-            <td className="amount-cell font-bold">{formData.declarationData.totalIncome || 0}</td>
+            {renderAutoCell(formData.declarationData.totalIncome, 'totalIncome')}
             <td className="text-center">21</td>
             <td className="font-bold">કુલ</td>
-            <td className="amount-cell font-bold">{formData.declarationData.totalDeduction || 0}</td>
+            {renderAutoCell(formData.declarationData.totalDeduction, 'totalDeduction')}
           </tr>
         </tbody>
       </table>

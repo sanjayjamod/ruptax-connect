@@ -32,6 +32,7 @@ const TaxFormAdmin = () => {
   const [formData, setFormData] = useState<TaxFormData | null>(null);
   const [activeTab, setActiveTab] = useState("pagar");
   const [autoCalcEnabled, setAutoCalcEnabled] = useState(true);
+  const [isManualMode, setIsManualMode] = useState(false); // Manual mode allows editing auto-calculated fields
   const [showTemplates, setShowTemplates] = useState(true);
   const [isImporting, setIsImporting] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
