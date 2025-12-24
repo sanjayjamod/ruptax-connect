@@ -3,10 +3,10 @@
 @media print {
   @page {
     size: A4 portrait;
-    margin: 8mm;
+    margin: 10mm;
   }
 
-  /* Pagar form specific - Landscape for wide table */
+  /* Pagar form specific - Landscape for wide table FULL PAGE */
   @page pagar {
     size: A4 landscape;
     margin: 5mm;
@@ -90,9 +90,9 @@
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
-    padding: 5mm !important;
-    font-size: 9pt !important;
-    line-height: 1.3 !important;
+    padding: 8mm !important;
+    font-size: 10pt !important;
+    line-height: 1.4 !important;
     color: #000 !important;
     background: #fff !important;
     page-break-after: always;
@@ -107,14 +107,14 @@
     width: 100% !important;
     border-collapse: collapse !important;
     page-break-inside: avoid !important;
-    margin-bottom: 3mm !important;
+    margin-bottom: 4mm !important;
   }
 
   .tax-form-print th,
   .tax-form-print td {
     border: 0.5pt solid #000 !important;
-    padding: 2px 4px !important;
-    font-size: 8pt !important;
+    padding: 3px 5px !important;
+    font-size: 9pt !important;
     vertical-align: middle !important;
     background: transparent !important;
   }
@@ -149,54 +149,61 @@
   }
 
   .tax-form-print .form-title {
-    font-size: 12pt !important;
+    font-size: 13pt !important;
     font-weight: bold !important;
     text-align: center !important;
-    margin-bottom: 4mm !important;
+    margin-bottom: 5mm !important;
     border-bottom: 1pt solid #000 !important;
-    padding-bottom: 2mm !important;
+    padding-bottom: 3mm !important;
   }
 
   .tax-form-print .section-title {
-    font-size: 10pt !important;
+    font-size: 11pt !important;
     font-weight: bold !important;
-    margin: 3mm 0 2mm !important;
+    margin: 4mm 0 3mm !important;
     background: #333 !important;
     color: #fff !important;
-    padding: 2px 4px !important;
+    padding: 3px 5px !important;
   }
 
   .tax-form-print .signature-box {
     display: flex !important;
     justify-content: space-between !important;
-    margin-top: 8mm !important;
+    margin-top: 10mm !important;
     page-break-inside: avoid !important;
   }
 
   .tax-form-print .signature-item {
     text-align: center !important;
-    min-width: 40mm !important;
+    min-width: 50mm !important;
   }
 
   .tax-form-print .signature-line {
     border-top: 0.5pt solid #000 !important;
-    margin-top: 15mm !important;
-    padding-top: 2mm !important;
+    margin-top: 20mm !important;
+    padding-top: 3mm !important;
   }
 
-  .tax-form-print .footer-note {
-    font-size: 7pt !important;
+  /* Hide footer from all forms except last */
+  .tax-form-print .form-footer {
+    display: none !important;
+  }
+
+  /* Only show footer on last form (Form16B) */
+  .tax-form-print:last-child .form-footer {
+    display: block !important;
+    font-size: 8pt !important;
     text-align: center !important;
-    margin-top: 5mm !important;
-    color: #666 !important;
+    margin-top: 8mm !important;
+    color: #444 !important;
     border-top: 0.5pt dashed #999 !important;
-    padding-top: 2mm !important;
+    padding-top: 3mm !important;
   }
 
   .tax-form-print input {
     border: none !important;
     background: transparent !important;
-    font-size: 8pt !important;
+    font-size: 9pt !important;
     padding: 0 !important;
     margin: 0 !important;
     text-align: right !important;
@@ -206,29 +213,38 @@
     page-break-before: always !important;
   }
 
-  /* Pagar form specific styles - optimized for landscape */
+  /* Pagar form specific styles - optimized for FULL PAGE landscape */
   #pagar-form {
-    font-size: 7pt !important;
-    padding: 3mm !important;
+    font-size: 8pt !important;
+    padding: 5mm !important;
+    height: calc(100vh - 10mm) !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  #pagar-form table {
+    flex: 1 !important;
   }
 
   #pagar-form table th,
   #pagar-form table td {
-    font-size: 6.5pt !important;
-    padding: 1px 2px !important;
+    font-size: 7pt !important;
+    padding: 2px 3px !important;
   }
 
   #pagar-form input {
-    font-size: 6pt !important;
+    font-size: 7pt !important;
   }
 
-  /* Portrait forms - Declaration, Aavak Vera A/B, Form 16A/B */
+  /* Portrait forms - Declaration, Aavak Vera A/B, Form 16A/B - FULL PAGE */
   #declaration-form,
   #aavak-vera-a-form,
   #aavak-vera-b-form,
   #form-16a,
   #form-16b {
-    font-size: 9pt !important;
+    font-size: 10pt !important;
+    height: auto !important;
+    min-height: calc(100vh - 20mm) !important;
   }
 
   #declaration-form table th,
@@ -241,8 +257,8 @@
   #form-16a table td,
   #form-16b table th,
   #form-16b table td {
-    font-size: 8pt !important;
-    padding: 2px 4px !important;
+    font-size: 9pt !important;
+    padding: 3px 5px !important;
   }
 }
 
