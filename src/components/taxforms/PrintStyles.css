@@ -225,7 +225,7 @@
     break-after: page !important;
   }
 
-  /* આવકવેરા A and B - COMPACT to fit on single page */
+  /* આવકવેરા A and B - FULL PAGE STRETCHED */
   #aavak-vera-form-a,
   #aavak-vera-form-b {
     width: 198mm !important;
@@ -233,9 +233,9 @@
     min-height: 280mm !important;
     height: 280mm !important;
     max-height: 280mm !important;
-    padding: 3mm !important;
-    font-size: 7pt !important;
-    overflow: hidden !important;
+    padding: 4mm !important;
+    font-size: 8pt !important;
+    overflow: visible !important;
     display: block !important;
     page-break-after: always !important;
     break-after: page !important;
@@ -262,8 +262,8 @@
   /* આવકવેરા Form Titles - Match PDF layout */
   #aavak-vera-form-a table:first-of-type td.text-center.font-bold,
   #aavak-vera-form-b table:first-of-type td.text-center.font-bold {
-    font-size: 10pt !important;
-    padding: 1mm !important;
+    font-size: 12pt !important;
+    padding: 3mm !important;
     font-weight: bold !important;
   }
 
@@ -277,14 +277,14 @@
     border: 0.5pt solid #000 !important;
   }
 
-  /* આવકવેરા Tables - COMPACT spacing */
+  /* આવકવેરા Tables - FULL WIDTH with proper spacing */
   #aavak-vera-form-a table,
   #aavak-vera-form-b table {
     width: 100% !important;
     border-collapse: collapse !important;
-    margin-bottom: 0.3mm !important;
-    margin-top: 0.3mm !important;
-    border: 0.4pt solid #000 !important;
+    margin-bottom: 2mm !important;
+    margin-top: 2mm !important;
+    border: 0.5pt solid #000 !important;
   }
 
   #declaration-form table th,
@@ -300,24 +300,24 @@
     vertical-align: middle !important;
   }
 
-  /* આવકવેરા Tables - COMPACT cells to fit page */
+  /* આવકવેરા Tables - LARGER cells to fill page */
   #aavak-vera-form-a table th,
   #aavak-vera-form-a table td,
   #aavak-vera-form-b table th,
   #aavak-vera-form-b table td {
-    border: 0.4pt solid #000 !important;
-    font-size: 6.5pt !important;
-    padding: 0.5mm 1mm !important;
-    line-height: 1.1 !important;
+    border: 0.5pt solid #000 !important;
+    font-size: 8pt !important;
+    padding: 2mm 2.5mm !important;
+    line-height: 1.4 !important;
     vertical-align: middle !important;
   }
 
-  /* આવકવેરા footer - compact */
+  /* આવકવેરા footer */
   #aavak-vera-form-a .form-footer,
   #aavak-vera-form-b .form-footer {
-    font-size: 5pt !important;
-    margin-top: 1mm !important;
-    padding-top: 0.5mm !important;
+    font-size: 7pt !important;
+    margin-top: 4mm !important;
+    padding-top: 2mm !important;
   }
 
   #declaration-form input,
