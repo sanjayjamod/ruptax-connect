@@ -21,7 +21,7 @@ const Form16B = ({ client, formData }: Form16BProps) => {
   const yearSuffix2 = fy[1]?.slice(-2) || '26';
 
   return (
-    <div className="tax-form-container tax-form-print page-break" id="form-16b">
+    <div className="tax-form-container tax-form-print" id="form-16b">
       <div className="text-center font-bold text-lg mb-3">FORM 16 (Part B - Continued)</div>
 
       {/* Other Sections under Chapter VI-A */}

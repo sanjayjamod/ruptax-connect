@@ -1,12 +1,12 @@
 /* Print Styles for Tax Forms - A4 Size */
 /* Pagar Form: A4 Landscape, Others: A4 Portrait */
-/* 6 Forms = 6 Pages (1 form per page) */
+/* 6 Forms = 6 Pages EXACTLY (1 form per page) */
 
 @media print {
   /* Default page style - Portrait for most forms */
   @page {
     size: A4 portrait;
-    margin: 6mm;
+    margin: 5mm;
   }
 
   /* Pagar form - Landscape A4 */
@@ -20,7 +20,7 @@
     page: pagar;
   }
 
-  /* Force exact color printing */
+  /* Force exact color printing - NO margin/padding on everything */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
@@ -38,7 +38,7 @@
     font-size: 8pt !important;
   }
 
-  /* Hide everything except print area */
+  /* Hide EVERYTHING except print area */
   .no-print,
   header,
   footer:not(.form-footer),
@@ -58,48 +58,74 @@
   a[href*="wa.me"] {
     display: none !important;
     visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Print area container - NO extra spacing */
+  .print-area {
+    display: block !important;
+    visibility: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   /* Show print area */
   .print\:block,
-  .hidden.print\:block,
-  .print-area {
+  .hidden.print\:block {
     display: block !important;
     visibility: visible !important;
   }
 
-  /* Base form container - each form = 1 page EXACTLY - NO BLANK PAGES */
+  /* Base form container - each form = 1 page EXACTLY */
   .tax-form-container,
-  .tax-form-print {
+  .tax-form-print,
+  .page-break {
     width: 100% !important;
     max-width: 100% !important;
     height: auto !important;
     min-height: 0 !important;
     max-height: none !important;
     margin: 0 !important;
-    padding: 3mm !important;
+    padding: 2mm !important;
     color: #000 !important;
     background: #fff !important;
+    overflow: hidden !important;
+    display: block !important;
+    position: relative !important;
     page-break-after: always !important;
     page-break-inside: avoid !important;
     break-after: page !important;
     break-inside: avoid !important;
-    overflow: visible !important;
-    display: block !important;
-    position: relative !important;
   }
 
-  /* Last form no page break after - prevents blank page */
+  /* CRITICAL: Last form (#form-16b) - NO page break after to prevent blank page */
   .tax-form-container:last-child,
-  .tax-form-print:last-child {
+  .tax-form-print:last-child,
+  #form-16b,
+  #form-16b.page-break {
     page-break-after: avoid !important;
     break-after: avoid !important;
   }
 
-  /* Remove any extra spacing/margins that cause blank pages */
+  /* Remove any gaps between forms - prevents extra blank pages */
   .tax-form-container + .tax-form-container,
-  .tax-form-print + .tax-form-print {
+  .tax-form-print + .tax-form-print,
+  .page-break + .page-break {
     margin-top: 0 !important;
+    padding-top: 0 !important;
+    border-top: none !important;
+  }
+
+  /* Ensure print-area doesn't add extra spacing */
+  .print-area > *:last-child {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
   }
 
   /* ========================================
@@ -190,12 +216,21 @@
   #form-16a,
   #form-16b {
     width: 198mm !important;
-    height: 283mm !important;
-    max-height: 283mm !important;
-    padding: 3mm !important;
+    max-width: 198mm !important;
+    height: auto !important;
+    max-height: 282mm !important;
+    padding: 2mm !important;
     font-size: 8pt !important;
     overflow: hidden !important;
     display: block !important;
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+
+  /* FORM 16B is the last form - NO page break after */
+  #form-16b {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
   }
 
   /* Portrait Form Titles - Compact */
