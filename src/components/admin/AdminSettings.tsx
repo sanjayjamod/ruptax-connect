@@ -45,9 +45,18 @@ const AdminSettings = ({ onResetData }: AdminSettingsProps) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   
-  // Email Settings
-  const [resendApiKey, setResendApiKey] = useState(
-    localStorage.getItem("ruptax_resend_api_key") || ""
+  // SMTP Email Settings
+  const [smtpHost, setSmtpHost] = useState(
+    localStorage.getItem("ruptax_smtp_host") || ""
+  );
+  const [smtpPort, setSmtpPort] = useState(
+    localStorage.getItem("ruptax_smtp_port") || "587"
+  );
+  const [smtpUsername, setSmtpUsername] = useState(
+    localStorage.getItem("ruptax_smtp_username") || ""
+  );
+  const [smtpPassword, setSmtpPassword] = useState(
+    localStorage.getItem("ruptax_smtp_password") || ""
   );
   const [senderEmail, setSenderEmail] = useState(
     localStorage.getItem("ruptax_sender_email") || ""
@@ -55,7 +64,10 @@ const AdminSettings = ({ onResetData }: AdminSettingsProps) => {
   const [senderName, setSenderName] = useState(
     localStorage.getItem("ruptax_sender_name") || "RupTax"
   );
-  const [showApiKey, setShowApiKey] = useState(false);
+  const [smtpSecure, setSmtpSecure] = useState(
+    localStorage.getItem("ruptax_smtp_secure") || "tls"
+  );
+  const [showPassword, setShowPassword] = useState(false);
   const [isSavingEmail, setIsSavingEmail] = useState(false);
 
   const toggleTheme = () => {
@@ -132,12 +144,16 @@ const AdminSettings = ({ onResetData }: AdminSettingsProps) => {
   const handleSaveEmailSettings = () => {
     setIsSavingEmail(true);
     try {
-      localStorage.setItem("ruptax_resend_api_key", resendApiKey);
+      localStorage.setItem("ruptax_smtp_host", smtpHost);
+      localStorage.setItem("ruptax_smtp_port", smtpPort);
+      localStorage.setItem("ruptax_smtp_username", smtpUsername);
+      localStorage.setItem("ruptax_smtp_password", smtpPassword);
       localStorage.setItem("ruptax_sender_email", senderEmail);
       localStorage.setItem("ruptax_sender_name", senderName);
+      localStorage.setItem("ruptax_smtp_secure", smtpSecure);
       
       toast({
-        title: "Email Settings Saved",
+        title: "SMTP Settings Saved",
         description: "Your email configuration has been saved successfully",
       });
     } catch (error) {
@@ -153,84 +169,132 @@ const AdminSettings = ({ onResetData }: AdminSettingsProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Email Settings */}
+      {/* SMTP Email Settings */}
       <Card className="border-border/50 shadow-sm">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <Mail className="h-4 w-4" />
-            Email Settings (SMTP)
+            SMTP Email Settings (AWS SES)
           </CardTitle>
           <CardDescription>
-            Configure email settings for sending forms to clients. 
-            <a 
-              href="https://resend.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-primary hover:underline ml-1"
-            >
-              Get Resend API Key
-            </a>
+            Configure SMTP settings for sending forms to clients via AWS SES
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="resend-api-key">Resend API Key</Label>
-            <div className="relative">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="smtp-host">SMTP Host</Label>
               <Input
-                id="resend-api-key"
-                type={showApiKey ? "text" : "password"}
-                value={resendApiKey}
-                onChange={(e) => setResendApiKey(e.target.value)}
-                placeholder="re_xxxxxxxx..."
-                className="pr-10"
+                id="smtp-host"
+                type="text"
+                value={smtpHost}
+                onChange={(e) => setSmtpHost(e.target.value)}
+                placeholder="email-smtp.ap-south-1.amazonaws.com"
               />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
-                onClick={() => setShowApiKey(!showApiKey)}
-              >
-                {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Create an API key at resend.com/api-keys
-            </p>
+            
+            <div className="space-y-2">
+              <Label htmlFor="smtp-port">SMTP Port</Label>
+              <Input
+                id="smtp-port"
+                type="text"
+                value={smtpPort}
+                onChange={(e) => setSmtpPort(e.target.value)}
+                placeholder="587"
+              />
+              <p className="text-xs text-muted-foreground">
+                Common ports: 25, 465 (SSL), 587 (TLS)
+              </p>
+            </div>
           </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="sender-name">Sender Name</Label>
-            <Input
-              id="sender-name"
-              type="text"
-              value={senderName}
-              onChange={(e) => setSenderName(e.target.value)}
-              placeholder="RupTax"
-            />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="smtp-username">SMTP Username</Label>
+              <Input
+                id="smtp-username"
+                type="text"
+                value={smtpUsername}
+                onChange={(e) => setSmtpUsername(e.target.value)}
+                placeholder="AKIA..."
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="smtp-password">SMTP Password</Label>
+              <div className="relative">
+                <Input
+                  id="smtp-password"
+                  type={showPassword ? "text" : "password"}
+                  value={smtpPassword}
+                  onChange={(e) => setSmtpPassword(e.target.value)}
+                  placeholder="Your SMTP password"
+                  className="pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
+              </div>
+            </div>
           </div>
-          
+
           <div className="space-y-2">
-            <Label htmlFor="sender-email">Sender Email</Label>
-            <Input
-              id="sender-email"
-              type="email"
-              value={senderEmail}
-              onChange={(e) => setSenderEmail(e.target.value)}
-              placeholder="noreply@yourdomain.com"
-            />
-            <p className="text-xs text-muted-foreground">
-              Domain must be verified at resend.com/domains
-            </p>
+            <Label htmlFor="smtp-secure">Security</Label>
+            <select
+              id="smtp-secure"
+              value={smtpSecure}
+              onChange={(e) => setSmtpSecure(e.target.value)}
+              className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
+            >
+              <option value="tls">TLS (Port 587)</option>
+              <option value="ssl">SSL (Port 465)</option>
+              <option value="none">None (Port 25)</option>
+            </select>
+          </div>
+
+          <div className="border-t pt-4 mt-4">
+            <p className="text-sm font-medium mb-3">Sender Information</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="sender-name">Sender Name</Label>
+                <Input
+                  id="sender-name"
+                  type="text"
+                  value={senderName}
+                  onChange={(e) => setSenderName(e.target.value)}
+                  placeholder="RupTax"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="sender-email">Sender Email</Label>
+                <Input
+                  id="sender-email"
+                  type="email"
+                  value={senderEmail}
+                  onChange={(e) => setSenderEmail(e.target.value)}
+                  placeholder="noreply@yourdomain.com"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Must be verified in AWS SES
+                </p>
+              </div>
+            </div>
           </div>
 
           <Button 
             onClick={handleSaveEmailSettings} 
-            disabled={isSavingEmail || !resendApiKey}
+            disabled={isSavingEmail || !smtpHost || !smtpUsername || !smtpPassword}
             className="w-full"
           >
             <Save className="h-4 w-4 mr-2" />
-            {isSavingEmail ? "Saving..." : "Save Email Settings"}
+            {isSavingEmail ? "Saving..." : "Save SMTP Settings"}
           </Button>
         </CardContent>
       </Card>
