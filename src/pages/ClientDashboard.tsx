@@ -118,7 +118,7 @@ const ClientDashboard = () => {
                   Client ID: <span className="font-mono font-semibold text-primary">{client.id}</span>
                 </p>
                 <div className="mt-2">
-                  <PasswordReset mobile={client.mobileNo} />
+                  <PasswordReset />
                 </div>
               </div>
             </div>

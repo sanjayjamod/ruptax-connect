@@ -48,74 +48,12 @@ export const searchClients = (query: string): Client[] => {
   );
 };
 
-// Register new client (from client registration)
-export const registerClient = (
-  name: string,
-  mobile: string,
-  password: string
-): Client | { error: string } => {
-  // Check if mobile already exists
-  const existingClient = getClientByMobile(mobile);
-  if (existingClient) {
-    return { error: "Mobile number already registered" };
-  }
+// DEPRECATED: Client registration and login now use Supabase Auth
+// These functions are kept for backward compatibility during migration
+// New registrations should use Supabase Auth via useAuth hook
 
-  const clients = getAllClients();
-  const newClient: Client = {
-    id: generateClientId(),
-    enterNo: "",
-    name: name.toUpperCase(),
-    nameGujarati: "",
-    schoolName: "",
-    schoolNameGujarati: "",
-    designation: "",
-    designationGujarati: "",
-    schoolAddress: "",
-    addressGujarati: "",
-    panNo: "",
-    bankAcNo: "",
-    ifscCode: "",
-    aadharNo: "",
-    dateOfBirth: "",
-    mobileNo: mobile,
-    email: "",
-    payCenterName: "",
-    payCenterAddress: "",
-    place: "",
-    tdo: "",
-    tdf: "",
-    headMaster: "",
-    headMasterFather: "",
-    headMasterPlace: "",
-    annualIncome: "",
-    occupation: "salaried",
-    assessmentYear: "2026-27",
-    formStatus: "pending",
-    password: password,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-  clients.push(newClient);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(clients));
-  return newClient;
-};
-
-// Login client
-export const loginClient = (
-  mobile: string,
-  password: string
-): Client | { error: string } => {
-  const client = getClientByMobile(mobile);
-  if (!client) {
-    return { error: "Mobile number not registered" };
-  }
-  if ((client as any).password !== password) {
-    return { error: "Incorrect password" };
-  }
-  // Store current logged in client
-  localStorage.setItem(CURRENT_CLIENT_KEY, JSON.stringify(client));
-  return client;
-};
+// Get current logged in client from localStorage (legacy)
+// Note: This is deprecated - use useAuth hook for authentication
 
 // Get current logged in client
 export const getCurrentClient = (): Client | null => {
@@ -128,16 +66,13 @@ export const logoutClient = () => {
   localStorage.removeItem(CURRENT_CLIENT_KEY);
 };
 
-// Add new client (from admin)
-export const addClient = (formData: ClientFormData, password?: string): Client => {
+// Add new client (from admin) - password management moved to Supabase Auth
+export const addClient = (formData: ClientFormData): Client => {
   const clients = getAllClients();
-  // Use mobile as password if not provided
-  const clientPassword = password || formData.mobileNo || "123456";
   const newClient: Client = {
     ...formData,
     id: generateClientId(),
     formStatus: "pending",
-    password: clientPassword,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };

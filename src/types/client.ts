@@ -35,7 +35,7 @@ export interface Client {
   paymentDate?: string; // Last payment date
   paymentStatus?: 'pending' | 'partial' | 'paid';
   paymentNotes?: string;
-  password?: string; // For client login
+  // Note: Passwords are now managed via Supabase Auth, not stored in client data
   createdAt: string;
   updatedAt: string;
 }
