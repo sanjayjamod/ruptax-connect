@@ -18,6 +18,7 @@ import {
   Sun,
   ClipboardList,
   Trash2,
+  FileSpreadsheet,
 } from "lucide-react";
 import {
   Sidebar,
@@ -100,6 +101,12 @@ const AdminSidebar = ({
       title: "Filled Forms",
       icon: ClipboardList,
       section: "filled-forms",
+    },
+    {
+      title: "Templates",
+      icon: FileSpreadsheet,
+      section: "templates",
+      onClick: () => navigate("/template-management"),
     },
     {
       title: "Calculator",
