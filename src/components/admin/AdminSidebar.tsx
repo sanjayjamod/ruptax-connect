@@ -109,17 +109,6 @@ const AdminSidebar = ({
       section: "pdfs",
     },
     {
-      title: "Templates",
-      icon: FileSpreadsheet,
-      section: "templates",
-      onClick: () => navigate("/template-management"),
-    },
-    {
-      title: "Calculator",
-      icon: Calculator,
-      section: "calculator",
-    },
-    {
       title: "Notes",
       icon: StickyNote,
       section: "notes",
@@ -137,11 +126,6 @@ const AdminSidebar = ({
       title: "Add Teacher",
       icon: UserPlus,
       onClick: onAddClient,
-    },
-    {
-      title: "Import Excel",
-      icon: Upload,
-      onClick: onImportExcel,
     },
     {
       title: "Export JSON",
