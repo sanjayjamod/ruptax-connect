@@ -502,9 +502,9 @@
     color: #333 !important;
   }
 
-  /* Declaration Form Footer - 20mm space from table */
+  /* Declaration Form Footer - 40mm space from table */
   #declaration-form .form-footer {
-    margin-top: 20mm !important;
+    margin-top: 40mm !important;
   }
 
   /* Signature sections - Compact */
