@@ -374,10 +374,10 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
           {renderMappedRow(3, "મોંઘવારી ભથ્થું", "da")}
           {renderMappedRow(4, "ઘરભાડા ભથ્થું", "hra")}
           {renderMappedRow(6, "મેડીકલ ભથ્થું", "medical")}
-          {renderMappedRow(7, "અપંગ એલાઉન્સ", "disabilityAllowance")}
-          {renderMappedRow(8, "આચાર્ય એલાઉન્સ", "principalAllowance")}
-          {renderMappedRow(9, "મોંઘવારી એરિયર્સ", "daArrears")}
-          {renderMappedRow(10, "પગાર એરિયર્સ", "salaryArrears")}
+          {renderMappedRow(7, "અપંગ એલા.", "disabilityAllowance")}
+          {renderMappedRow(8, "આચાર્ય એલા.", "principalAllowance")}
+          {renderMappedRow(9, "મોંઘવારી એરિ.", "daArrears")}
+          {renderMappedRow(10, "પગાર એરિ.", "salaryArrears")}
           {renderMappedRow(11, "અન્ય આવક 1", "otherIncome1")}
           {renderMappedRow(12, "અન્ય આવક 2", "otherIncome2")}
           
@@ -410,9 +410,10 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
         <div>
           <p>સ્થળ: {client.schoolNameGujarati || client.schoolName || '_____________'}</p>
           <p>તારીખ: _______________</p>
+          <p className="mt-6 border-t border-black pt-1">કર્મચારીની સહી</p>
         </div>
         <div className="text-right">
-          <p className="mt-8 border-t border-black pt-1">સંસ્થાના વડાની સહી</p>
+          <p className="mt-6 border-t border-black pt-1">આચાર્યની સહી</p>
         </div>
       </div>
 
