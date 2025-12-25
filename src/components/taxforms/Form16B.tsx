@@ -219,7 +219,7 @@ const Form16B = ({ client, formData }: Form16BProps) => {
           I further certify that the information given above is true and correct based on the books of account, documents and other available records.
         </p>
 
-        <div className="flex justify-between mt-3 text-[9px]">
+        <div className="flex justify-between mt-8 text-[9px]">
           <div>
             <p className="text-[9px]">DATE:- {form16.certificationDate || '_______________'}</p>
             <p className="text-[9px]">PLACE: {form16.certificationPlace || client.headMasterPlace || client.payCenterName || '_______________'}</p>
