@@ -290,10 +290,12 @@
     vertical-align: middle !important;
   }
 
-  /* Title row - Compact */
-  #aavak-vera-form-a table:first-of-type td {
+  /* Title row - 18pt with higher specificity */
+  #aavak-vera-form-a > table:first-of-type td,
+  #aavak-vera-form-a table:first-of-type td.text-center.font-bold {
     font-size: 18pt !important;
     padding: 2mm !important;
+    font-weight: bold !important;
   }
 
   /* Header Info Table (NAME, INCOME YEAR, VILLAGE, etc.) - 11pt */
