@@ -42,7 +42,7 @@ const AavakVeraFormA = ({ client, formData, onChange, readOnly = false, isManual
   );
 
   return (
-    <div className="tax-form-container tax-form-print aavak-vera-form page-break flex flex-col" id="aavak-vera-form-a" style={{ fontFamily: 'Arial, sans-serif', minHeight: '297mm' }}>
+    <div className="tax-form-container tax-form-print aavak-vera-form page-break" id="aavak-vera-form-a" style={{ fontFamily: 'Arial, sans-serif' }}>
       {/* Main Title - 18pt bold */}
       <table className="w-full border-collapse">
         <tbody>
