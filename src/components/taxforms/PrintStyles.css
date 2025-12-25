@@ -713,3 +713,66 @@
     padding: 2px 3px;
   }
 }
+
+/* ==========================================
+   TEXT EDIT MODE STYLES
+   ========================================== */
+.text-edit-mode {
+  position: relative;
+}
+
+.text-edit-mode td,
+.text-edit-mode th,
+.text-edit-mode span:not(.no-edit),
+.text-edit-mode p:not(.no-edit),
+.text-edit-mode label:not(.no-edit) {
+  cursor: text;
+  transition: all 0.15s ease;
+}
+
+.text-edit-mode [contenteditable="true"] {
+  cursor: text;
+  min-width: 20px;
+  display: inline-block;
+}
+
+.text-edit-mode [contenteditable="true"]:hover {
+  background-color: rgba(147, 51, 234, 0.15) !important;
+  outline: 1px dashed rgb(147, 51, 234);
+  border-radius: 2px;
+}
+
+.text-edit-mode [contenteditable="true"]:focus {
+  background-color: rgba(147, 51, 234, 0.25) !important;
+  outline: 2px solid rgb(147, 51, 234);
+  border-radius: 2px;
+}
+
+.text-edit-active-indicator {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: rgb(147, 51, 234);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  z-index: 9999;
+  box-shadow: 0 2px 8px rgba(147, 51, 234, 0.4);
+}
+
+/* Hide text edit mode elements in print */
+@media print {
+  .text-edit-active-indicator,
+  .form-font-control,
+  .no-print {
+    display: none !important;
+  }
+  
+  .text-edit-mode [contenteditable="true"]:hover,
+  .text-edit-mode [contenteditable="true"]:focus {
+    background-color: transparent !important;
+    outline: none !important;
+  }
+}
