@@ -76,12 +76,16 @@
     padding: 0 !important;
   }
 
-  /* Print area container - NO extra spacing */
-  .print-area {
+  /* Print area container - NO extra spacing, remove hidden class effects */
+  .print-area,
+  .hidden.print-area {
     display: block !important;
     visibility: visible !important;
     margin: 0 !important;
     padding: 0 !important;
+    height: auto !important;
+    width: 100% !important;
+    position: static !important;
   }
 
   /* Show print area */
