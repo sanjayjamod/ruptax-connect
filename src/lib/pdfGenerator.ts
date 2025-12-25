@@ -199,12 +199,13 @@ const createPrintStyledClone = (printElement: HTMLElement): HTMLElement => {
   clone.classList.remove('print-only-area');
   clone.id = 'pdf-capture-container';
   
-  // Main container styles - MUST be visible
+  // Main container styles - use FIXED position to ensure visibility
   clone.style.cssText = `
-    position: absolute !important;
+    position: fixed !important;
     left: 0 !important;
     top: 0 !important;
     width: 210mm !important;
+    min-width: 210mm !important;
     background: white !important;
     visibility: visible !important;
     display: block !important;
@@ -214,9 +215,11 @@ const createPrintStyledClone = (printElement: HTMLElement): HTMLElement => {
     opacity: 1 !important;
     overflow: visible !important;
     height: auto !important;
+    transform: none !important;
+    pointer-events: none !important;
   `;
 
-  // Force ALL children to be visible
+  // Force ALL children to be visible with inline styles
   const allElements = clone.querySelectorAll('*');
   console.log('PDF: Total elements in clone:', allElements.length);
   
@@ -224,10 +227,15 @@ const createPrintStyledClone = (printElement: HTMLElement): HTMLElement => {
     const htmlEl = el as HTMLElement;
     // Remove hidden classes
     htmlEl.classList.remove('hidden', 'invisible', 'print-only-area');
-    // Ensure visibility
-    if (htmlEl.style.display === 'none' || htmlEl.style.visibility === 'hidden') {
-      htmlEl.style.display = 'block';
+    
+    // Force visibility on all elements
+    const computedStyle = window.getComputedStyle(htmlEl);
+    if (computedStyle.display === 'none' || computedStyle.visibility === 'hidden' || computedStyle.opacity === '0') {
+      htmlEl.style.display = htmlEl.tagName === 'TABLE' ? 'table' : 
+                              htmlEl.tagName === 'TR' ? 'table-row' :
+                              htmlEl.tagName === 'TD' || htmlEl.tagName === 'TH' ? 'table-cell' : 'block';
       htmlEl.style.visibility = 'visible';
+      htmlEl.style.opacity = '1';
     }
   });
 
@@ -269,14 +277,20 @@ export const downloadPDF = async (
   const options = {
     margin: [5, 5, 5, 5],
     filename: filename,
-    image: { type: 'jpeg', quality: 0.98 },
+    image: { type: 'jpeg', quality: 0.95 },
     html2canvas: { 
       scale: 2,
       useCORS: true,
       letterRendering: true,
-      logging: false,
+      logging: true, // Enable logging to debug
       backgroundColor: '#ffffff',
-      windowWidth: 1123, // Use landscape width to capture pagar properly
+      windowWidth: 794, // A4 portrait width
+      scrollX: 0,
+      scrollY: 0,
+      x: 0,
+      y: 0,
+      foreignObjectRendering: false,
+      removeContainer: false,
     },
     jsPDF: { 
       unit: 'mm', 
@@ -317,14 +331,20 @@ export const generateAndSavePDF = async (
     const options = {
       margin: [5, 5, 5, 5],
       filename: `${clientName}_TaxForms_${financialYear}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
+      image: { type: 'jpeg', quality: 0.95 },
       html2canvas: { 
         scale: 2,
         useCORS: true,
         letterRendering: true,
-        logging: false,
+        logging: true,
         backgroundColor: '#ffffff',
-        windowWidth: 1123, // Use landscape width for pagar
+        windowWidth: 794,
+        scrollX: 0,
+        scrollY: 0,
+        x: 0,
+        y: 0,
+        foreignObjectRendering: false,
+        removeContainer: false,
       },
       jsPDF: { 
         unit: 'mm', 
