@@ -13,7 +13,7 @@ import { MessageCircle, Send, Loader2, Bot, User, X } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { TaxFormData } from "@/types/taxForm";
 import { Client } from "@/types/client";
-
+import { supabase } from "@/integrations/supabase/client";
 interface Message {
   role: "user" | "assistant";
   content: string;
@@ -25,8 +25,7 @@ interface TaxChatbotProps {
   client?: Client | null;
 }
 
-const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tax-chatbot`;
-
+// Use supabase.functions.invoke for authenticated calls
 const formHelpMessages: Record<string, string> = {
   pagar: "નમસ્તે! 🙏 હું પગાર ફોર્મ ભરવામાં મદદ કરું છું.\n\n• Basic Pay, Grade Pay, DA ભરો\n• HRA, Medical Allowance\n• GPF/CPF કપાત\n• Profession Tax\n• Net Salary ગણતરી\n\nકોઈ પ્રશ્ન પૂછો!",
   declaration: "નમસ્તે! 🙏 Declaration Form માટે મદદ:\n\n• Bank Interest (બચત ખાતું)\n• NSC/FD વ્યાજ\n• LIC Premium\n• PPF રોકાણ\n• Housing Loan\n• 80C/80D કપાત\n\nકોઈ પ્રશ્ન પૂછો!",
@@ -101,11 +100,25 @@ const TaxChatbot = ({ activeForm, formData, client }: TaxChatbotProps) => {
     let assistantSoFar = "";
     
     try {
-      const resp = await fetch(CHAT_URL, {
+      // Get current session for authentication
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast({
+          title: "Authentication Required",
+          description: "Please log in to use the chatbot",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      const resp = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tax-chatbot`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          "Authorization": `Bearer ${session.access_token}`,
+          "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
         },
         body: JSON.stringify({ 
           messages: [...messages, userMsg], 

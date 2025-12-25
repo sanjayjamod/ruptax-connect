@@ -275,12 +275,17 @@ export const generateAndSavePDF = async (
       throw new Error(`Failed to upload PDF: ${uploadError.message}`);
     }
 
-    // Get public URL
-    const { data: urlData } = supabase.storage
+    // Create signed URL for secure access (valid for 1 hour)
+    const { data: signedUrlData, error: signedUrlError } = await supabase.storage
       .from('client-pdfs')
-      .getPublicUrl(filePath);
+      .createSignedUrl(filePath, 3600);
 
-    const fileUrl = urlData.publicUrl;
+    if (signedUrlError) {
+      console.error('Signed URL error:', signedUrlError);
+      throw new Error(`Failed to get file URL: ${signedUrlError.message}`);
+    }
+
+    const fileUrl = signedUrlData.signedUrl;
 
     // Save record to client_pdfs table
     const { error: dbError } = await supabase
