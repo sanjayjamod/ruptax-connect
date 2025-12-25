@@ -60,6 +60,17 @@
     padding: 0 !important;
   }
 
+  /* CRITICAL: Hide everything except print-only-area */
+  #root > *:not(.print-only-area) {
+    display: none !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    visibility: hidden !important;
+    position: absolute !important;
+    left: -9999px !important;
+  }
+
   /* Hide React Fragment spacing - target empty elements */
   #root > *:empty,
   body > *:empty {
@@ -71,6 +82,7 @@
 
   /* Hide EVERYTHING except print area */
   .no-print,
+  .screen-only,
   .text-edit-active-indicator,
   header,
   footer:not(.form-footer),
@@ -96,9 +108,11 @@
     overflow: hidden !important;
     margin: 0 !important;
     padding: 0 !important;
+    position: absolute !important;
+    left: -9999px !important;
   }
 
-  /* Print only area - visible in print */
+  /* Print only area - visible in print - MUST BE FIRST */
   .print-only-area {
     display: block !important;
     visibility: visible !important;
@@ -108,6 +122,8 @@
     width: 100% !important;
     position: static !important;
     overflow: visible !important;
+    page-break-before: avoid !important;
+    break-before: avoid !important;
   }
 
   /* Force first form to start at top - no blank page */
@@ -117,6 +133,7 @@
     margin-top: 0 !important;
     padding-top: 0 !important;
   }
+
 
   /* Base form container - each form = 1 page EXACTLY */
   .tax-form-container,
