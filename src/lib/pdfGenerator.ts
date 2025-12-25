@@ -47,13 +47,17 @@ const applyPrintStyles = (clone: HTMLElement): void => {
     `;
 
     if (isPagar) {
+      // Pagar form - scale to fit portrait page (transform scale)
       form.style.cssText = baseStyles + `
-        width: 287mm !important;
-        min-width: 287mm !important;
-        height: 198mm !important;
-        max-height: 198mm !important;
+        width: 297mm !important;
+        min-width: 297mm !important;
+        height: auto !important;
+        max-height: none !important;
         padding: 2mm !important;
-        font-size: 10pt !important;
+        font-size: 8pt !important;
+        transform: scale(0.68) !important;
+        transform-origin: top left !important;
+        margin-bottom: -80mm !important;
       `;
     } else if (formId === 'aavak-vera-form-a' || formId === 'aavak-vera-form-b') {
       form.style.cssText = baseStyles + `
