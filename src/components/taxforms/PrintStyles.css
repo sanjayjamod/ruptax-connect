@@ -292,7 +292,7 @@
 
   /* Title row - Compact */
   #aavak-vera-form-a table:first-of-type td {
-    font-size: 16pt !important;
+    font-size: 18pt !important;
     padding: 2mm !important;
   }
 
@@ -302,10 +302,10 @@
     padding: 1mm 1.5mm !important;
   }
 
-  /* Section headers - Compact */
+  /* Section headers - 11pt */
   #aavak-vera-form-a .bg-gray-200 td,
   #aavak-vera-form-a td[style*="13pt"] {
-    font-size: 9pt !important;
+    font-size: 11pt !important;
     padding: 1mm 1.5mm !important;
     background: #e0e0e0 !important;
   }
@@ -419,7 +419,7 @@
   #aavak-vera-form-b input,
   #form-16a input,
   #form-16b input {
-    font-size: 7.5pt !important;
+    font-size: 11pt !important;
     border: none !important;
     background: transparent !important;
     padding: 0 !important;
