@@ -572,47 +572,31 @@ const TaxFormAdmin = () => {
       <div className="flex min-h-screen flex-col bg-background screen-only">
         <Header />
         
-        <main className="flex-1 py-4">
-          <div className="container mx-auto px-4">
-          {/* Top Bar */}
-          <div className="mb-4 flex flex-wrap items-center gap-3 no-print">
-            <Button variant="outline" size="sm" onClick={() => navigate("/admin-dashboard")}>
-              <ArrowLeft className="h-4 w-4 mr-1" /> Back
-            </Button>
-            
-            <div className="flex items-center gap-2">
-              <Input
-                placeholder="Client ID (e.g., 202601)"
-                value={clientId}
-                onChange={(e) => setClientId(e.target.value)}
-                className="w-40"
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              />
-              <Button onClick={handleSearch} size="sm">
-                <Search className="h-4 w-4 mr-1" /> Load
-              </Button>
-            </div>
-
-            {client && (
-              <>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  accept=".xlsx,.xls,.xlsm"
-                  onChange={handleImportExcel}
-                  className="hidden"
-                />
-                <Button 
-                  onClick={() => fileInputRef.current?.click()} 
-                  variant="default" 
-                  size="sm" 
-                  title="Import from Excel file (.xlsm)"
-                  disabled={isImporting}
-                >
-                  {isImporting ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Upload className="h-4 w-4 mr-1" />}
-                  Import Excel
+        {/* Sticky Toolbar Header */}
+        {client && (
+          <div className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b shadow-sm no-print">
+            <div className="container mx-auto px-4 py-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <Button variant="outline" size="sm" onClick={() => navigate("/admin-dashboard")}>
+                  <ArrowLeft className="h-4 w-4 mr-1" /> Back
                 </Button>
-                <Button onClick={handleLoadSampleData} variant="secondary" size="sm" title="Load sample data from Excel">
+                
+                <div className="flex items-center gap-2">
+                  <Input
+                    placeholder="Client ID"
+                    value={clientId}
+                    onChange={(e) => setClientId(e.target.value)}
+                    className="w-28 h-8"
+                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  />
+                  <Button onClick={handleSearch} size="sm">
+                    <Search className="h-4 w-4 mr-1" /> Load
+                  </Button>
+                </div>
+
+                <div className="h-6 w-px bg-border" />
+
+                <Button onClick={handleLoadSampleData} variant="secondary" size="sm" title="Load sample data">
                   <Database className="h-4 w-4 mr-1" /> Sample
                 </Button>
                 <Button
@@ -628,25 +612,26 @@ const TaxFormAdmin = () => {
                   onClick={() => setIsManualMode(!isManualMode)} 
                   variant={isManualMode ? "secondary" : "outline"} 
                   size="sm"
-                  title={isManualMode ? "Manual Mode ON - Can edit auto fields" : "Manual Mode OFF"}
                   className={isManualMode ? "bg-yellow-500/20 border-yellow-500 text-yellow-700" : ""}
                 >
                   {isManualMode ? "Manual ON" : "Manual OFF"}
                 </Button>
-                <Button onClick={handleCalculate} variant="secondary" size="sm">
-                  <Calculator className="h-4 w-4 mr-1" /> Calculate
-                </Button>
+
+                <div className="h-6 w-px bg-border" />
+
                 <Button 
                   onClick={handleResetData} 
                   variant="destructive" 
                   size="sm"
-                  title="Reset all form data / ફોર્મ ડેટા રીસેટ"
                 >
                   <RotateCcw className="h-4 w-4 mr-1" /> Reset
                 </Button>
                 <Button onClick={handleSave} size="sm">
                   <Save className="h-4 w-4 mr-1" /> Save
                 </Button>
+
+                <div className="h-6 w-px bg-border" />
+
                 <PrintSettings client={client} formData={formData} onChange={handleFormChange} />
                 <Button onClick={() => handlePrint()} variant="outline" size="sm">
                   <Printer className="h-4 w-4 mr-1" /> Print All
@@ -665,6 +650,9 @@ const TaxFormAdmin = () => {
                   )}
                   PDF
                 </Button>
+
+                <div className="h-6 w-px bg-border" />
+
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -673,7 +661,7 @@ const TaxFormAdmin = () => {
                       className={isTextEditMode ? "bg-purple-600 hover:bg-purple-700" : ""}
                     >
                       <Type className="h-4 w-4 mr-1" />
-                      {isTextEditMode ? "Edit ON" : "Text Edit"}
+                      Text Edit
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-72 p-4" side="bottom">
@@ -727,60 +715,6 @@ const TaxFormAdmin = () => {
                 </Popover>
                 <WhatsAppShare client={client} onSharePDF={handleExportPDF} />
                 <EmailShare client={client} formData={formData} />
-                
-                {/* Template Export Button */}
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      disabled={isExporting}
-                      className="bg-green-600 hover:bg-green-700 text-white"
-                    >
-                      {isExporting ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Download className="h-4 w-4 mr-1" />}
-                      Export Template
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-64 p-3" side="bottom">
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium mb-2">Export with Template:</p>
-                      {[
-                        { id: 'pagar', name: 'પગાર ફોર્મ' },
-                        { id: 'declaration', name: 'ડેકલેરેશન' },
-                        { id: 'aavak-vera-a', name: 'આવકવેરા A' },
-                        { id: 'aavak-vera-b', name: 'આવકવેરા B' },
-                        { id: 'form-16a', name: 'Form 16A' },
-                        { id: 'form-16b', name: 'Form 16B' },
-                      ].map((form) => (
-                        <Button
-                          key={form.id}
-                          variant={availableTemplates[form.id] ? "default" : "outline"}
-                          size="sm"
-                          className="w-full justify-between"
-                          onClick={() => handleExportWithTemplate(form.id)}
-                          disabled={!availableTemplates[form.id] || isExporting}
-                        >
-                          <span>{form.name}</span>
-                          {availableTemplates[form.id] ? (
-                            <FileSpreadsheet className="h-4 w-4 text-green-500" />
-                          ) : (
-                            <span className="text-xs text-muted-foreground">No Template</span>
-                          )}
-                        </Button>
-                      ))}
-                      <div className="pt-2 border-t">
-                        <Button
-                          variant="link"
-                          size="sm"
-                          className="w-full text-xs"
-                          onClick={() => navigate('/template-management')}
-                        >
-                          Manage Templates →
-                        </Button>
-                      </div>
-                    </div>
-                  </PopoverContent>
-                </Popover>
 
                 <Button
                   onClick={() => setShowTemplates(!showTemplates)} 
@@ -790,9 +724,34 @@ const TaxFormAdmin = () => {
                 >
                   {showTemplates ? <PanelRightClose className="h-4 w-4" /> : <PanelRightOpen className="h-4 w-4" />}
                 </Button>
-              </>
-            )}
+              </div>
+            </div>
           </div>
+        )}
+        
+        <main className="flex-1 py-4">
+          <div className="container mx-auto px-4">
+          {/* Top Bar - Only show when no client loaded */}
+          {!client && (
+            <div className="mb-4 flex flex-wrap items-center gap-3 no-print">
+              <Button variant="outline" size="sm" onClick={() => navigate("/admin-dashboard")}>
+                <ArrowLeft className="h-4 w-4 mr-1" /> Back
+              </Button>
+              
+              <div className="flex items-center gap-2">
+                <Input
+                  placeholder="Client ID (e.g., 202601)"
+                  value={clientId}
+                  onChange={(e) => setClientId(e.target.value)}
+                  className="w-40"
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                />
+                <Button onClick={handleSearch} size="sm">
+                  <Search className="h-4 w-4 mr-1" /> Load
+                </Button>
+              </div>
+            </div>
+          )}
 
           {/* Client Info */}
           {client && (
