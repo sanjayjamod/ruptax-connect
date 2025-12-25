@@ -174,10 +174,19 @@ export const updateClientStatus = (id: string, status: Client["formStatus"]): Cl
   const index = clients.findIndex((c) => c.id === id);
   if (index === -1) return null;
 
-  clients[index] = {
-    ...clients[index],
+  const updateData: Partial<Client> = {
     formStatus: status,
     updatedAt: new Date().toISOString(),
+  };
+
+  // Set completedAt when status changes to completed or submitted
+  if ((status === 'completed' || status === 'submitted') && !clients[index].completedAt) {
+    updateData.completedAt = new Date().toISOString();
+  }
+
+  clients[index] = {
+    ...clients[index],
+    ...updateData,
   };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(clients));
   return clients[index];
