@@ -231,7 +231,7 @@ const DeclarationForm = ({ client, formData, onChange, readOnly = false, isManua
       </table>
 
       {/* Signature Section - Editable Paragraph Format */}
-      <div className="mt-22 pt-10 text-[11px] leading-relaxed">
+      <div className="mt-30 pt-20 text-[11px] leading-relaxed">
         <div className="flex justify-between">
           <div className="text-left">
             {readOnly ? (
