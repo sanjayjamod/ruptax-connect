@@ -61,8 +61,8 @@ const AavakVeraFormA = ({ client, formData, onChange, readOnly = false, isManual
         </tbody>
       </table>
 
-      {/* Header Info Table - 11pt */}
-      <table className="w-full border-collapse" style={{ fontSize: '11pt' }}>
+      {/* Header Info Table - 13pt */}
+      <table className="w-full border-collapse" style={{ fontSize: '13pt' }}>
         <tbody>
           <tr>
             <td className="border border-black px-3 py-2 font-bold bg-gray-100" style={{ width: '15%' }}>NAME</td>
