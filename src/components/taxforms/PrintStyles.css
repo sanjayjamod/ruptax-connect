@@ -362,7 +362,12 @@
   }
 
   /* Portrait Form Titles - Compact */
-  #declaration-form > .text-center.font-bold,
+  #declaration-form > .text-center.font-bold.text-lg {
+    font-size: 16pt !important;
+    margin-bottom: 1.5mm !important;
+    font-weight: bold !important;
+  }
+
   #form-16a > .text-center.font-bold,
   #form-16b > .text-center.font-bold {
     font-size: 11pt !important;
@@ -398,7 +403,14 @@
   }
 
   #declaration-form table th,
-  #declaration-form table td,
+  #declaration-form table td {
+    border: 0.5pt solid #000 !important;
+    font-size: 11pt !important;
+    padding: 1mm 1.5mm !important;
+    line-height: 1.2 !important;
+    vertical-align: middle !important;
+  }
+
   #form-16a table th,
   #form-16a table td,
   #form-16b table th,
@@ -495,7 +507,19 @@
     display: flex !important;
     justify-content: space-between !important;
     margin-top: 2mm !important;
-    font-size: 7pt !important;
+    font-size: 11pt !important;
+  }
+
+  /* Declaration form all text 11pt */
+  #declaration-form,
+  #declaration-form p,
+  #declaration-form span,
+  #declaration-form div:not(.text-center.font-bold.text-lg) {
+    font-size: 11pt !important;
+  }
+
+  #declaration-form > .text-center.text-sm {
+    font-size: 11pt !important;
   }
 
   /* Input styling in print */
