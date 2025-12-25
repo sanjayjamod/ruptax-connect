@@ -51,6 +51,7 @@
 
   /* Hide EVERYTHING except print area */
   .no-print,
+  .text-edit-active-indicator,
   header,
   footer:not(.form-footer),
   nav,
@@ -66,7 +67,8 @@
   [class*="WhatsApp"],
   [class*="Chatbot"],
   a[href*="whatsapp"],
-  a[href*="wa.me"] {
+  a[href*="wa.me"],
+  .flex.min-h-screen {
     display: none !important;
     visibility: hidden !important;
     height: 0 !important;
