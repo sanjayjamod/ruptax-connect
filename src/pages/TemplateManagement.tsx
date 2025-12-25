@@ -119,10 +119,12 @@ const TemplateManagement = () => {
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
-      const { data: urlData } = supabase.storage
+      // Get signed URL for secure access (valid for 1 hour)
+      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
         .from("form-templates")
-        .getPublicUrl(filePath);
+        .createSignedUrl(filePath, 3600);
+
+      if (signedUrlError) throw signedUrlError;
 
       // Deactivate existing templates for this form type
       await supabase
@@ -130,12 +132,12 @@ const TemplateManagement = () => {
         .update({ is_active: false })
         .eq("form_type", formType);
 
-      // Insert new template record
+      // Insert new template record (store file_path for signed URL generation)
       const { error: insertError } = await supabase.from("form_templates").insert({
         form_type: formType,
         template_name: file.name,
         file_path: filePath,
-        file_url: urlData.publicUrl,
+        file_url: signedUrlData.signedUrl, // Store signed URL temporarily
         uploaded_by: user?.id,
         is_active: true,
       });
@@ -263,7 +265,21 @@ const TemplateManagement = () => {
                           variant="outline"
                           size="sm"
                           className="flex-1"
-                          onClick={() => window.open(activeTemplate.file_url, "_blank")}
+                          onClick={async () => {
+                            // Get signed URL for viewing
+                            const { data, error } = await supabase.storage
+                              .from("form-templates")
+                              .createSignedUrl(activeTemplate.file_path, 3600);
+                            if (data?.signedUrl) {
+                              window.open(data.signedUrl, "_blank");
+                            } else {
+                              toast({
+                                title: "Error",
+                                description: "Failed to get view URL",
+                                variant: "destructive",
+                              });
+                            }
+                          }}
                         >
                           <Eye className="h-4 w-4 mr-1" />
                           View
@@ -272,11 +288,23 @@ const TemplateManagement = () => {
                           variant="outline"
                           size="sm"
                           className="flex-1"
-                          onClick={() => {
-                            const a = document.createElement("a");
-                            a.href = activeTemplate.file_url;
-                            a.download = activeTemplate.template_name;
-                            a.click();
+                          onClick={async () => {
+                            // Get signed URL for download
+                            const { data, error } = await supabase.storage
+                              .from("form-templates")
+                              .createSignedUrl(activeTemplate.file_path, 3600);
+                            if (data?.signedUrl) {
+                              const a = document.createElement("a");
+                              a.href = data.signedUrl;
+                              a.download = activeTemplate.template_name;
+                              a.click();
+                            } else {
+                              toast({
+                                title: "Error",
+                                description: "Failed to get download URL",
+                                variant: "destructive",
+                              });
+                            }
                           }}
                         >
                           <Download className="h-4 w-4 mr-1" />

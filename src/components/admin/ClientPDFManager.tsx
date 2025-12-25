@@ -9,6 +9,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Download, Trash2, Search, FileText, Loader2, RefreshCw } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { getAllPDFs, deletePDF } from "@/lib/pdfGenerator";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ClientPDF {
   id: string;
@@ -81,8 +82,31 @@ const ClientPDFManager = () => {
     setSelectedIds(newSet);
   };
 
-  const handleDownload = (pdf: ClientPDF) => {
-    window.open(pdf.file_url, '_blank');
+  const handleDownload = async (pdf: ClientPDF) => {
+    try {
+      // Get a signed URL for secure download
+      const { data: signedUrlData, error } = await supabase.storage
+        .from('client-pdfs')
+        .createSignedUrl(pdf.file_path, 3600); // 1 hour expiry
+
+      if (error || !signedUrlData?.signedUrl) {
+        toast({ 
+          title: "Error", 
+          description: "Failed to get download URL", 
+          variant: "destructive" 
+        });
+        return;
+      }
+
+      window.open(signedUrlData.signedUrl, '_blank');
+    } catch (error) {
+      console.error("Download error:", error);
+      toast({ 
+        title: "Error", 
+        description: "Failed to download PDF", 
+        variant: "destructive" 
+      });
+    }
   };
 
   const handleDelete = async (pdf: ClientPDF) => {

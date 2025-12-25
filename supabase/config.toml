@@ -4,7 +4,7 @@ project_id = "ewmxonenrzbumoapxwib"
 verify_jwt = true
 
 [functions.tax-chatbot]
-verify_jwt = false
+verify_jwt = true
 
 [functions.send-test-email]
 verify_jwt = false

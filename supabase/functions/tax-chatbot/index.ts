@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -38,35 +39,131 @@ Assessment Year 2026-27 માટે:
 
 હંમેશા ગુજરાતી ભાષામાં જવાબ આપો.`;
 
+// Input validation constants
+const MAX_MESSAGES = 50;
+const MAX_MESSAGE_LENGTH = 4000;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { messages, activeForm, dataSummary } = await req.json();
-    
+    // ==================== AUTHENTICATION CHECK ====================
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      console.error("No authorization header provided");
+      return new Response(JSON.stringify({ error: "Authentication required" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Verify user authentication
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) {
+      console.error("Auth error:", authError?.message);
+      return new Response(JSON.stringify({ error: "Invalid authentication" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    console.log("Authenticated user:", user.id);
+
+    // ==================== INPUT VALIDATION ====================
+    const body = await req.json();
+    const { messages, activeForm, dataSummary } = body;
+
+    // Validate messages array
+    if (!messages || !Array.isArray(messages)) {
+      return new Response(JSON.stringify({ error: "Invalid input: messages must be an array" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Check message count limit
+    if (messages.length > MAX_MESSAGES) {
+      return new Response(JSON.stringify({ error: `Too many messages. Maximum: ${MAX_MESSAGES}` }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Validate each message
+    for (let i = 0; i < messages.length; i++) {
+      const msg = messages[i];
+      
+      if (!msg || typeof msg !== 'object') {
+        return new Response(JSON.stringify({ error: `Invalid message at index ${i}` }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      if (!msg.role || (msg.role !== 'user' && msg.role !== 'assistant')) {
+        return new Response(JSON.stringify({ error: `Invalid role at message ${i}` }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      if (typeof msg.content !== 'string') {
+        return new Response(JSON.stringify({ error: `Invalid content at message ${i}` }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      if (msg.content.length > MAX_MESSAGE_LENGTH) {
+        return new Response(JSON.stringify({ error: `Message ${i} too long. Maximum: ${MAX_MESSAGE_LENGTH} characters` }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    // Validate activeForm if provided
+    const validForms = ['pagar', 'declaration', 'formA', 'formB', 'form16a', 'form16b'];
+    if (activeForm && !validForms.includes(activeForm)) {
+      console.warn("Unknown form type provided:", activeForm);
+    }
+
+    // ==================== BUILD CONTEXT ====================
     // Build personalized data context if available
     let dataContext = "";
-    if (dataSummary) {
+    if (dataSummary && typeof dataSummary === 'object') {
+      // Sanitize numeric values
+      const sanitizeNumber = (val: unknown) => {
+        const num = Number(val);
+        return isNaN(num) ? 0 : num;
+      };
+      
       dataContext = `
 
 યુઝરનો ભરેલો ડેટા (Personalized Analysis માટે):
-- Client: ${dataSummary.clientName}
-- કુલ પગાર (Gross Salary): ₹${dataSummary.grossSalary?.toLocaleString('en-IN') || 0}
-- કુલ કપાત (Total Deductions): ₹${dataSummary.totalDeductions?.toLocaleString('en-IN') || 0}
-- ચોખ્ખો પગાર (Net Salary): ₹${dataSummary.netSalary?.toLocaleString('en-IN') || 0}
-- GPF: ₹${dataSummary.gpf?.toLocaleString('en-IN') || 0}
-- CPF: ₹${dataSummary.cpf?.toLocaleString('en-IN') || 0}
-- LIC Premium: ₹${dataSummary.licPremium?.toLocaleString('en-IN') || 0}
-- PPF: ₹${dataSummary.ppf?.toLocaleString('en-IN') || 0}
-- Medical Insurance: ₹${dataSummary.medicalInsurance?.toLocaleString('en-IN') || 0}
-- Housing Loan: ₹${dataSummary.housingLoan?.toLocaleString('en-IN') || 0}
-- કુલ 80C: ₹${dataSummary.total80C?.toLocaleString('en-IN') || 0} (Maximum: ₹1,50,000)
-- Taxable Income: ₹${dataSummary.taxableIncome?.toLocaleString('en-IN') || 0}
-- Total Tax Payable: ₹${dataSummary.totalTaxPayable?.toLocaleString('en-IN') || 0}
-- Tax Paid: ₹${dataSummary.taxPaid?.toLocaleString('en-IN') || 0}
-- Balance Tax: ₹${dataSummary.balanceTax?.toLocaleString('en-IN') || 0}
+- Client: ${String(dataSummary.clientName || "Client").slice(0, 100)}
+- કુલ પગાર (Gross Salary): ₹${sanitizeNumber(dataSummary.grossSalary).toLocaleString('en-IN')}
+- કુલ કપાત (Total Deductions): ₹${sanitizeNumber(dataSummary.totalDeductions).toLocaleString('en-IN')}
+- ચોખ્ખો પગાર (Net Salary): ₹${sanitizeNumber(dataSummary.netSalary).toLocaleString('en-IN')}
+- GPF: ₹${sanitizeNumber(dataSummary.gpf).toLocaleString('en-IN')}
+- CPF: ₹${sanitizeNumber(dataSummary.cpf).toLocaleString('en-IN')}
+- LIC Premium: ₹${sanitizeNumber(dataSummary.licPremium).toLocaleString('en-IN')}
+- PPF: ₹${sanitizeNumber(dataSummary.ppf).toLocaleString('en-IN')}
+- Medical Insurance: ₹${sanitizeNumber(dataSummary.medicalInsurance).toLocaleString('en-IN')}
+- Housing Loan: ₹${sanitizeNumber(dataSummary.housingLoan).toLocaleString('en-IN')}
+- કુલ 80C: ₹${sanitizeNumber(dataSummary.total80C).toLocaleString('en-IN')} (Maximum: ₹1,50,000)
+- Taxable Income: ₹${sanitizeNumber(dataSummary.taxableIncome).toLocaleString('en-IN')}
+- Total Tax Payable: ₹${sanitizeNumber(dataSummary.totalTaxPayable).toLocaleString('en-IN')}
+- Tax Paid: ₹${sanitizeNumber(dataSummary.taxPaid).toLocaleString('en-IN')}
+- Balance Tax: ₹${sanitizeNumber(dataSummary.balanceTax).toLocaleString('en-IN')}
 
 આ ડેટા જોઈને personalized tax saving suggestions આપો. જેમ કે:
 - 80C limit પૂરી થઈ છે કે નહીં?
@@ -132,8 +229,12 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+      console.error("LOVABLE_API_KEY is not configured");
+      throw new Error("AI service not configured");
     }
+
+    // ==================== AI API CALL ====================
+    console.log("Making AI request for user:", user.id, "form:", activeForm || "general");
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
