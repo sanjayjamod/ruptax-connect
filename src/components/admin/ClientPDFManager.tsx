@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Download, Trash2, Search, FileText, Loader2, RefreshCw } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -26,9 +27,12 @@ const ClientPDFManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
   const loadPDFs = async () => {
     setIsLoading(true);
+    setSelectedIds(new Set());
     try {
       const data = await getAllPDFs();
       setPdfs(data as ClientPDF[]);
@@ -56,7 +60,26 @@ const ClientPDFManager = () => {
     } else {
       setFilteredPdfs(pdfs);
     }
+    setSelectedIds(new Set());
   }, [searchTerm, pdfs]);
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(new Set(filteredPdfs.map(pdf => pdf.id)));
+    } else {
+      setSelectedIds(new Set());
+    }
+  };
+
+  const handleSelectOne = (id: string, checked: boolean) => {
+    const newSet = new Set(selectedIds);
+    if (checked) {
+      newSet.add(id);
+    } else {
+      newSet.delete(id);
+    }
+    setSelectedIds(newSet);
+  };
 
   const handleDownload = (pdf: ClientPDF) => {
     window.open(pdf.file_url, '_blank');
@@ -80,6 +103,43 @@ const ClientPDFManager = () => {
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    
+    setIsBulkDeleting(true);
+    const selectedPdfs = filteredPdfs.filter(pdf => selectedIds.has(pdf.id));
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const pdf of selectedPdfs) {
+      try {
+        const success = await deletePDF(pdf.id, pdf.file_path);
+        if (success) {
+          successCount++;
+        } else {
+          failCount++;
+        }
+      } catch (error) {
+        console.error("Bulk delete error:", error);
+        failCount++;
+      }
+    }
+
+    setPdfs(prev => prev.filter(p => !selectedIds.has(p.id)));
+    setSelectedIds(new Set());
+    setIsBulkDeleting(false);
+
+    if (failCount === 0) {
+      toast({ title: "Deleted", description: `${successCount} PDFs deleted successfully` });
+    } else {
+      toast({ 
+        title: "Partial Success", 
+        description: `${successCount} deleted, ${failCount} failed`, 
+        variant: "destructive" 
+      });
+    }
+  };
+
   const formatFileSize = (bytes: number | null) => {
     if (!bytes) return '-';
     if (bytes < 1024) return `${bytes} B`;
@@ -97,6 +157,9 @@ const ClientPDFManager = () => {
     });
   };
 
+  const isAllSelected = filteredPdfs.length > 0 && selectedIds.size === filteredPdfs.length;
+  const isSomeSelected = selectedIds.size > 0 && selectedIds.size < filteredPdfs.length;
+
   return (
     <Card>
       <CardHeader>
@@ -106,6 +169,35 @@ const ClientPDFManager = () => {
             Client PDFs / ક્લાયન્ટ PDF
           </CardTitle>
           <div className="flex items-center gap-2">
+            {selectedIds.size > 0 && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="sm" disabled={isBulkDeleting}>
+                    {isBulkDeleting ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                    ) : (
+                      <Trash2 className="h-4 w-4 mr-1" />
+                    )}
+                    Delete {selectedIds.size} Selected
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete {selectedIds.size} PDFs?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will permanently delete {selectedIds.size} selected PDFs.
+                      This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleBulkDelete}>
+                      Delete All
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
             <div className="relative flex-1 md:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -137,6 +229,15 @@ const ClientPDFManager = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-12">
+                    <Checkbox 
+                      checked={isAllSelected}
+                      ref={(el) => {
+                        if (el) (el as any).indeterminate = isSomeSelected;
+                      }}
+                      onCheckedChange={handleSelectAll}
+                    />
+                  </TableHead>
                   <TableHead>Client ID</TableHead>
                   <TableHead>Client Name / નામ</TableHead>
                   <TableHead>Financial Year</TableHead>
@@ -147,7 +248,13 @@ const ClientPDFManager = () => {
               </TableHeader>
               <TableBody>
                 {filteredPdfs.map((pdf) => (
-                  <TableRow key={pdf.id}>
+                  <TableRow key={pdf.id} className={selectedIds.has(pdf.id) ? "bg-muted/50" : ""}>
+                    <TableCell>
+                      <Checkbox 
+                        checked={selectedIds.has(pdf.id)}
+                        onCheckedChange={(checked) => handleSelectOne(pdf.id, checked as boolean)}
+                      />
+                    </TableCell>
                     <TableCell>
                       <Badge variant="outline">{pdf.client_id}</Badge>
                     </TableCell>
@@ -210,6 +317,9 @@ const ClientPDFManager = () => {
         
         {filteredPdfs.length > 0 && (
           <div className="mt-4 text-sm text-muted-foreground">
+            {selectedIds.size > 0 ? (
+              <span className="font-medium text-primary">{selectedIds.size} selected • </span>
+            ) : null}
             Showing {filteredPdfs.length} of {pdfs.length} PDFs
           </div>
         )}
