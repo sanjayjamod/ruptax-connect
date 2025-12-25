@@ -93,10 +93,14 @@
     padding: 0 !important;
   }
 
-  /* Print area container - NO extra spacing, remove hidden class effects */
-  .print-area,
-  .hidden.print-area,
-  .hidden.print\:block.print-area {
+  /* Print wrapper - no spacing */
+  .print-wrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Print area container - Screen: hidden, Print: visible */
+  .print-area-container {
     display: block !important;
     visibility: visible !important;
     margin: 0 !important;
@@ -107,15 +111,8 @@
     overflow: visible !important;
   }
 
-  /* Show print area */
-  .print\:block,
-  .hidden.print\:block {
-    display: block !important;
-    visibility: visible !important;
-  }
-
   /* Force first form to start at top - no blank page */
-  .print-area > *:first-child {
+  .print-area-container > *:first-child {
     page-break-before: avoid !important;
     break-before: avoid !important;
     margin-top: 0 !important;
@@ -855,5 +852,18 @@
   .text-edit-mode [contenteditable="true"]:focus {
     background-color: transparent !important;
     outline: none !important;
+  }
+}
+
+/* Screen styles - Hide print area on screen */
+@media screen {
+  .print-area-container {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    left: -9999px !important;
   }
 }

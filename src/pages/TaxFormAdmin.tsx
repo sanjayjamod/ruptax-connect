@@ -501,23 +501,23 @@ const TaxFormAdmin = () => {
   };
 
   return (
-    <>
-      {/* Text Edit Mode Floating Indicator */}
-      {isTextEditMode && (
-        <div className="text-edit-active-indicator no-print">
-          <Type className="h-4 w-4 inline mr-1" /> Text Edit Mode ON
-        </div>
-      )}
-
-      {/* Print Area - All Forms for A4 Print - Outside main for clean printing */}
+    <div className="print-wrapper">
+      {/* Print Area - All Forms for A4 Print - FIRST for proper print order */}
       {client && formData && (
-        <div className="hidden print:block print-area" ref={printRef}>
+        <div className="print-area-container" ref={printRef}>
           <PagarForm client={client} formData={formData} onChange={setFormData} readOnly />
           <DeclarationForm client={client} formData={formData} onChange={setFormData} readOnly />
           <AavakVeraFormA client={client} formData={formData} onChange={setFormData} readOnly />
           <AavakVeraFormB client={client} formData={formData} onChange={setFormData} readOnly />
           <Form16A client={client} formData={formData} onChange={setFormData} readOnly />
           <Form16B client={client} formData={formData} onChange={setFormData} readOnly />
+        </div>
+      )}
+
+      {/* Text Edit Mode Floating Indicator */}
+      {isTextEditMode && (
+        <div className="text-edit-active-indicator no-print">
+          <Type className="h-4 w-4 inline mr-1" /> Text Edit Mode ON
         </div>
       )}
 
@@ -1013,7 +1013,7 @@ const TaxFormAdmin = () => {
       <SideCalculator />
       <TaxChatbot formData={formData} />
     </div>
-    </>
+    </div>
   );
 };
 
