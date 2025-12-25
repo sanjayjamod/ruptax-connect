@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, Edit, Trash2, FileText, Key, StickyNote } from "lucide-react";
+import { Search, Edit, Trash2, FileText, Key, StickyNote, CheckCircle } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -92,13 +92,14 @@ const ClientList = ({
               <TableHead className="font-semibold">PAN</TableHead>
               <TableHead className="font-semibold">School</TableHead>
               <TableHead className="font-semibold">Status</TableHead>
+              <TableHead className="font-semibold">Completed Date</TableHead>
               <TableHead className="font-semibold text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {clients.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                   No clients found. Add a new client to get started.
                 </TableCell>
               </TableRow>
@@ -120,6 +121,20 @@ const ClientList = ({
                   <TableCell className="font-mono">{client.panNo}</TableCell>
                   <TableCell className="max-w-[200px] truncate">{client.schoolName}</TableCell>
                   <TableCell>{getStatusBadge(client.formStatus)}</TableCell>
+                  <TableCell>
+                    {client.completedAt ? (
+                      <span className="flex items-center gap-1 text-xs text-green-600">
+                        <CheckCircle className="h-3 w-3" />
+                        {new Date(client.completedAt).toLocaleDateString('en-IN', { 
+                          day: '2-digit', 
+                          month: 'short', 
+                          year: 'numeric' 
+                        })}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">-</span>
+                    )}
+                  </TableCell>
                   <TableCell>
                     <div className="flex items-center justify-end gap-1 flex-wrap">
                       <Button
