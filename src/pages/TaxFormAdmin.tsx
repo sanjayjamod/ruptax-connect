@@ -569,202 +569,173 @@ const TaxFormAdmin = () => {
         </div>
       )}
 
-      <div className="flex min-h-screen flex-col bg-background screen-only">
-        <Header />
-        
-        {/* Sticky Toolbar Header */}
-        {client && (
-          <div className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b shadow-sm no-print">
-            <div className="container mx-auto px-4 py-2">
-              <div className="flex flex-wrap items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => navigate("/admin-dashboard")}>
-                  <ArrowLeft className="h-4 w-4 mr-1" /> Back
-                </Button>
-                
-                <div className="flex items-center gap-2">
-                  <Input
-                    placeholder="Client ID"
-                    value={clientId}
-                    onChange={(e) => setClientId(e.target.value)}
-                    className="w-28 h-8"
-                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  />
-                  <Button onClick={handleSearch} size="sm">
-                    <Search className="h-4 w-4 mr-1" /> Load
-                  </Button>
-                </div>
+      <div className="flex min-h-screen bg-background screen-only">
+        {/* Left Sidebar */}
+        <aside className="w-56 shrink-0 border-r bg-card flex flex-col no-print sticky top-0 h-screen overflow-y-auto">
+          {/* Logo Header */}
+          <div className="p-3 border-b">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-primary-foreground font-bold text-sm">R</div>
+              <div>
+                <p className="font-bold text-sm">RupTax</p>
+                <p className="text-xs text-muted-foreground">Tax Form</p>
+              </div>
+            </div>
+          </div>
 
-                <div className="h-6 w-px bg-border" />
+          {/* Search Section */}
+          <div className="p-3 border-b space-y-2">
+            <Input
+              placeholder="Client ID"
+              value={clientId}
+              onChange={(e) => setClientId(e.target.value)}
+              className="h-8 text-sm"
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            />
+            <Button onClick={handleSearch} size="sm" className="w-full">
+              <Search className="h-4 w-4 mr-1" /> Load Client
+            </Button>
+          </div>
 
-                <Button onClick={handleLoadSampleData} variant="secondary" size="sm" title="Load sample data">
-                  <Database className="h-4 w-4 mr-1" /> Sample
+          {client && (
+            <>
+              {/* Client Info */}
+              <div className="p-3 border-b bg-muted/50">
+                <p className="font-medium text-sm truncate">{client.name}</p>
+                <p className="text-xs text-muted-foreground">ID: {client.id}</p>
+                <p className="text-xs text-muted-foreground">PAN: {client.panNo || '-'}</p>
+              </div>
+
+              {/* Actions */}
+              <div className="flex-1 p-2 space-y-1">
+                <p className="text-xs font-medium text-muted-foreground px-2 py-1">DATA</p>
+                <Button onClick={handleLoadSampleData} variant="ghost" size="sm" className="w-full justify-start">
+                  <Database className="h-4 w-4 mr-2" /> Sample Data
                 </Button>
                 <Button
                   onClick={() => setAutoCalcEnabled(!autoCalcEnabled)} 
-                  variant={autoCalcEnabled ? "default" : "outline"} 
+                  variant={autoCalcEnabled ? "secondary" : "ghost"} 
                   size="sm"
-                  title={autoCalcEnabled ? "Auto-calc ON" : "Auto-calc OFF"}
+                  className="w-full justify-start"
                 >
-                  <RefreshCw className={`h-4 w-4 mr-1 ${autoCalcEnabled ? 'animate-spin' : ''}`} /> 
-                  Auto
+                  <RefreshCw className={`h-4 w-4 mr-2 ${autoCalcEnabled ? 'animate-spin' : ''}`} /> 
+                  Auto {autoCalcEnabled ? "ON" : "OFF"}
                 </Button>
                 <Button
                   onClick={() => setIsManualMode(!isManualMode)} 
-                  variant={isManualMode ? "secondary" : "outline"} 
+                  variant={isManualMode ? "secondary" : "ghost"} 
                   size="sm"
-                  className={isManualMode ? "bg-yellow-500/20 border-yellow-500 text-yellow-700" : ""}
+                  className={`w-full justify-start ${isManualMode ? "bg-yellow-500/20 text-yellow-700" : ""}`}
                 >
-                  {isManualMode ? "Manual ON" : "Manual OFF"}
+                  <Edit2 className="h-4 w-4 mr-2" />
+                  Manual {isManualMode ? "ON" : "OFF"}
                 </Button>
 
-                <div className="h-6 w-px bg-border" />
-
-                <Button 
-                  onClick={handleResetData} 
-                  variant="destructive" 
-                  size="sm"
-                >
-                  <RotateCcw className="h-4 w-4 mr-1" /> Reset
+                <p className="text-xs font-medium text-muted-foreground px-2 py-1 mt-3">ACTIONS</p>
+                <Button onClick={handleResetData} variant="ghost" size="sm" className="w-full justify-start text-destructive hover:text-destructive">
+                  <RotateCcw className="h-4 w-4 mr-2" /> Reset
                 </Button>
-                <Button onClick={handleSave} size="sm">
-                  <Save className="h-4 w-4 mr-1" /> Save
+                <Button onClick={handleSave} variant="ghost" size="sm" className="w-full justify-start">
+                  <Save className="h-4 w-4 mr-2" /> Save
                 </Button>
 
-                <div className="h-6 w-px bg-border" />
-
+                <p className="text-xs font-medium text-muted-foreground px-2 py-1 mt-3">PRINT & EXPORT</p>
                 <PrintSettings client={client} formData={formData} onChange={handleFormChange} />
-                <Button onClick={() => handlePrint()} variant="outline" size="sm">
-                  <Printer className="h-4 w-4 mr-1" /> Print All
+                <Button onClick={() => handlePrint()} variant="ghost" size="sm" className="w-full justify-start">
+                  <Printer className="h-4 w-4 mr-2" /> Print All
                 </Button>
                 <Button 
                   onClick={handleGeneratePDF} 
-                  variant="default" 
+                  variant="ghost" 
                   size="sm"
                   disabled={isGeneratingPDF}
-                  className="bg-green-600 hover:bg-green-700"
+                  className="w-full justify-start"
                 >
                   {isGeneratingPDF ? (
-                    <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   ) : (
-                    <FileDown className="h-4 w-4 mr-1" />
+                    <FileDown className="h-4 w-4 mr-2" />
                   )}
                   PDF
                 </Button>
 
-                <div className="h-6 w-px bg-border" />
-
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={isTextEditMode ? "default" : "outline"}
-                      size="sm"
-                      className={isTextEditMode ? "bg-purple-600 hover:bg-purple-700" : ""}
-                    >
-                      <Type className="h-4 w-4 mr-1" />
-                      Text Edit
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-72 p-4" side="bottom">
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium text-sm">Text Edit Mode</span>
-                        <Button
-                          variant={isTextEditMode ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setIsTextEditMode(!isTextEditMode)}
-                        >
-                          {isTextEditMode ? "ON" : "OFF"}
-                        </Button>
-                      </div>
-
-                      <div className="pt-2 border-t space-y-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={resetAllFontSizes}
-                          className="w-full"
-                        >
-                          <RotateCcw className="h-3 w-3 mr-1" /> Reset All Sizes
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            resetAllTextEdits();
-                            toast({ title: "Reset", description: "All text edits reset to default" });
-                            window.location.reload();
-                          }}
-                          className="w-full"
-                        >
-                          <RotateCcw className="h-3 w-3 mr-1" /> Reset All Text
-                        </Button>
-                      </div>
-
-                      {isTextEditMode && (
-                        <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
-                          <p className="font-medium mb-1">Edit Mode Tips:</p>
-                          <ul className="list-disc list-inside space-y-1">
-                            <li>Use slider below each form to change font size</li>
-                            <li>Click any text to edit directly</li>
-                            <li>Changes are saved automatically</li>
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                <p className="text-xs font-medium text-muted-foreground px-2 py-1 mt-3">SHARE</p>
                 <WhatsAppShare client={client} onSharePDF={handleExportPDF} />
                 <EmailShare client={client} formData={formData} />
 
+                <p className="text-xs font-medium text-muted-foreground px-2 py-1 mt-3">TOOLS</p>
+                <Button
+                  onClick={() => setIsTextEditMode(!isTextEditMode)}
+                  variant={isTextEditMode ? "secondary" : "ghost"}
+                  size="sm"
+                  className={`w-full justify-start ${isTextEditMode ? "bg-purple-600/20 text-purple-700" : ""}`}
+                >
+                  <Type className="h-4 w-4 mr-2" />
+                  Text Edit {isTextEditMode ? "ON" : "OFF"}
+                </Button>
+                {isTextEditMode && (
+                  <div className="pl-6 space-y-1">
+                    <Button variant="ghost" size="sm" onClick={resetAllFontSizes} className="w-full justify-start text-xs">
+                      <RotateCcw className="h-3 w-3 mr-1" /> Reset Sizes
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => {
+                      resetAllTextEdits();
+                      toast({ title: "Reset", description: "All text edits reset" });
+                      window.location.reload();
+                    }} className="w-full justify-start text-xs">
+                      <RotateCcw className="h-3 w-3 mr-1" /> Reset Text
+                    </Button>
+                  </div>
+                )}
                 <Button
                   onClick={() => setShowTemplates(!showTemplates)} 
                   variant="ghost" 
                   size="sm"
-                  title={showTemplates ? "Hide Templates" : "Show Templates"}
+                  className="w-full justify-start"
                 >
-                  {showTemplates ? <PanelRightClose className="h-4 w-4" /> : <PanelRightOpen className="h-4 w-4" />}
+                  {showTemplates ? <PanelRightClose className="h-4 w-4 mr-2" /> : <PanelRightOpen className="h-4 w-4 mr-2" />}
+                  {showTemplates ? "Hide Templates" : "Show Templates"}
                 </Button>
               </div>
-            </div>
-          </div>
-        )}
-        
-        <main className="flex-1 py-4">
-          <div className="container mx-auto px-4">
-          {/* Top Bar - Only show when no client loaded */}
-          {!client && (
-            <div className="mb-4 flex flex-wrap items-center gap-3 no-print">
-              <Button variant="outline" size="sm" onClick={() => navigate("/admin-dashboard")}>
-                <ArrowLeft className="h-4 w-4 mr-1" /> Back
-              </Button>
-              
-              <div className="flex items-center gap-2">
-                <Input
-                  placeholder="Client ID (e.g., 202601)"
-                  value={clientId}
-                  onChange={(e) => setClientId(e.target.value)}
-                  className="w-40"
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                />
-                <Button onClick={handleSearch} size="sm">
-                  <Search className="h-4 w-4 mr-1" /> Load
-                </Button>
-              </div>
-            </div>
+            </>
           )}
 
-          {/* Client Info */}
-          {client && (
-            <div className="mb-4 p-3 bg-muted rounded-lg no-print">
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-sm">
-                <div><strong>ID:</strong> {client.id}</div>
-                <div><strong>Name:</strong> {client.name}</div>
-                <div><strong>PAN:</strong> {client.panNo || '-'}</div>
-                <div><strong>Mobile:</strong> {client.mobileNo}</div>
-                <div><strong>School:</strong> {client.schoolName || '-'}</div>
+          {/* Back Button */}
+          <div className="p-2 border-t mt-auto">
+            <Button variant="outline" size="sm" onClick={() => navigate("/admin-dashboard")} className="w-full">
+              <ArrowLeft className="h-4 w-4 mr-1" /> Back to Dashboard
+            </Button>
+          </div>
+        </aside>
+
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col min-h-screen">
+          <Header />
+          
+          <main className="flex-1 py-4">
+            <div className="container mx-auto px-4">
+            {/* No client message */}
+            {!client && (
+              <div className="flex items-center justify-center h-[60vh]">
+                <div className="text-center text-muted-foreground">
+                  <FileText className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                  <p className="text-lg">Enter Client ID in sidebar to load form</p>
+                  <p className="text-sm">Client ID enter करो form load करने के लिए</p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+
+            {/* Client Info Bar */}
+            {client && (
+              <div className="mb-4 p-2 bg-muted rounded-lg no-print">
+                <div className="flex flex-wrap items-center gap-4 text-sm">
+                  <span><strong>ID:</strong> {client.id}</span>
+                  <span><strong>Name:</strong> {client.name}</span>
+                  <span><strong>Mobile:</strong> {client.mobileNo}</span>
+                  <span><strong>School:</strong> {client.schoolName || '-'}</span>
+                </div>
+              </div>
+            )}
 
           {/* Main Content with Sidebar */}
           <div className="flex gap-4">
@@ -783,7 +754,7 @@ const TaxFormAdmin = () => {
                       <TabsTrigger value="form16b" className="text-xs">Form 16B</TabsTrigger>
                     </TabsList>
 
-                    <div className="border rounded-lg p-4 bg-white dark:bg-card overflow-auto max-h-[70vh]">
+                    <div className="border rounded-lg p-4 bg-white dark:bg-card overflow-auto max-h-[80vh]">
                       <TabsContent value="profile" className="mt-0">
                         <div className="space-y-4">
                           <div className="flex items-center justify-between border-b pb-2">
@@ -1028,12 +999,13 @@ const TaxFormAdmin = () => {
               </div>
             )}
           </div>
+          </div>
+        </main>
+        
+        <SideCalculator />
+        <TaxChatbot formData={formData} />
         </div>
-      </main>
-      
-      <SideCalculator />
-      <TaxChatbot formData={formData} />
-    </div>
+      </div>
     </>
   );
 };
