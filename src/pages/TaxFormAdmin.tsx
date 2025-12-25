@@ -11,6 +11,7 @@ import { getOrCreateTaxForm, saveTaxForm, calculateTax, getAllTaxForms } from "@
 import { getEmptyTaxFormData } from "@/types/taxForm";
 import { fillSampleDataForClient } from "@/lib/sampleTaxData";
 import { importTaxFormFromExcel } from "@/lib/taxFormExcelImport";
+import { exportWithTemplate, getActiveTemplate } from "@/lib/templateExport";
 import { Client, ClientFormData } from "@/types/client";
 import { TaxFormData } from "@/types/taxForm";
 import PagarForm from "@/components/taxforms/PagarForm";
@@ -19,7 +20,7 @@ import AavakVeraFormA from "@/components/taxforms/AavakVeraFormA";
 import AavakVeraFormB from "@/components/taxforms/AavakVeraFormB";
 import Form16A from "@/components/taxforms/Form16A";
 import Form16B from "@/components/taxforms/Form16B";
-import { Search, Printer, FileText, Save, ArrowLeft, Calculator, RefreshCw, Database, Loader2, PanelRightOpen, PanelRightClose, Upload, RotateCcw, Edit2, X, Check, Clock, Type } from "lucide-react";
+import { Search, Printer, FileText, Save, ArrowLeft, Calculator, RefreshCw, Database, Loader2, PanelRightOpen, PanelRightClose, Upload, RotateCcw, Edit2, X, Check, Clock, Type, FileSpreadsheet, Download } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import TaxChatbot from "@/components/TaxChatbot";
 import SideCalculator from "@/components/admin/SideCalculator";
@@ -57,6 +58,22 @@ const TaxFormAdmin = () => {
     const saved = localStorage.getItem(FONT_SIZE_STORAGE_KEY);
     return saved ? JSON.parse(saved) : {};
   });
+  const [availableTemplates, setAvailableTemplates] = useState<Record<string, boolean>>({});
+  const [isExporting, setIsExporting] = useState(false);
+
+  // Check available templates
+  useEffect(() => {
+    const checkTemplates = async () => {
+      const formTypes = ['pagar', 'declaration', 'aavak-vera-a', 'aavak-vera-b', 'form-16a', 'form-16b'];
+      const templates: Record<string, boolean> = {};
+      for (const formType of formTypes) {
+        const template = await getActiveTemplate(formType);
+        templates[formType] = !!template;
+      }
+      setAvailableTemplates(templates);
+    };
+    checkTemplates();
+  }, []);
 
   // Save font sizes to localStorage
   useEffect(() => {
@@ -71,6 +88,29 @@ const TaxFormAdmin = () => {
     setFormFontSizes({});
     localStorage.removeItem(FONT_SIZE_STORAGE_KEY);
     toast({ title: "Reset", description: "All font sizes reset to default" });
+  };
+
+  // Export with uploaded template
+  const handleExportWithTemplate = async (formType: string) => {
+    if (!client || !formData) {
+      toast({ title: "Error", description: "Please load client data first", variant: "destructive" });
+      return;
+    }
+
+    setIsExporting(true);
+    try {
+      const success = await exportWithTemplate(formType, client, formData);
+      if (success) {
+        toast({ title: "Exported", description: `${formType} exported with template` });
+      } else {
+        toast({ title: "No Template", description: "No template found. Using default export.", variant: "destructive" });
+      }
+    } catch (error) {
+      console.error("Export error:", error);
+      toast({ title: "Export Failed", description: "Failed to export with template", variant: "destructive" });
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   // Check admin authentication via Supabase
@@ -625,7 +665,62 @@ const TaxFormAdmin = () => {
                 </Popover>
                 <WhatsAppShare client={client} onSharePDF={handleExportPDF} />
                 <EmailShare client={client} formData={formData} />
-                <Button 
+                
+                {/* Template Export Button */}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      disabled={isExporting}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      {isExporting ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Download className="h-4 w-4 mr-1" />}
+                      Export Template
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-64 p-3" side="bottom">
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium mb-2">Export with Template:</p>
+                      {[
+                        { id: 'pagar', name: 'પગાર ફોર્મ' },
+                        { id: 'declaration', name: 'ડેકલેરેશન' },
+                        { id: 'aavak-vera-a', name: 'આવકવેરા A' },
+                        { id: 'aavak-vera-b', name: 'આવકવેરા B' },
+                        { id: 'form-16a', name: 'Form 16A' },
+                        { id: 'form-16b', name: 'Form 16B' },
+                      ].map((form) => (
+                        <Button
+                          key={form.id}
+                          variant={availableTemplates[form.id] ? "default" : "outline"}
+                          size="sm"
+                          className="w-full justify-between"
+                          onClick={() => handleExportWithTemplate(form.id)}
+                          disabled={!availableTemplates[form.id] || isExporting}
+                        >
+                          <span>{form.name}</span>
+                          {availableTemplates[form.id] ? (
+                            <FileSpreadsheet className="h-4 w-4 text-green-500" />
+                          ) : (
+                            <span className="text-xs text-muted-foreground">No Template</span>
+                          )}
+                        </Button>
+                      ))}
+                      <div className="pt-2 border-t">
+                        <Button
+                          variant="link"
+                          size="sm"
+                          className="w-full text-xs"
+                          onClick={() => navigate('/template-management')}
+                        >
+                          Manage Templates →
+                        </Button>
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+
+                <Button
                   onClick={() => setShowTemplates(!showTemplates)} 
                   variant="ghost" 
                   size="sm"
