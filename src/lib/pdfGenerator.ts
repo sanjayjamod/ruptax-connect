@@ -18,19 +18,159 @@ const FORM_IDS = [
   'form-16b'
 ];
 
+// Apply print-like styles to clone for PDF generation
+const applyPrintStyles = (clone: HTMLElement): void => {
+  // Style each form based on its type
+  FORM_IDS.forEach((formId, index) => {
+    const form = clone.querySelector(`#${formId}`) as HTMLElement;
+    if (!form) return;
+
+    const isPagar = formId === 'pagar-form';
+    const isLast = index === FORM_IDS.length - 1;
+    
+    // Base form styles
+    form.style.display = 'block';
+    form.style.visibility = 'visible';
+    form.style.background = 'white';
+    form.style.color = 'black';
+    form.style.margin = '0';
+    form.style.boxSizing = 'border-box';
+    form.style.overflow = 'hidden';
+    form.style.position = 'relative';
+    form.style.pageBreakAfter = isLast ? 'avoid' : 'always';
+    form.style.pageBreakInside = 'avoid';
+
+    if (isPagar) {
+      // Pagar - Landscape A4
+      form.style.width = '287mm';
+      form.style.minWidth = '287mm';
+      form.style.height = '198mm';
+      form.style.maxHeight = '198mm';
+      form.style.padding = '2mm';
+      form.style.fontSize = '10pt';
+    } else if (formId === 'aavak-vera-form-a' || formId === 'aavak-vera-form-b') {
+      // Aavak Vera forms - Portrait A4
+      form.style.width = '198mm';
+      form.style.maxWidth = '198mm';
+      form.style.height = 'auto';
+      form.style.maxHeight = '280mm';
+      form.style.padding = '3mm';
+      form.style.fontSize = formId === 'aavak-vera-form-a' ? '8pt' : '7.5pt';
+    } else {
+      // Declaration, Form 16A, Form 16B - Portrait A4
+      form.style.width = '198mm';
+      form.style.maxWidth = '198mm';
+      form.style.height = 'auto';
+      form.style.maxHeight = '282mm';
+      form.style.padding = '2mm';
+      form.style.fontSize = formId === 'declaration-form' ? '11pt' : '7.5pt';
+    }
+
+    // Style tables within this form
+    const tables = form.querySelectorAll('table');
+    tables.forEach((table) => {
+      const tableEl = table as HTMLElement;
+      tableEl.style.width = '100%';
+      tableEl.style.borderCollapse = 'collapse';
+      tableEl.style.marginBottom = isPagar ? '0.5mm' : '1mm';
+      tableEl.style.background = 'white';
+      tableEl.style.border = '0.5pt solid black';
+      if (isPagar) {
+        tableEl.style.tableLayout = 'fixed';
+      }
+    });
+
+    // Style cells within this form
+    const cells = form.querySelectorAll('th, td');
+    cells.forEach((cell) => {
+      const cellEl = cell as HTMLElement;
+      const isHeader = cell.tagName === 'TH';
+      
+      cellEl.style.border = isPagar ? '0.3pt solid black' : '0.5pt solid black';
+      cellEl.style.color = 'black';
+      cellEl.style.background = isHeader ? '#e8e8e8' : 'white';
+      cellEl.style.verticalAlign = 'middle';
+      cellEl.style.fontWeight = isHeader ? 'bold' : 'normal';
+      cellEl.style.lineHeight = '1.2';
+      cellEl.style.overflow = 'hidden';
+      
+      if (isPagar) {
+        cellEl.style.fontSize = '10pt';
+        cellEl.style.padding = '0.3mm';
+        cellEl.style.whiteSpace = 'nowrap';
+      } else if (formId === 'aavak-vera-form-a') {
+        cellEl.style.fontSize = '11pt';
+        cellEl.style.padding = '0.8mm 1.2mm';
+      } else if (formId === 'aavak-vera-form-b') {
+        cellEl.style.fontSize = '7.5pt';
+        cellEl.style.padding = '0.8mm 1.2mm';
+      } else if (formId === 'declaration-form') {
+        cellEl.style.fontSize = '11pt';
+        cellEl.style.padding = '1mm 1.5mm';
+      } else {
+        cellEl.style.fontSize = '7.5pt';
+        cellEl.style.padding = '1mm 1.5mm';
+      }
+    });
+
+    // Style inputs/spans within this form
+    const inputs = form.querySelectorAll('input, span');
+    inputs.forEach((input) => {
+      const el = input as HTMLElement;
+      el.style.border = 'none';
+      el.style.background = 'transparent';
+      el.style.color = 'black';
+      if (isPagar) {
+        el.style.fontSize = '11pt';
+      }
+    });
+
+    // Handle Aavak Vera A title - 18pt
+    if (formId === 'aavak-vera-form-a') {
+      const firstTable = form.querySelector('table:first-of-type');
+      if (firstTable) {
+        const titleCell = firstTable.querySelector('td');
+        if (titleCell) {
+          (titleCell as HTMLElement).style.fontSize = '18pt';
+          (titleCell as HTMLElement).style.fontWeight = 'bold';
+          (titleCell as HTMLElement).style.padding = '2mm';
+        }
+      }
+    }
+  });
+
+  // Convert all inputs to spans with their values
+  const allInputs = clone.querySelectorAll('input');
+  allInputs.forEach((input) => {
+    const inputEl = input as HTMLInputElement;
+    const span = document.createElement('span');
+    span.textContent = inputEl.value || '';
+    span.style.color = 'black';
+    span.style.fontSize = 'inherit';
+    span.style.fontFamily = 'inherit';
+    span.style.border = 'none';
+    span.style.background = 'transparent';
+    if (inputEl.parentNode) {
+      inputEl.parentNode.replaceChild(span, inputEl);
+    }
+  });
+
+  // Hide screen-only elements
+  const hideElements = clone.querySelectorAll('.screen-only, .no-print, button');
+  hideElements.forEach((el) => {
+    (el as HTMLElement).style.display = 'none';
+  });
+};
+
 // Create a print-styled clone for PDF generation
 const createPrintStyledClone = (printElement: HTMLElement): HTMLElement => {
-  console.log('Creating PDF clone from element:', printElement);
-  console.log('Original element innerHTML length:', printElement.innerHTML.length);
-  console.log('Original element children count:', printElement.children.length);
-  
   const clone = printElement.cloneNode(true) as HTMLElement;
   
   // Remove classes that hide content
   clone.classList.remove('print-only-area');
   clone.id = 'pdf-capture-container';
   
-  // Main container styles - make it visible
+  // Main container styles
   clone.style.position = 'absolute';
   clone.style.left = '0';
   clone.style.top = '0';
@@ -43,89 +183,8 @@ const createPrintStyledClone = (printElement: HTMLElement): HTMLElement => {
   clone.style.margin = '0';
   clone.style.opacity = '1';
 
-  // Get all form containers by their specific IDs
-  const forms: HTMLElement[] = [];
-  FORM_IDS.forEach(id => {
-    const form = clone.querySelector(`#${id}`) as HTMLElement;
-    if (form) forms.push(form);
-  });
-  console.log('Found forms in clone:', forms.length);
-  
-  forms.forEach((form, index) => {
-    const formEl = form as HTMLElement;
-    const isPagarForm = formEl.id === 'pagar-form';
-    console.log(`Form ${index}: ${formEl.id}, isPagar: ${isPagarForm}`);
-    
-    // Make form visible
-    formEl.style.display = 'block';
-    formEl.style.visibility = 'visible';
-    formEl.style.background = 'white';
-    formEl.style.color = 'black';
-    formEl.style.margin = '0';
-    formEl.style.padding = isPagarForm ? '3mm' : '5mm';
-    formEl.style.boxSizing = 'border-box';
-    formEl.style.pageBreakAfter = index < forms.length - 1 ? 'always' : 'avoid';
-    formEl.style.pageBreakInside = 'avoid';
-    formEl.style.overflow = 'visible';
-    formEl.style.width = isPagarForm ? '287mm' : '200mm';
-    formEl.style.minHeight = isPagarForm ? '200mm' : '280mm';
-    formEl.style.fontFamily = 'Arial, sans-serif';
-    formEl.style.fontSize = isPagarForm ? '9pt' : '10pt';
-    formEl.style.position = 'relative';
-  });
-
-  // Style all tables
-  const tables = clone.querySelectorAll('table');
-  console.log('Found tables:', tables.length);
-  tables.forEach((table) => {
-    const tableEl = table as HTMLElement;
-    tableEl.style.width = '100%';
-    tableEl.style.borderCollapse = 'collapse';
-    tableEl.style.marginBottom = '2mm';
-    tableEl.style.background = 'white';
-    tableEl.style.display = 'table';
-    tableEl.style.visibility = 'visible';
-  });
-
-  // Style all table cells
-  const cells = clone.querySelectorAll('th, td');
-  console.log('Found cells:', cells.length);
-  cells.forEach((cell) => {
-    const cellEl = cell as HTMLElement;
-    const isHeader = cell.tagName === 'TH';
-    cellEl.style.border = '0.5pt solid black';
-    cellEl.style.padding = '1mm 1.5mm';
-    cellEl.style.fontSize = '9pt';
-    cellEl.style.color = 'black';
-    cellEl.style.background = isHeader ? '#e8e8e8' : 'white';
-    cellEl.style.verticalAlign = 'middle';
-    cellEl.style.fontWeight = isHeader ? 'bold' : 'normal';
-    cellEl.style.visibility = 'visible';
-    cellEl.style.display = 'table-cell';
-  });
-
-  // Convert inputs to spans with their values
-  const inputs = clone.querySelectorAll('input');
-  console.log('Found inputs to convert:', inputs.length);
-  inputs.forEach((input) => {
-    const inputEl = input as HTMLInputElement;
-    const span = document.createElement('span');
-    span.textContent = inputEl.value || '';
-    span.style.color = 'black';
-    span.style.fontSize = 'inherit';
-    span.style.fontFamily = 'inherit';
-    if (inputEl.parentNode) {
-      inputEl.parentNode.replaceChild(span, inputEl);
-    }
-  });
-
-  // Hide screen-only elements
-  const hideElements = clone.querySelectorAll('.screen-only, .no-print, button');
-  hideElements.forEach((el) => {
-    (el as HTMLElement).style.display = 'none';
-  });
-
-  console.log('Clone prepared, innerHTML length:', clone.innerHTML.length);
+  // Apply all print styles
+  applyPrintStyles(clone);
   
   return clone;
 };
@@ -139,11 +198,11 @@ export const downloadPDF = async (
   const clone = createPrintStyledClone(printElement);
   document.body.appendChild(clone);
   
-  // Wait for DOM to render
-  await new Promise(resolve => setTimeout(resolve, 300));
+  await new Promise(resolve => setTimeout(resolve, 500));
 
   const filename = `${clientName}_TaxForms_${financialYear}.pdf`;
   
+  // Generate all forms with proper page breaks
   const options = {
     margin: [5, 5, 5, 5],
     filename: filename,
@@ -154,9 +213,7 @@ export const downloadPDF = async (
       letterRendering: true,
       logging: false,
       backgroundColor: '#ffffff',
-      windowWidth: 794,
-      scrollX: 0,
-      scrollY: 0
+      windowWidth: 1123, // Use landscape width to capture pagar properly
     },
     jsPDF: { 
       unit: 'mm', 
@@ -164,9 +221,8 @@ export const downloadPDF = async (
       orientation: 'portrait' as const
     },
     pagebreak: { 
-      mode: ['avoid-all', 'css', 'legacy'],
-      before: '.page-break',
-      after: '[id$="-form"]:not(:last-child)'
+      mode: ['css', 'legacy'],
+      after: ['#pagar-form', '#declaration-form', '#aavak-vera-form-a', '#aavak-vera-form-b', '#form-16a']
     }
   };
 
@@ -192,8 +248,9 @@ export const generateAndSavePDF = async (
     const clone = createPrintStyledClone(printElement);
     document.body.appendChild(clone);
     
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise(resolve => setTimeout(resolve, 500));
 
+    // Generate all forms with proper page breaks
     const options = {
       margin: [5, 5, 5, 5],
       filename: `${clientName}_TaxForms_${financialYear}.pdf`,
@@ -204,9 +261,7 @@ export const generateAndSavePDF = async (
         letterRendering: true,
         logging: false,
         backgroundColor: '#ffffff',
-        windowWidth: 794,
-        scrollX: 0,
-        scrollY: 0
+        windowWidth: 1123, // Use landscape width for pagar
       },
       jsPDF: { 
         unit: 'mm', 
@@ -214,9 +269,8 @@ export const generateAndSavePDF = async (
         orientation: 'portrait' as const
       },
       pagebreak: { 
-        mode: ['avoid-all', 'css', 'legacy'],
-        before: '.page-break',
-        after: '[id$="-form"]:not(:last-child)'
+        mode: ['css', 'legacy'],
+        after: ['#pagar-form', '#declaration-form', '#aavak-vera-form-a', '#aavak-vera-form-b', '#form-16a']
       }
     };
 
