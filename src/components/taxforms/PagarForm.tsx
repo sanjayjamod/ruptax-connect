@@ -405,19 +405,19 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
         </tbody>
       </table>
 
-      {/* Signature Section */}
-      <div className="flex justify-between mt-4 text-[10px]">
+      {/* Signature Section - More space from table */}
+      <div className="flex justify-between mt-12 text-[10px]">
         <div>
           <p>સ્થળ: {client.schoolNameGujarati || client.schoolName || '_____________'}</p>
           <p>તારીખ: _______________</p>
-          <p className="mt-6 border-t border-black pt-1">કર્મચારીની સહી</p>
+          <p className="mt-10 border-t border-black pt-1">કર્મચારીની સહી</p>
         </div>
         <div className="text-right">
-          <p className="mt-6 border-t border-black pt-1">આચાર્યની સહી</p>
+          <p className="mt-10 border-t border-black pt-1">આચાર્યની સહી</p>
         </div>
       </div>
 
-      <div className="form-footer text-center text-[8px] mt-4 pt-2 border-t border-dashed border-gray-400">
+      <div className="form-footer text-center text-[8px] mt-8 pt-2 border-t border-dashed border-gray-400">
         Developed by - Smart Computer - 9924640689 ,9574031243
       </div>
     </div>
