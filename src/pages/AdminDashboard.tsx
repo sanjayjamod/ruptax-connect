@@ -14,6 +14,7 @@ import ClientProfilesSection from "@/components/admin/ClientProfilesSection";
 import FilledFormsSection from "@/components/admin/FilledFormsSection";
 import TeachersSection from "@/components/admin/TeachersSection";
 import AdminSettings from "@/components/admin/AdminSettings";
+import ClientPDFManager from "@/components/admin/ClientPDFManager";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { Client, ClientFormData } from "@/types/client";
 import {
@@ -551,6 +552,13 @@ const AdminDashboard = () => {
               {activeSection === "teachers" && (
                 <div className="animate-fade-in">
                   <TeachersSection clients={clients} />
+                </div>
+              )}
+
+              {/* PDFs Section */}
+              {activeSection === "pdfs" && (
+                <div className="animate-fade-in">
+                  <ClientPDFManager />
                 </div>
               )}
 

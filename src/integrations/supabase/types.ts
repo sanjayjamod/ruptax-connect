@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      client_pdfs: {
+        Row: {
+          client_id: string
+          client_name: string
+          created_at: string
+          created_by: string | null
+          file_path: string
+          file_size: number | null
+          file_url: string
+          financial_year: string
+          id: string
+        }
+        Insert: {
+          client_id: string
+          client_name: string
+          created_at?: string
+          created_by?: string | null
+          file_path: string
+          file_size?: number | null
+          file_url: string
+          financial_year: string
+          id?: string
+        }
+        Update: {
+          client_id?: string
+          client_name?: string
+          created_at?: string
+          created_by?: string | null
+          file_path?: string
+          file_size?: number | null
+          file_url?: string
+          financial_year?: string
+          id?: string
+        }
+        Relationships: []
+      }
       clients: {
         Row: {
           aadhar_number: string | null

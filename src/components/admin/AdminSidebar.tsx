@@ -19,6 +19,7 @@ import {
   ClipboardList,
   Trash2,
   FileSpreadsheet,
+  FileDown,
 } from "lucide-react";
 import {
   Sidebar,
@@ -101,6 +102,11 @@ const AdminSidebar = ({
       title: "Filled Forms",
       icon: ClipboardList,
       section: "filled-forms",
+    },
+    {
+      title: "PDFs",
+      icon: FileDown,
+      section: "pdfs",
     },
     {
       title: "Templates",

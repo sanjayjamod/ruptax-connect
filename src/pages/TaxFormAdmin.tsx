@@ -20,7 +20,7 @@ import AavakVeraFormA from "@/components/taxforms/AavakVeraFormA";
 import AavakVeraFormB from "@/components/taxforms/AavakVeraFormB";
 import Form16A from "@/components/taxforms/Form16A";
 import Form16B from "@/components/taxforms/Form16B";
-import { Search, Printer, FileText, Save, ArrowLeft, Calculator, RefreshCw, Database, Loader2, PanelRightOpen, PanelRightClose, Upload, RotateCcw, Edit2, X, Check, Clock, Type, FileSpreadsheet, Download } from "lucide-react";
+import { Search, Printer, FileText, Save, ArrowLeft, Calculator, RefreshCw, Database, Loader2, PanelRightOpen, PanelRightClose, Upload, RotateCcw, Edit2, X, Check, Clock, Type, FileSpreadsheet, Download, FileDown } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import TaxChatbot from "@/components/TaxChatbot";
 import SideCalculator from "@/components/admin/SideCalculator";
@@ -30,6 +30,7 @@ import EmailShare from "@/components/admin/EmailShare";
 import PrintSettings from "@/components/admin/PrintSettings";
 import { useAuth } from "@/hooks/useAuth";
 import { resetAllTextEdits } from "@/components/taxforms/EditableLabel";
+import { generateAndSavePDF, downloadPDF } from "@/lib/pdfGenerator";
 
 // Text Edit Mode Storage
 const FONT_SIZE_STORAGE_KEY = "tax_form_font_sizes";
@@ -60,6 +61,7 @@ const TaxFormAdmin = () => {
   });
   const [availableTemplates, setAvailableTemplates] = useState<Record<string, boolean>>({});
   const [isExporting, setIsExporting] = useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   // Check available templates
   useEffect(() => {
@@ -500,6 +502,53 @@ const TaxFormAdmin = () => {
     }
   };
 
+  // Generate PDF and save to storage
+  const handleGeneratePDF = async () => {
+    if (!client || !formData || !printRef.current) {
+      toast({ title: "Error", description: "Please load client data first", variant: "destructive" });
+      return;
+    }
+
+    setIsGeneratingPDF(true);
+    try {
+      const financialYear = formData.salaryData?.financialYear || '2025-26';
+      
+      // First download the PDF
+      await downloadPDF(printRef.current, client.name, financialYear);
+      
+      // Then save to storage
+      const result = await generateAndSavePDF(
+        printRef.current,
+        client.id,
+        client.name,
+        financialYear,
+        user?.id
+      );
+
+      if (result.success) {
+        toast({ 
+          title: "PDF Generated", 
+          description: `PDF saved as ${client.name}_TaxForms_${financialYear}.pdf` 
+        });
+      } else {
+        toast({ 
+          title: "Download Complete", 
+          description: "PDF downloaded. Note: Storage save may have failed.",
+          variant: "default"
+        });
+      }
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast({ 
+        title: "Error", 
+        description: "Failed to generate PDF", 
+        variant: "destructive" 
+      });
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
   return (
     <>
       {/* Print Area - Absolutely positioned off-screen, visible only in print */}
@@ -602,6 +651,20 @@ const TaxFormAdmin = () => {
                 <PrintSettings client={client} formData={formData} onChange={handleFormChange} />
                 <Button onClick={() => handlePrint()} variant="outline" size="sm">
                   <Printer className="h-4 w-4 mr-1" /> Print All
+                </Button>
+                <Button 
+                  onClick={handleGeneratePDF} 
+                  variant="default" 
+                  size="sm"
+                  disabled={isGeneratingPDF}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  {isGeneratingPDF ? (
+                    <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                  ) : (
+                    <FileDown className="h-4 w-4 mr-1" />
+                  )}
+                  PDF
                 </Button>
                 <Popover>
                   <PopoverTrigger asChild>
