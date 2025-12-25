@@ -86,6 +86,42 @@ export type Database = {
         }
         Relationships: []
       }
+      form_templates: {
+        Row: {
+          created_at: string
+          file_path: string
+          file_url: string
+          form_type: string
+          id: string
+          is_active: boolean | null
+          template_name: string
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          file_path: string
+          file_url: string
+          form_type: string
+          id?: string
+          is_active?: boolean | null
+          template_name: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          file_path?: string
+          file_url?: string
+          form_type?: string
+          id?: string
+          is_active?: boolean | null
+          template_name?: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
