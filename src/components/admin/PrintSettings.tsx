@@ -113,13 +113,33 @@ const PrintSettings = ({ client, formData, onChange }: PrintSettingsProps) => {
     };
   });
 
-  // Global page border settings for all forms
-  const [globalBorder, setGlobalBorder] = useState({
-    enabled: false,
-    width: 1,
-    style: "solid" as "solid" | "dashed" | "dotted" | "double",
-    color: "#000000",
+  // Global page border settings for all forms - load from localStorage
+  const [globalBorder, setGlobalBorder] = useState(() => {
+    const saved = localStorage.getItem("globalPrintBorder");
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return {
+          enabled: false,
+          width: 1,
+          style: "solid" as "solid" | "dashed" | "dotted" | "double",
+          color: "#000000",
+        };
+      }
+    }
+    return {
+      enabled: false,
+      width: 1,
+      style: "solid" as "solid" | "dashed" | "dotted" | "double",
+      color: "#000000",
+    };
   });
+
+  // Save global border to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("globalPrintBorder", JSON.stringify(globalBorder));
+  }, [globalBorder]);
 
   const updateFormSetting = <K extends keyof FormPrintSettings>(
     formKey: keyof AllFormSettings,
