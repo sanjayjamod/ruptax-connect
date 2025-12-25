@@ -502,51 +502,24 @@ const TaxFormAdmin = () => {
     }
   };
 
-  // Generate PDF and save to storage
+  // Generate PDF using browser's native print-to-PDF functionality
+  // This gives EXACT same output as print
   const handleGeneratePDF = async () => {
     if (!client || !formData || !printRef.current) {
       toast({ title: "Error", description: "Please load client data first", variant: "destructive" });
       return;
     }
 
-    setIsGeneratingPDF(true);
-    try {
-      const financialYear = formData.salaryData?.financialYear || '2025-26';
-      
-      // First download the PDF
-      await downloadPDF(printRef.current, client.name, financialYear);
-      
-      // Then save to storage
-      const result = await generateAndSavePDF(
-        printRef.current,
-        client.id,
-        client.name,
-        financialYear,
-        user?.id
-      );
+    // Show instruction toast
+    toast({ 
+      title: "PDF बनाने के लिए", 
+      description: "Print dialog में 'Save as PDF' या 'PDF में सेव करें' चुनें। यह Print जैसा exact same PDF देगा।",
+      duration: 5000
+    });
 
-      if (result.success) {
-        toast({ 
-          title: "PDF Generated", 
-          description: `PDF saved as ${client.name}_TaxForms_${financialYear}.pdf` 
-        });
-      } else {
-        toast({ 
-          title: "Download Complete", 
-          description: "PDF downloaded. Note: Storage save may have failed.",
-          variant: "default"
-        });
-      }
-    } catch (error) {
-      console.error('PDF generation error:', error);
-      toast({ 
-        title: "Error", 
-        description: "Failed to generate PDF", 
-        variant: "destructive" 
-      });
-    } finally {
-      setIsGeneratingPDF(false);
-    }
+    // Use the same print function - user selects "Save as PDF" in print dialog
+    // This gives 100% exact same output as print
+    handlePrint();
   };
 
   return (
