@@ -133,6 +133,11 @@ const AdminSidebar = ({
       onClick: onAddClient,
     },
     {
+      title: "Import Excel",
+      icon: Upload,
+      onClick: onImportExcel,
+    },
+    {
       title: "Export JSON",
       icon: Download,
       onClick: onExportJSON,
