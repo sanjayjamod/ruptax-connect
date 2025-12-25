@@ -296,6 +296,12 @@
     padding: 2mm !important;
   }
 
+  /* Header Info Table (NAME, INCOME YEAR, VILLAGE, etc.) - 11pt */
+  #aavak-vera-form-a table:nth-of-type(2) td {
+    font-size: 11pt !important;
+    padding: 1mm 1.5mm !important;
+  }
+
   /* Section headers - Compact */
   #aavak-vera-form-a .bg-gray-200 td,
   #aavak-vera-form-a td[style*="13pt"] {
