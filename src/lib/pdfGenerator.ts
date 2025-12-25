@@ -18,188 +18,88 @@ const FORM_IDS = [
   'form-16b'
 ];
 
-// Apply print-like styles to clone for PDF generation
-const applyPrintStyles = (clone: HTMLElement): void => {
-  // Style each form based on its type
-  FORM_IDS.forEach((formId, index) => {
-    const form = clone.querySelector(`#${formId}`) as HTMLElement;
-    if (!form) {
-      console.log(`PDF: Form #${formId} not found`);
-      return;
-    }
+// Style a form element for PDF capture
+const styleFormForCapture = (form: HTMLElement, formId: string): void => {
+  const isPagar = formId === 'pagar-form';
+  
+  // Make form visible and properly sized
+  form.style.cssText = `
+    display: block !important;
+    visibility: visible !important;
+    background: white !important;
+    color: black !important;
+    opacity: 1 !important;
+    position: relative !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+    width: ${isPagar ? '280mm' : '200mm'} !important;
+    min-width: ${isPagar ? '280mm' : '200mm'} !important;
+    padding: ${isPagar ? '3mm' : '5mm'} !important;
+    font-size: ${isPagar ? '9pt' : '10pt'} !important;
+    page-break-after: always !important;
+    page-break-inside: avoid !important;
+  `;
 
-    const isPagar = formId === 'pagar-form';
-    const isLast = index === FORM_IDS.length - 1;
-    
-    // Base form styles with !important to override CSS
-    const baseStyles = `
-      display: block !important;
-      visibility: visible !important;
+  // Style tables
+  const tables = form.querySelectorAll('table');
+  tables.forEach((table) => {
+    (table as HTMLElement).style.cssText = `
+      width: 100% !important;
+      border-collapse: collapse !important;
       background: white !important;
-      color: black !important;
-      margin: 0 !important;
-      box-sizing: border-box !important;
-      overflow: hidden !important;
-      position: relative !important;
-      page-break-after: ${isLast ? 'avoid' : 'always'} !important;
-      page-break-inside: avoid !important;
-      opacity: 1 !important;
+      border: 0.5pt solid black !important;
+      display: table !important;
+      visibility: visible !important;
+      margin-bottom: 2mm !important;
     `;
-
-    if (isPagar) {
-      // Pagar form - scale to fit portrait page (transform scale)
-      form.style.cssText = baseStyles + `
-        width: 297mm !important;
-        min-width: 297mm !important;
-        height: auto !important;
-        max-height: none !important;
-        padding: 2mm !important;
-        font-size: 8pt !important;
-        transform: scale(0.68) !important;
-        transform-origin: top left !important;
-        margin-bottom: -80mm !important;
-      `;
-    } else if (formId === 'aavak-vera-form-a' || formId === 'aavak-vera-form-b') {
-      form.style.cssText = baseStyles + `
-        width: 198mm !important;
-        max-width: 198mm !important;
-        height: auto !important;
-        max-height: 280mm !important;
-        padding: 3mm !important;
-        font-size: ${formId === 'aavak-vera-form-a' ? '8pt' : '7.5pt'} !important;
-      `;
-    } else {
-      form.style.cssText = baseStyles + `
-        width: 198mm !important;
-        max-width: 198mm !important;
-        height: auto !important;
-        max-height: 282mm !important;
-        padding: 2mm !important;
-        font-size: ${formId === 'declaration-form' ? '11pt' : '7.5pt'} !important;
-      `;
-    }
-
-    // Style tables within this form
-    const tables = form.querySelectorAll('table');
-    tables.forEach((table) => {
-      const tableEl = table as HTMLElement;
-      tableEl.style.cssText = `
-        width: 100% !important;
-        border-collapse: collapse !important;
-        margin-bottom: ${isPagar ? '0.5mm' : '1mm'} !important;
-        background: white !important;
-        border: 0.5pt solid black !important;
-        display: table !important;
-        visibility: visible !important;
-        ${isPagar ? 'table-layout: fixed !important;' : ''}
-      `;
-    });
-
-    // Style cells within this form
-    const cells = form.querySelectorAll('th, td');
-    cells.forEach((cell) => {
-      const cellEl = cell as HTMLElement;
-      const isHeader = cell.tagName === 'TH';
-      
-      let fontSize = '7.5pt';
-      let padding = '1mm 1.5mm';
-      
-      if (isPagar) {
-        fontSize = '10pt';
-        padding = '0.3mm';
-      } else if (formId === 'aavak-vera-form-a') {
-        fontSize = '11pt';
-        padding = '0.8mm 1.2mm';
-      } else if (formId === 'aavak-vera-form-b') {
-        fontSize = '7.5pt';
-        padding = '0.8mm 1.2mm';
-      } else if (formId === 'declaration-form') {
-        fontSize = '11pt';
-        padding = '1mm 1.5mm';
-      }
-      
-      cellEl.style.cssText = `
-        border: ${isPagar ? '0.3pt' : '0.5pt'} solid black !important;
-        color: black !important;
-        background: ${isHeader ? '#e8e8e8' : 'white'} !important;
-        vertical-align: middle !important;
-        font-weight: ${isHeader ? 'bold' : 'normal'} !important;
-        line-height: 1.2 !important;
-        overflow: hidden !important;
-        font-size: ${fontSize} !important;
-        padding: ${padding} !important;
-        ${isPagar ? 'white-space: nowrap !important;' : ''}
-        display: table-cell !important;
-        visibility: visible !important;
-      `;
-    });
-
-    // Style inputs/spans within this form
-    const inputs = form.querySelectorAll('input, span');
-    inputs.forEach((input) => {
-      const el = input as HTMLElement;
-      el.style.cssText = `
-        border: none !important;
-        background: transparent !important;
-        color: black !important;
-        ${isPagar ? 'font-size: 11pt !important;' : ''}
-        visibility: visible !important;
-      `;
-    });
-
-    // Handle Aavak Vera A title - 18pt
-    if (formId === 'aavak-vera-form-a') {
-      const firstTable = form.querySelector('table:first-of-type');
-      if (firstTable) {
-        const titleCell = firstTable.querySelector('td');
-        if (titleCell) {
-          (titleCell as HTMLElement).style.cssText += `
-            font-size: 18pt !important;
-            font-weight: bold !important;
-            padding: 2mm !important;
-          `;
-        }
-      }
-    }
-    
-    console.log(`PDF: Styled form #${formId}`);
   });
 
-  // Convert all inputs to spans with their values
-  const allInputs = clone.querySelectorAll('input');
-  console.log(`PDF: Converting ${allInputs.length} inputs to spans`);
-  allInputs.forEach((input) => {
-    const inputEl = input as HTMLInputElement;
+  // Style cells
+  const cells = form.querySelectorAll('th, td');
+  cells.forEach((cell) => {
+    const isHeader = cell.tagName === 'TH';
+    (cell as HTMLElement).style.cssText = `
+      border: 0.5pt solid black !important;
+      color: black !important;
+      background: ${isHeader ? '#e8e8e8' : 'white'} !important;
+      padding: ${isPagar ? '0.5mm 1mm' : '1mm 2mm'} !important;
+      font-size: ${isPagar ? '9pt' : '10pt'} !important;
+      vertical-align: middle !important;
+      display: table-cell !important;
+      visibility: visible !important;
+      line-height: 1.2 !important;
+    `;
+  });
+
+  // Convert inputs to text
+  const inputs = form.querySelectorAll('input');
+  inputs.forEach((input) => {
     const span = document.createElement('span');
-    span.textContent = inputEl.value || '';
+    span.textContent = input.value || '';
     span.style.cssText = `
       color: black !important;
       font-size: inherit !important;
-      font-family: inherit !important;
-      border: none !important;
       background: transparent !important;
-      visibility: visible !important;
     `;
-    if (inputEl.parentNode) {
-      inputEl.parentNode.replaceChild(span, inputEl);
+    if (input.parentNode) {
+      input.parentNode.replaceChild(span, input);
     }
   });
 
-  // Hide screen-only elements
-  const hideElements = clone.querySelectorAll('.screen-only, .no-print, button');
+  // Hide buttons and screen-only elements
+  const hideElements = form.querySelectorAll('.screen-only, .no-print, button');
   hideElements.forEach((el) => {
     (el as HTMLElement).style.cssText = 'display: none !important;';
   });
 };
 
-// Create a print-styled clone for PDF generation
-const createPrintStyledClone = (printElement: HTMLElement): HTMLElement => {
-  console.log('PDF: Starting clone creation');
-  console.log('PDF: Source element children:', printElement.children.length);
+// Create styled clone of print area
+const createStyledClone = (printElement: HTMLElement): HTMLElement => {
+  console.log('PDF: Creating styled clone');
   
-  // Create a wrapper div that will be visible
+  // Create wrapper
   const wrapper = document.createElement('div');
-  wrapper.id = 'pdf-capture-wrapper';
+  wrapper.id = 'pdf-wrapper';
   wrapper.style.cssText = `
     position: fixed !important;
     top: 0 !important;
@@ -213,69 +113,38 @@ const createPrintStyledClone = (printElement: HTMLElement): HTMLElement => {
     margin: 0 !important;
   `;
   
+  // Clone print element
   const clone = printElement.cloneNode(true) as HTMLElement;
-  
-  // Remove classes that hide content
   clone.classList.remove('print-only-area');
-  clone.id = 'pdf-capture-container';
-  
-  // Main container styles - static position for proper capture
+  clone.id = 'pdf-container';
   clone.style.cssText = `
     position: static !important;
     width: 210mm !important;
-    min-width: 210mm !important;
     background: white !important;
     visibility: visible !important;
     display: block !important;
     padding: 0 !important;
     margin: 0 auto !important;
     opacity: 1 !important;
-    overflow: visible !important;
-    height: auto !important;
-    transform: none !important;
   `;
 
-  // Force ALL children to be visible with inline styles
+  // Force visibility on all elements first
   const allElements = clone.querySelectorAll('*');
-  console.log('PDF: Total elements in clone:', allElements.length);
-  
   allElements.forEach((el) => {
     const htmlEl = el as HTMLElement;
-    // Remove hidden classes
     htmlEl.classList.remove('hidden', 'invisible', 'print-only-area');
-    
-    // Force visibility on all elements
-    const computedStyle = window.getComputedStyle(htmlEl);
-    if (computedStyle.display === 'none' || computedStyle.visibility === 'hidden' || computedStyle.opacity === '0') {
-      htmlEl.style.display = htmlEl.tagName === 'TABLE' ? 'table' : 
-                              htmlEl.tagName === 'TR' ? 'table-row' :
-                              htmlEl.tagName === 'TD' || htmlEl.tagName === 'TH' ? 'table-cell' : 'block';
-      htmlEl.style.visibility = 'visible';
-      htmlEl.style.opacity = '1';
-    }
   });
 
-  // Check forms exist
-  let formsFound = 0;
-  FORM_IDS.forEach(id => {
-    const form = clone.querySelector(`#${id}`);
+  // Style each form
+  FORM_IDS.forEach((formId) => {
+    const form = clone.querySelector(`#${formId}`) as HTMLElement;
     if (form) {
-      formsFound++;
-      console.log(`PDF: Found form #${id}`);
-    } else {
-      console.log(`PDF: MISSING form #${id}`);
+      styleFormForCapture(form, formId);
+      console.log(`PDF: Styled form ${formId}`);
     }
   });
-  console.log('PDF: Total forms found:', formsFound);
 
-  // Apply all print styles
-  applyPrintStyles(clone);
-  
-  // Add clone to wrapper
   wrapper.appendChild(clone);
-  
-  console.log('PDF: Clone innerHTML length:', clone.innerHTML.length);
-  
   return wrapper;
 };
 
@@ -285,40 +154,32 @@ export const downloadPDF = async (
   clientName: string,
   financialYear: string
 ): Promise<void> => {
-  const wrapper = createPrintStyledClone(printElement);
+  console.log('PDF: Starting download...');
+  
+  const wrapper = createStyledClone(printElement);
   document.body.appendChild(wrapper);
   
-  // Get the actual content container inside wrapper
-  const contentContainer = wrapper.querySelector('#pdf-capture-container') as HTMLElement;
-  
-  // Scroll wrapper to top to ensure content is visible
+  const container = wrapper.querySelector('#pdf-container') as HTMLElement;
   wrapper.scrollTop = 0;
   
   await new Promise(resolve => setTimeout(resolve, 800));
 
   const filename = `${clientName}_TaxForms_${financialYear}.pdf`;
   
-  // Log dimensions for debugging
-  console.log('PDF: Content container dimensions:', contentContainer?.offsetWidth, contentContainer?.offsetHeight);
-  console.log('PDF: Wrapper dimensions:', wrapper.offsetWidth, wrapper.offsetHeight);
+  console.log('PDF: Container size:', container?.offsetWidth, container?.offsetHeight);
   
-  // Generate all forms with proper page breaks
   const options = {
     margin: [5, 5, 5, 5],
     filename: filename,
-    image: { type: 'jpeg', quality: 0.95 },
+    image: { type: 'jpeg', quality: 0.92 },
     html2canvas: { 
-      scale: 2,
+      scale: 1.5,
       useCORS: true,
-      letterRendering: true,
-      logging: true,
+      logging: false,
       backgroundColor: '#ffffff',
-      width: contentContainer?.offsetWidth || 794,
-      height: contentContainer?.offsetHeight || 1123,
-      scrollX: 0,
-      scrollY: 0,
-      windowWidth: contentContainer?.offsetWidth || 794,
-      windowHeight: contentContainer?.offsetHeight || 1123,
+      width: container?.scrollWidth || 794,
+      height: container?.scrollHeight || 5000,
+      windowWidth: container?.scrollWidth || 794,
     },
     jsPDF: { 
       unit: 'mm', 
@@ -334,8 +195,12 @@ export const downloadPDF = async (
   try {
     await html2pdf()
       .set(options)
-      .from(contentContainer)
+      .from(container)
       .save();
+    console.log('PDF: Download complete');
+  } catch (error) {
+    console.error('PDF download error:', error);
+    throw error;
   } finally {
     document.body.removeChild(wrapper);
   }
@@ -350,34 +215,28 @@ export const generateAndSavePDF = async (
   userId?: string
 ): Promise<PDFGenerationResult> => {
   try {
-    const wrapper = createPrintStyledClone(printElement);
+    console.log('PDF: Generating for storage...');
+    
+    const wrapper = createStyledClone(printElement);
     document.body.appendChild(wrapper);
     
-    // Get the actual content container inside wrapper
-    const contentContainer = wrapper.querySelector('#pdf-capture-container') as HTMLElement;
-    
-    // Scroll wrapper to top
+    const container = wrapper.querySelector('#pdf-container') as HTMLElement;
     wrapper.scrollTop = 0;
     
     await new Promise(resolve => setTimeout(resolve, 800));
 
-    // Generate all forms with proper page breaks
     const options = {
       margin: [5, 5, 5, 5],
       filename: `${clientName}_TaxForms_${financialYear}.pdf`,
-      image: { type: 'jpeg', quality: 0.95 },
+      image: { type: 'jpeg', quality: 0.92 },
       html2canvas: { 
-        scale: 2,
+        scale: 1.5,
         useCORS: true,
-        letterRendering: true,
-        logging: true,
+        logging: false,
         backgroundColor: '#ffffff',
-        width: contentContainer?.offsetWidth || 794,
-        height: contentContainer?.offsetHeight || 1123,
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: contentContainer?.offsetWidth || 794,
-        windowHeight: contentContainer?.offsetHeight || 1123,
+        width: container?.scrollWidth || 794,
+        height: container?.scrollHeight || 5000,
+        windowWidth: container?.scrollWidth || 794,
       },
       jsPDF: { 
         unit: 'mm', 
@@ -393,7 +252,7 @@ export const generateAndSavePDF = async (
     // Generate PDF blob
     const pdfBlob = await html2pdf()
       .set(options)
-      .from(contentContainer)
+      .from(container)
       .outputPdf('blob');
 
     document.body.removeChild(wrapper);
@@ -440,6 +299,8 @@ export const generateAndSavePDF = async (
       console.error('Database error:', dbError);
     }
 
+    console.log('PDF: Saved to storage');
+    
     return {
       success: true,
       fileUrl,
