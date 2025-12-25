@@ -491,24 +491,15 @@
     border: 0.5pt solid #000 !important;
   }
 
-  /* FOOTER - Fixed at bottom of page */
+  /* FOOTER - Compact */
   .form-footer {
     display: block !important;
     font-size: 6pt !important;
     text-align: center !important;
-    position: absolute !important;
-    bottom: 2mm !important;
-    left: 0 !important;
-    right: 0 !important;
+    margin-top: 1mm !important;
     padding-top: 1mm !important;
     border-top: 0.3pt dashed #666 !important;
     color: #333 !important;
-  }
-
-  /* Declaration form footer */
-  #declaration-form .form-footer {
-    font-size: 11pt !important;
-    bottom: 3mm !important;
   }
 
   /* Signature sections - Compact */
