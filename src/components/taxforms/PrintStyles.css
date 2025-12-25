@@ -895,16 +895,19 @@
    SCREEN vs PRINT VISIBILITY
    ======================================== */
 
-/* Screen: Hide print area completely */
+/* Screen: Hide print area - use visibility and position, NOT display:none */
+/* This allows html2pdf to temporarily make it visible for PDF generation */
 @media screen {
   .print-only-area {
     position: absolute !important;
     left: -99999px !important;
-    top: -99999px !important;
-    width: 0 !important;
-    height: 0 !important;
-    overflow: hidden !important;
+    top: 0 !important;
+    width: 210mm !important;
+    height: auto !important;
+    overflow: visible !important;
     visibility: hidden !important;
+    background: white !important;
+    z-index: -9999 !important;
   }
   
   .screen-only {

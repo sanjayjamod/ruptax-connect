@@ -16,6 +16,28 @@ export const generateAndSavePDF = async (
   userId?: string
 ): Promise<PDFGenerationResult> => {
   try {
+    // Temporarily make print element visible for PDF generation
+    const originalStyles = {
+      position: printElement.style.position,
+      left: printElement.style.left,
+      top: printElement.style.top,
+      visibility: printElement.style.visibility,
+      display: printElement.style.display,
+      zIndex: printElement.style.zIndex,
+      width: printElement.style.width,
+      background: printElement.style.background
+    };
+
+    // Make visible for html2pdf capture
+    printElement.style.position = 'absolute';
+    printElement.style.left = '0';
+    printElement.style.top = '0';
+    printElement.style.visibility = 'visible';
+    printElement.style.display = 'block';
+    printElement.style.zIndex = '-1';
+    printElement.style.width = '210mm';
+    printElement.style.background = 'white';
+
     // Generate PDF from the print element
     const options = {
       margin: 5,
@@ -25,14 +47,16 @@ export const generateAndSavePDF = async (
         scale: 2,
         useCORS: true,
         letterRendering: true,
-        logging: false
+        logging: false,
+        windowWidth: 794, // A4 width in pixels at 96 DPI
+        windowHeight: 1123 // A4 height in pixels at 96 DPI
       },
       jsPDF: { 
         unit: 'mm', 
         format: 'a4', 
         orientation: 'portrait' as const
       },
-      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+      pagebreak: { mode: ['css', 'legacy'], before: '.page-break' }
     };
 
     // Generate PDF blob
@@ -40,6 +64,16 @@ export const generateAndSavePDF = async (
       .set(options)
       .from(printElement)
       .outputPdf('blob');
+
+    // Restore original styles
+    printElement.style.position = originalStyles.position;
+    printElement.style.left = originalStyles.left;
+    printElement.style.top = originalStyles.top;
+    printElement.style.visibility = originalStyles.visibility;
+    printElement.style.display = originalStyles.display;
+    printElement.style.zIndex = originalStyles.zIndex;
+    printElement.style.width = originalStyles.width;
+    printElement.style.background = originalStyles.background;
 
     // Create file path
     const timestamp = Date.now();
@@ -103,6 +137,28 @@ export const downloadPDF = async (
   clientName: string,
   financialYear: string
 ): Promise<void> => {
+  // Temporarily make print element visible for PDF generation
+  const originalStyles = {
+    position: printElement.style.position,
+    left: printElement.style.left,
+    top: printElement.style.top,
+    visibility: printElement.style.visibility,
+    display: printElement.style.display,
+    zIndex: printElement.style.zIndex,
+    width: printElement.style.width,
+    background: printElement.style.background
+  };
+
+  // Make visible for html2pdf capture
+  printElement.style.position = 'absolute';
+  printElement.style.left = '0';
+  printElement.style.top = '0';
+  printElement.style.visibility = 'visible';
+  printElement.style.display = 'block';
+  printElement.style.zIndex = '-1';
+  printElement.style.width = '210mm';
+  printElement.style.background = 'white';
+
   const options = {
     margin: 5,
     filename: `${clientName}_TaxForms_${financialYear}.pdf`,
@@ -111,20 +167,32 @@ export const downloadPDF = async (
       scale: 2,
       useCORS: true,
       letterRendering: true,
-      logging: false
+      logging: false,
+      windowWidth: 794,
+      windowHeight: 1123
     },
     jsPDF: { 
       unit: 'mm', 
       format: 'a4', 
       orientation: 'portrait' as const
     },
-    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    pagebreak: { mode: ['css', 'legacy'], before: '.page-break' }
   };
 
   await html2pdf()
     .set(options)
     .from(printElement)
     .save();
+
+  // Restore original styles
+  printElement.style.position = originalStyles.position;
+  printElement.style.left = originalStyles.left;
+  printElement.style.top = originalStyles.top;
+  printElement.style.visibility = originalStyles.visibility;
+  printElement.style.display = originalStyles.display;
+  printElement.style.zIndex = originalStyles.zIndex;
+  printElement.style.width = originalStyles.width;
+  printElement.style.background = originalStyles.background;
 };
 
 export const getClientPDFs = async (clientId: string) => {
