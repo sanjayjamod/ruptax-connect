@@ -1,5 +1,6 @@
 import { Client } from "@/types/client";
 import { TaxFormData } from "@/types/taxForm";
+import EditableLabel from "./EditableLabel";
 import "./PrintStyles.css";
 
 interface AavakVeraFormBProps {
@@ -8,9 +9,10 @@ interface AavakVeraFormBProps {
   onChange: (data: TaxFormData) => void;
   readOnly?: boolean;
   isManualMode?: boolean;
+  isTextEditMode?: boolean;
 }
 
-const AavakVeraFormB = ({ client, formData, onChange, readOnly = false, isManualMode = false }: AavakVeraFormBProps) => {
+const AavakVeraFormB = ({ client, formData, onChange, readOnly = false, isManualMode = false, isTextEditMode = false }: AavakVeraFormBProps) => {
   const taxB = formData.taxCalculationB;
 
   const updateField = (field: keyof typeof formData.taxCalculationB, value: number | string) => {
@@ -41,6 +43,11 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false, isManual
     <span className="font-medium">{value || 0}</span>
   );
 
+  // Editable label helper
+  const EL = ({ id, text, className = "" }: { id: string; text: string; className?: string }) => (
+    <EditableLabel id={`formB_${id}`} defaultText={text} isEditMode={isTextEditMode} className={className} />
+  );
+
   return (
     <div className="tax-form-container tax-form-print page-break aavak-vera-form" id="aavak-vera-form-b">
       {/* Main Title - 18pt */}
@@ -48,7 +55,7 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false, isManual
         <tbody>
           <tr>
             <td colSpan={8} className="text-center font-bold border border-black py-2" style={{ fontSize: '18pt' }}>
-              આવક વેરા ગણતરી ફોર્મ
+              <EL id="title" text="આવક વેરા ગણતરી ફોર્મ" />
             </td>
           </tr>
         </tbody>
@@ -59,12 +66,12 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false, isManual
         <tbody>
           <tr>
             <td colSpan={8} className="border border-black px-2 py-1 font-bold bg-gray-100" style={{ fontSize: '13pt' }}>
-              વિભાગ (D) સમગ્ર કુલ આવક માંથી કલમ મુજબ બાદ મળતર વિભાગ
+              <EL id="sectionD" text="વિભાગ (D) સમગ્ર કુલ આવક માંથી કલમ મુજબ બાદ મળતર વિભાગ" />
             </td>
           </tr>
           <tr>
             <td className="border border-black px-2 py-1">1</td>
-            <td colSpan={3} className="border border-black px-2 py-1 font-bold">Under section 80-C,</td>
+            <td colSpan={3} className="border border-black px-2 py-1 font-bold"><EL id="section80c" text="Under section 80-C," /></td>
             <td colSpan={4} className="border border-black px-2 py-1"></td>
           </tr>
           <tr>

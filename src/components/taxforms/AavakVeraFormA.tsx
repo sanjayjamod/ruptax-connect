@@ -1,5 +1,6 @@
 import { Client } from "@/types/client";
 import { TaxFormData } from "@/types/taxForm";
+import EditableLabel from "./EditableLabel";
 import "./PrintStyles.css";
 
 interface AavakVeraFormAProps {
@@ -8,9 +9,10 @@ interface AavakVeraFormAProps {
   onChange: (data: TaxFormData) => void;
   readOnly?: boolean;
   isManualMode?: boolean;
+  isTextEditMode?: boolean;
 }
 
-const AavakVeraFormA = ({ client, formData, onChange, readOnly = false, isManualMode = false }: AavakVeraFormAProps) => {
+const AavakVeraFormA = ({ client, formData, onChange, readOnly = false, isManualMode = false, isTextEditMode = false }: AavakVeraFormAProps) => {
   const taxA = formData.taxCalculationA;
 
   const updateField = (field: keyof typeof formData.taxCalculationA, value: number) => {
@@ -41,6 +43,11 @@ const AavakVeraFormA = ({ client, formData, onChange, readOnly = false, isManual
     <span className="font-medium">{value || 0}</span>
   );
 
+  // Editable label helper
+  const EL = ({ id, text, className = "", style }: { id: string; text: string; className?: string; style?: React.CSSProperties }) => (
+    <EditableLabel id={`formA_${id}`} defaultText={text} isEditMode={isTextEditMode} className={className} style={style} />
+  );
+
   return (
     <div className="tax-form-container tax-form-print aavak-vera-form page-break" id="aavak-vera-form-a" style={{ fontFamily: 'Arial, sans-serif' }}>
       {/* Main Title - 18pt bold */}
@@ -48,7 +55,7 @@ const AavakVeraFormA = ({ client, formData, onChange, readOnly = false, isManual
         <tbody>
           <tr>
             <td colSpan={6} className="text-center font-bold border border-black" style={{ fontSize: '18pt', padding: '8px' }}>
-              આવક વેરા ગણતરી ફોર્મ
+              <EL id="title" text="આવક વેરા ગણતરી ફોર્મ" />
             </td>
           </tr>
         </tbody>
@@ -105,19 +112,25 @@ const AavakVeraFormA = ({ client, formData, onChange, readOnly = false, isManual
         <tbody>
           {/* Gross Salary Row - 12pt bold */}
           <tr>
-            <td colSpan={4} className="border border-black px-3 py-2 font-bold bg-yellow-50" style={{ fontSize: '12pt' }}>કુલ ગ્રોસ આવક : AS PER RULE 17</td>
+            <td colSpan={4} className="border border-black px-3 py-2 font-bold bg-yellow-50" style={{ fontSize: '12pt' }}>
+              <EL id="grossSalary" text="કુલ ગ્રોસ આવક : AS PER RULE 17" />
+            </td>
             <td className="border border-black px-3 py-2 text-right font-bold">RS.</td>
             <td className="border border-black px-3 py-2 text-right font-bold">{renderAutoField(taxA.grossSalary)}</td>
           </tr>
           
           {/* Section Header - 13pt bold */}
           <tr>
-            <td colSpan={6} className="border border-black px-3 py-2 font-bold bg-gray-200" style={{ fontSize: '13pt' }}>કલમ ૧૦ મુજબ બાદ પાત કરમુક્ત ભથ્થાઓ</td>
+            <td colSpan={6} className="border border-black px-3 py-2 font-bold bg-gray-200" style={{ fontSize: '13pt' }}>
+              <EL id="section10" text="કલમ ૧૦ મુજબ બાદ પાત કરમુક્ત ભથ્થાઓ" />
+            </td>
           </tr>
           
           <tr>
             <td className="border border-black px-3 py-2" style={{ width: '5%' }}>(a)</td>
-            <td colSpan={3} className="border border-black px-3 py-2">ઘરભાડું ભાડાના મકાનમાં રહેતા હોઈ તો જ જે ઓછુ હોય તે RULE 10(13-A)</td>
+            <td colSpan={3} className="border border-black px-3 py-2">
+              <EL id="hraLabel" text="ઘરભાડું ભાડાના મકાનમાં રહેતા હોઈ તો જ જે ઓછુ હોય તે RULE 10(13-A)" />
+            </td>
             <td className="border border-black px-3 py-2"></td>
             <td className="border border-black px-3 py-2"></td>
           </tr>

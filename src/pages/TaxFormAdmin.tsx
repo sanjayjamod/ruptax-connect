@@ -28,9 +28,9 @@ import WhatsAppShare from "@/components/admin/WhatsAppShare";
 import EmailShare from "@/components/admin/EmailShare";
 import PrintSettings from "@/components/admin/PrintSettings";
 import { useAuth } from "@/hooks/useAuth";
+import { resetAllTextEdits } from "@/components/taxforms/EditableLabel";
 
 // Text Edit Mode Storage
-const TEXT_EDIT_STORAGE_KEY = "tax_form_text_edits";
 const FONT_SIZE_STORAGE_KEY = "tax_form_font_sizes";
 
 const TaxFormAdmin = () => {
@@ -587,7 +587,7 @@ const TaxFormAdmin = () => {
                         </Button>
                       </div>
 
-                      <div className="pt-2 border-t">
+                      <div className="pt-2 border-t space-y-2">
                         <Button
                           variant="outline"
                           size="sm"
@@ -595,6 +595,18 @@ const TaxFormAdmin = () => {
                           className="w-full"
                         >
                           <RotateCcw className="h-3 w-3 mr-1" /> Reset All Sizes
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            resetAllTextEdits();
+                            toast({ title: "Reset", description: "All text edits reset to default" });
+                            window.location.reload();
+                          }}
+                          className="w-full"
+                        >
+                          <RotateCcw className="h-3 w-3 mr-1" /> Reset All Text
                         </Button>
                       </div>
 
@@ -831,7 +843,7 @@ const TaxFormAdmin = () => {
                           </div>
                         )}
                         <div className={isTextEditMode ? 'text-edit-mode' : ''} style={{ fontSize: `${formFontSizes['formA'] ?? 100}%` }}>
-                          <AavakVeraFormA client={client} formData={formData} onChange={handleFormChange} isManualMode={isManualMode} />
+                          <AavakVeraFormA client={client} formData={formData} onChange={handleFormChange} isManualMode={isManualMode} isTextEditMode={isTextEditMode} />
                         </div>
                       </TabsContent>
                       <TabsContent value="formB" className="mt-0">
@@ -846,7 +858,7 @@ const TaxFormAdmin = () => {
                           </div>
                         )}
                         <div className={isTextEditMode ? 'text-edit-mode' : ''} style={{ fontSize: `${formFontSizes['formB'] ?? 100}%` }}>
-                          <AavakVeraFormB client={client} formData={formData} onChange={handleFormChange} isManualMode={isManualMode} />
+                          <AavakVeraFormB client={client} formData={formData} onChange={handleFormChange} isManualMode={isManualMode} isTextEditMode={isTextEditMode} />
                         </div>
                       </TabsContent>
                       <TabsContent value="form16a" className="mt-0">
