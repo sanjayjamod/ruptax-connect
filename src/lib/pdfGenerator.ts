@@ -16,29 +16,30 @@ export const generateAndSavePDF = async (
   userId?: string
 ): Promise<PDFGenerationResult> => {
   try {
-    // Temporarily make print element visible for PDF generation
-    const originalStyles = {
-      position: printElement.style.position,
-      left: printElement.style.left,
-      top: printElement.style.top,
-      visibility: printElement.style.visibility,
-      display: printElement.style.display,
-      zIndex: printElement.style.zIndex,
-      width: printElement.style.width,
-      background: printElement.style.background
-    };
+    // Clone the element and make it visible for PDF generation
+    const clone = printElement.cloneNode(true) as HTMLElement;
+    
+    // Style the clone for PDF capture
+    clone.style.cssText = `
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 210mm;
+      min-height: 297mm;
+      background: white;
+      visibility: visible;
+      display: block;
+      z-index: 99999;
+      overflow: visible;
+    `;
+    
+    // Add to body temporarily
+    document.body.appendChild(clone);
+    
+    // Small delay to ensure DOM is ready
+    await new Promise(resolve => setTimeout(resolve, 100));
 
-    // Make visible for html2pdf capture
-    printElement.style.position = 'absolute';
-    printElement.style.left = '0';
-    printElement.style.top = '0';
-    printElement.style.visibility = 'visible';
-    printElement.style.display = 'block';
-    printElement.style.zIndex = '-1';
-    printElement.style.width = '210mm';
-    printElement.style.background = 'white';
-
-    // Generate PDF from the print element
+    // Generate PDF from the cloned element
     const options = {
       margin: 5,
       filename: `${clientName}_TaxForms_${financialYear}.pdf`,
@@ -48,8 +49,10 @@ export const generateAndSavePDF = async (
         useCORS: true,
         letterRendering: true,
         logging: false,
-        windowWidth: 794, // A4 width in pixels at 96 DPI
-        windowHeight: 1123 // A4 height in pixels at 96 DPI
+        width: 794,
+        height: clone.scrollHeight,
+        scrollX: 0,
+        scrollY: 0
       },
       jsPDF: { 
         unit: 'mm', 
@@ -62,18 +65,11 @@ export const generateAndSavePDF = async (
     // Generate PDF blob
     const pdfBlob = await html2pdf()
       .set(options)
-      .from(printElement)
+      .from(clone)
       .outputPdf('blob');
 
-    // Restore original styles
-    printElement.style.position = originalStyles.position;
-    printElement.style.left = originalStyles.left;
-    printElement.style.top = originalStyles.top;
-    printElement.style.visibility = originalStyles.visibility;
-    printElement.style.display = originalStyles.display;
-    printElement.style.zIndex = originalStyles.zIndex;
-    printElement.style.width = originalStyles.width;
-    printElement.style.background = originalStyles.background;
+    // Remove clone
+    document.body.removeChild(clone);
 
     // Create file path
     const timestamp = Date.now();
@@ -137,27 +133,28 @@ export const downloadPDF = async (
   clientName: string,
   financialYear: string
 ): Promise<void> => {
-  // Temporarily make print element visible for PDF generation
-  const originalStyles = {
-    position: printElement.style.position,
-    left: printElement.style.left,
-    top: printElement.style.top,
-    visibility: printElement.style.visibility,
-    display: printElement.style.display,
-    zIndex: printElement.style.zIndex,
-    width: printElement.style.width,
-    background: printElement.style.background
-  };
-
-  // Make visible for html2pdf capture
-  printElement.style.position = 'absolute';
-  printElement.style.left = '0';
-  printElement.style.top = '0';
-  printElement.style.visibility = 'visible';
-  printElement.style.display = 'block';
-  printElement.style.zIndex = '-1';
-  printElement.style.width = '210mm';
-  printElement.style.background = 'white';
+  // Clone the element and make it visible for PDF generation
+  const clone = printElement.cloneNode(true) as HTMLElement;
+  
+  // Style the clone for PDF capture
+  clone.style.cssText = `
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 210mm;
+    min-height: 297mm;
+    background: white;
+    visibility: visible;
+    display: block;
+    z-index: 99999;
+    overflow: visible;
+  `;
+  
+  // Add to body temporarily
+  document.body.appendChild(clone);
+  
+  // Small delay to ensure DOM is ready
+  await new Promise(resolve => setTimeout(resolve, 100));
 
   const options = {
     margin: 5,
@@ -167,9 +164,11 @@ export const downloadPDF = async (
       scale: 2,
       useCORS: true,
       letterRendering: true,
-      logging: false,
-      windowWidth: 794,
-      windowHeight: 1123
+      logging: true,
+      width: 794,
+      height: clone.scrollHeight,
+      scrollX: 0,
+      scrollY: 0
     },
     jsPDF: { 
       unit: 'mm', 
@@ -179,20 +178,15 @@ export const downloadPDF = async (
     pagebreak: { mode: ['css', 'legacy'], before: '.page-break' }
   };
 
-  await html2pdf()
-    .set(options)
-    .from(printElement)
-    .save();
-
-  // Restore original styles
-  printElement.style.position = originalStyles.position;
-  printElement.style.left = originalStyles.left;
-  printElement.style.top = originalStyles.top;
-  printElement.style.visibility = originalStyles.visibility;
-  printElement.style.display = originalStyles.display;
-  printElement.style.zIndex = originalStyles.zIndex;
-  printElement.style.width = originalStyles.width;
-  printElement.style.background = originalStyles.background;
+  try {
+    await html2pdf()
+      .set(options)
+      .from(clone)
+      .save();
+  } finally {
+    // Remove clone
+    document.body.removeChild(clone);
+  }
 };
 
 export const getClientPDFs = async (clientId: string) => {
