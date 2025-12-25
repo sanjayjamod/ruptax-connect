@@ -8,6 +8,16 @@ export interface PDFGenerationResult {
   error?: string;
 }
 
+// All form IDs in the print area
+const FORM_IDS = [
+  'pagar-form',
+  'declaration-form', 
+  'aavak-vera-form-a',
+  'aavak-vera-form-b',
+  'form-16a',
+  'form-16b'
+];
+
 // Create a print-styled clone for PDF generation
 const createPrintStyledClone = (printElement: HTMLElement): HTMLElement => {
   console.log('Creating PDF clone from element:', printElement);
@@ -33,8 +43,12 @@ const createPrintStyledClone = (printElement: HTMLElement): HTMLElement => {
   clone.style.margin = '0';
   clone.style.opacity = '1';
 
-  // Get all form containers
-  const forms = clone.querySelectorAll('[id$="-form"]');
+  // Get all form containers by their specific IDs
+  const forms: HTMLElement[] = [];
+  FORM_IDS.forEach(id => {
+    const form = clone.querySelector(`#${id}`) as HTMLElement;
+    if (form) forms.push(form);
+  });
   console.log('Found forms in clone:', forms.length);
   
   forms.forEach((form, index) => {
