@@ -23,7 +23,8 @@ import {
   Printer,
   Download,
   Calendar,
-  User
+  User,
+  CheckCircle
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -199,8 +200,14 @@ const FilledFormsSection = () => {
                             </Button>
                           </div>
                         </div>
-                        <div className="mt-2 text-xs text-muted-foreground">
-                          Tax: ₹{(form.taxForm.taxCalculationB?.netTaxPayable || 0).toLocaleString('en-IN')}
+                        <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
+                          <span>Tax: ₹{(form.taxForm.taxCalculationB?.netTaxPayable || 0).toLocaleString('en-IN')}</span>
+                          {form.client?.completedAt && (
+                            <span className="flex items-center gap-1 text-green-600">
+                              <CheckCircle className="h-3 w-3" />
+                              {new Date(form.client.completedAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                            </span>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
@@ -219,6 +226,7 @@ const FilledFormsSection = () => {
                   <TableHead>Name</TableHead>
                   <TableHead className="hidden md:table-cell">PAN</TableHead>
                   <TableHead className="hidden sm:table-cell">Financial Year</TableHead>
+                  <TableHead className="hidden lg:table-cell">Completed Date</TableHead>
                   <TableHead className="text-right">Net Tax</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -245,6 +253,20 @@ const FilledFormsSection = () => {
                         {form.taxForm.salaryData?.financialYear || '2025-2026'}
                       </Badge>
                     </TableCell>
+                    <TableCell className="hidden lg:table-cell">
+                      {form.client?.completedAt ? (
+                        <span className="flex items-center gap-1 text-xs text-green-600">
+                          <CheckCircle className="h-3 w-3" />
+                          {new Date(form.client.completedAt).toLocaleDateString('en-IN', { 
+                            day: '2-digit', 
+                            month: 'short', 
+                            year: 'numeric' 
+                          })}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
                     <TableCell className="text-right font-medium">
                       ₹{(form.taxForm.taxCalculationB?.netTaxPayable || 0).toLocaleString('en-IN')}
                     </TableCell>
@@ -267,7 +289,6 @@ const FilledFormsSection = () => {
                           className="h-7 w-7"
                           onClick={(e) => { 
                             e.stopPropagation();
-                            // Print/PDF action
                             handleViewForm(form.taxForm.clientId);
                           }}
                         >
