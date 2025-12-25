@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Slider } from "@/components/ui/slider";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import Header from "@/components/Header";
 import { getClientById, updateClientStatus, updateClient } from "@/lib/clientStorage";
 import { getOrCreateTaxForm, saveTaxForm, calculateTax, getAllTaxForms } from "@/lib/taxFormStorage";
@@ -17,7 +19,7 @@ import AavakVeraFormA from "@/components/taxforms/AavakVeraFormA";
 import AavakVeraFormB from "@/components/taxforms/AavakVeraFormB";
 import Form16A from "@/components/taxforms/Form16A";
 import Form16B from "@/components/taxforms/Form16B";
-import { Search, Printer, FileText, FileSpreadsheet, Save, ArrowLeft, Calculator, RefreshCw, Database, Loader2, PanelRightOpen, PanelRightClose, Upload, RotateCcw, Edit2, X, Check, Clock } from "lucide-react";
+import { Search, Printer, FileText, Save, ArrowLeft, Calculator, RefreshCw, Database, Loader2, PanelRightOpen, PanelRightClose, Upload, RotateCcw, Edit2, X, Check, Clock, Type } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import TaxChatbot from "@/components/TaxChatbot";
 import SideCalculator from "@/components/admin/SideCalculator";
@@ -26,6 +28,11 @@ import WhatsAppShare from "@/components/admin/WhatsAppShare";
 import EmailShare from "@/components/admin/EmailShare";
 import PrintSettings from "@/components/admin/PrintSettings";
 import { useAuth } from "@/hooks/useAuth";
+
+// Text Edit Mode Storage
+const TEXT_EDIT_STORAGE_KEY = "tax_form_text_edits";
+const FONT_SIZE_STORAGE_KEY = "tax_form_font_sizes";
+
 const TaxFormAdmin = () => {
   const navigate = useNavigate();
   const { user, isAdmin, isLoading: authLoading } = useAuth();
@@ -43,6 +50,28 @@ const TaxFormAdmin = () => {
   const [savedForms, setSavedForms] = useState<TaxFormData[]>([]);
   const printRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Text Edit Mode State
+  const [isTextEditMode, setIsTextEditMode] = useState(false);
+  const [formFontSizes, setFormFontSizes] = useState<Record<string, number>>(() => {
+    const saved = localStorage.getItem(FONT_SIZE_STORAGE_KEY);
+    return saved ? JSON.parse(saved) : {};
+  });
+
+  // Save font sizes to localStorage
+  useEffect(() => {
+    localStorage.setItem(FONT_SIZE_STORAGE_KEY, JSON.stringify(formFontSizes));
+  }, [formFontSizes]);
+
+  const updateFormFontSize = (formId: string, size: number) => {
+    setFormFontSizes(prev => ({ ...prev, [formId]: size }));
+  };
+
+  const resetAllFontSizes = () => {
+    setFormFontSizes({});
+    localStorage.removeItem(FONT_SIZE_STORAGE_KEY);
+    toast({ title: "Reset", description: "All font sizes reset to default" });
+  };
 
   // Check admin authentication via Supabase
   useEffect(() => {
@@ -433,6 +462,13 @@ const TaxFormAdmin = () => {
 
   return (
     <>
+      {/* Text Edit Mode Floating Indicator */}
+      {isTextEditMode && (
+        <div className="text-edit-active-indicator no-print">
+          <Type className="h-4 w-4 inline mr-1" /> Text Edit Mode ON
+        </div>
+      )}
+
       {/* Print Area - All Forms for A4 Print - Outside main for clean printing */}
       {client && formData && (
         <div className="hidden print:block print-area" ref={printRef}>
@@ -527,6 +563,54 @@ const TaxFormAdmin = () => {
                 <Button onClick={() => handlePrint()} variant="outline" size="sm">
                   <Printer className="h-4 w-4 mr-1" /> Print All
                 </Button>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={isTextEditMode ? "default" : "outline"}
+                      size="sm"
+                      className={isTextEditMode ? "bg-purple-600 hover:bg-purple-700" : ""}
+                    >
+                      <Type className="h-4 w-4 mr-1" />
+                      {isTextEditMode ? "Edit ON" : "Text Edit"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-72 p-4" side="bottom">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-sm">Text Edit Mode</span>
+                        <Button
+                          variant={isTextEditMode ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setIsTextEditMode(!isTextEditMode)}
+                        >
+                          {isTextEditMode ? "ON" : "OFF"}
+                        </Button>
+                      </div>
+
+                      <div className="pt-2 border-t">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={resetAllFontSizes}
+                          className="w-full"
+                        >
+                          <RotateCcw className="h-3 w-3 mr-1" /> Reset All Sizes
+                        </Button>
+                      </div>
+
+                      {isTextEditMode && (
+                        <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
+                          <p className="font-medium mb-1">Edit Mode Tips:</p>
+                          <ul className="list-disc list-inside space-y-1">
+                            <li>Use slider below each form to change font size</li>
+                            <li>Click any text to edit directly</li>
+                            <li>Changes are saved automatically</li>
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </PopoverContent>
+                </Popover>
                 <WhatsAppShare client={client} onSharePDF={handleExportPDF} />
                 <EmailShare client={client} formData={formData} />
                 <Button 
@@ -706,24 +790,94 @@ const TaxFormAdmin = () => {
                         </div>
                       </TabsContent>
                       <TabsContent value="pagar" className="mt-0">
-                        <div id="pagar-form-screen">
+                        {isTextEditMode && (
+                          <div className="mb-3 p-2 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-lg no-print form-font-control">
+                            <div className="flex items-center gap-4">
+                              <span className="text-sm font-medium text-purple-700 dark:text-purple-300 min-w-fit">પગાર Font Size:</span>
+                              <Slider value={[formFontSizes['pagar'] ?? 100]} onValueChange={(v) => updateFormFontSize('pagar', v[0])} min={50} max={150} step={5} className="flex-1" />
+                              <span className="text-sm font-bold text-purple-700 dark:text-purple-300 min-w-12">{formFontSizes['pagar'] ?? 100}%</span>
+                              <Button variant="ghost" size="sm" onClick={() => updateFormFontSize('pagar', 100)} className="h-7 px-2"><RotateCcw className="h-3 w-3" /></Button>
+                            </div>
+                          </div>
+                        )}
+                        <div id="pagar-form-screen" className={isTextEditMode ? 'text-edit-mode' : ''} style={{ fontSize: `${formFontSizes['pagar'] ?? 100}%` }}>
                           <PagarForm client={client} formData={formData} onChange={handleFormChange} isManualMode={isManualMode} />
                         </div>
                       </TabsContent>
                       <TabsContent value="declaration" className="mt-0">
-                        <DeclarationForm client={client} formData={formData} onChange={handleFormChange} isManualMode={isManualMode} />
+                        {isTextEditMode && (
+                          <div className="mb-3 p-2 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-lg no-print form-font-control">
+                            <div className="flex items-center gap-4">
+                              <span className="text-sm font-medium text-purple-700 dark:text-purple-300 min-w-fit">Declaration Font Size:</span>
+                              <Slider value={[formFontSizes['declaration'] ?? 100]} onValueChange={(v) => updateFormFontSize('declaration', v[0])} min={50} max={150} step={5} className="flex-1" />
+                              <span className="text-sm font-bold text-purple-700 dark:text-purple-300 min-w-12">{formFontSizes['declaration'] ?? 100}%</span>
+                              <Button variant="ghost" size="sm" onClick={() => updateFormFontSize('declaration', 100)} className="h-7 px-2"><RotateCcw className="h-3 w-3" /></Button>
+                            </div>
+                          </div>
+                        )}
+                        <div className={isTextEditMode ? 'text-edit-mode' : ''} style={{ fontSize: `${formFontSizes['declaration'] ?? 100}%` }}>
+                          <DeclarationForm client={client} formData={formData} onChange={handleFormChange} isManualMode={isManualMode} />
+                        </div>
                       </TabsContent>
                       <TabsContent value="formA" className="mt-0">
-                        <AavakVeraFormA client={client} formData={formData} onChange={handleFormChange} isManualMode={isManualMode} />
+                        {isTextEditMode && (
+                          <div className="mb-3 p-2 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-lg no-print form-font-control">
+                            <div className="flex items-center gap-4">
+                              <span className="text-sm font-medium text-purple-700 dark:text-purple-300 min-w-fit">આવકવેરા A Font Size:</span>
+                              <Slider value={[formFontSizes['formA'] ?? 100]} onValueChange={(v) => updateFormFontSize('formA', v[0])} min={50} max={150} step={5} className="flex-1" />
+                              <span className="text-sm font-bold text-purple-700 dark:text-purple-300 min-w-12">{formFontSizes['formA'] ?? 100}%</span>
+                              <Button variant="ghost" size="sm" onClick={() => updateFormFontSize('formA', 100)} className="h-7 px-2"><RotateCcw className="h-3 w-3" /></Button>
+                            </div>
+                          </div>
+                        )}
+                        <div className={isTextEditMode ? 'text-edit-mode' : ''} style={{ fontSize: `${formFontSizes['formA'] ?? 100}%` }}>
+                          <AavakVeraFormA client={client} formData={formData} onChange={handleFormChange} isManualMode={isManualMode} />
+                        </div>
                       </TabsContent>
                       <TabsContent value="formB" className="mt-0">
-                        <AavakVeraFormB client={client} formData={formData} onChange={handleFormChange} isManualMode={isManualMode} />
+                        {isTextEditMode && (
+                          <div className="mb-3 p-2 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-lg no-print form-font-control">
+                            <div className="flex items-center gap-4">
+                              <span className="text-sm font-medium text-purple-700 dark:text-purple-300 min-w-fit">આવકવેરા B Font Size:</span>
+                              <Slider value={[formFontSizes['formB'] ?? 100]} onValueChange={(v) => updateFormFontSize('formB', v[0])} min={50} max={150} step={5} className="flex-1" />
+                              <span className="text-sm font-bold text-purple-700 dark:text-purple-300 min-w-12">{formFontSizes['formB'] ?? 100}%</span>
+                              <Button variant="ghost" size="sm" onClick={() => updateFormFontSize('formB', 100)} className="h-7 px-2"><RotateCcw className="h-3 w-3" /></Button>
+                            </div>
+                          </div>
+                        )}
+                        <div className={isTextEditMode ? 'text-edit-mode' : ''} style={{ fontSize: `${formFontSizes['formB'] ?? 100}%` }}>
+                          <AavakVeraFormB client={client} formData={formData} onChange={handleFormChange} isManualMode={isManualMode} />
+                        </div>
                       </TabsContent>
                       <TabsContent value="form16a" className="mt-0">
-                        <Form16A client={client} formData={formData} onChange={handleFormChange} />
+                        {isTextEditMode && (
+                          <div className="mb-3 p-2 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-lg no-print form-font-control">
+                            <div className="flex items-center gap-4">
+                              <span className="text-sm font-medium text-purple-700 dark:text-purple-300 min-w-fit">Form 16A Font Size:</span>
+                              <Slider value={[formFontSizes['form16a'] ?? 100]} onValueChange={(v) => updateFormFontSize('form16a', v[0])} min={50} max={150} step={5} className="flex-1" />
+                              <span className="text-sm font-bold text-purple-700 dark:text-purple-300 min-w-12">{formFontSizes['form16a'] ?? 100}%</span>
+                              <Button variant="ghost" size="sm" onClick={() => updateFormFontSize('form16a', 100)} className="h-7 px-2"><RotateCcw className="h-3 w-3" /></Button>
+                            </div>
+                          </div>
+                        )}
+                        <div className={isTextEditMode ? 'text-edit-mode' : ''} style={{ fontSize: `${formFontSizes['form16a'] ?? 100}%` }}>
+                          <Form16A client={client} formData={formData} onChange={handleFormChange} />
+                        </div>
                       </TabsContent>
                       <TabsContent value="form16b" className="mt-0">
-                        <Form16B client={client} formData={formData} onChange={handleFormChange} />
+                        {isTextEditMode && (
+                          <div className="mb-3 p-2 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-lg no-print form-font-control">
+                            <div className="flex items-center gap-4">
+                              <span className="text-sm font-medium text-purple-700 dark:text-purple-300 min-w-fit">Form 16B Font Size:</span>
+                              <Slider value={[formFontSizes['form16b'] ?? 100]} onValueChange={(v) => updateFormFontSize('form16b', v[0])} min={50} max={150} step={5} className="flex-1" />
+                              <span className="text-sm font-bold text-purple-700 dark:text-purple-300 min-w-12">{formFontSizes['form16b'] ?? 100}%</span>
+                              <Button variant="ghost" size="sm" onClick={() => updateFormFontSize('form16b', 100)} className="h-7 px-2"><RotateCcw className="h-3 w-3" /></Button>
+                            </div>
+                          </div>
+                        )}
+                        <div className={isTextEditMode ? 'text-edit-mode' : ''} style={{ fontSize: `${formFontSizes['form16b'] ?? 100}%` }}>
+                          <Form16B client={client} formData={formData} onChange={handleFormChange} />
+                        </div>
                       </TabsContent>
                     </div>
                   </Tabs>
