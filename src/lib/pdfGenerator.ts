@@ -23,61 +23,72 @@ const applyPrintStyles = (clone: HTMLElement): void => {
   // Style each form based on its type
   FORM_IDS.forEach((formId, index) => {
     const form = clone.querySelector(`#${formId}`) as HTMLElement;
-    if (!form) return;
+    if (!form) {
+      console.log(`PDF: Form #${formId} not found`);
+      return;
+    }
 
     const isPagar = formId === 'pagar-form';
     const isLast = index === FORM_IDS.length - 1;
     
-    // Base form styles
-    form.style.display = 'block';
-    form.style.visibility = 'visible';
-    form.style.background = 'white';
-    form.style.color = 'black';
-    form.style.margin = '0';
-    form.style.boxSizing = 'border-box';
-    form.style.overflow = 'hidden';
-    form.style.position = 'relative';
-    form.style.pageBreakAfter = isLast ? 'avoid' : 'always';
-    form.style.pageBreakInside = 'avoid';
+    // Base form styles with !important to override CSS
+    const baseStyles = `
+      display: block !important;
+      visibility: visible !important;
+      background: white !important;
+      color: black !important;
+      margin: 0 !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
+      position: relative !important;
+      page-break-after: ${isLast ? 'avoid' : 'always'} !important;
+      page-break-inside: avoid !important;
+      opacity: 1 !important;
+    `;
 
     if (isPagar) {
-      // Pagar - Landscape A4
-      form.style.width = '287mm';
-      form.style.minWidth = '287mm';
-      form.style.height = '198mm';
-      form.style.maxHeight = '198mm';
-      form.style.padding = '2mm';
-      form.style.fontSize = '10pt';
+      form.style.cssText = baseStyles + `
+        width: 287mm !important;
+        min-width: 287mm !important;
+        height: 198mm !important;
+        max-height: 198mm !important;
+        padding: 2mm !important;
+        font-size: 10pt !important;
+      `;
     } else if (formId === 'aavak-vera-form-a' || formId === 'aavak-vera-form-b') {
-      // Aavak Vera forms - Portrait A4
-      form.style.width = '198mm';
-      form.style.maxWidth = '198mm';
-      form.style.height = 'auto';
-      form.style.maxHeight = '280mm';
-      form.style.padding = '3mm';
-      form.style.fontSize = formId === 'aavak-vera-form-a' ? '8pt' : '7.5pt';
+      form.style.cssText = baseStyles + `
+        width: 198mm !important;
+        max-width: 198mm !important;
+        height: auto !important;
+        max-height: 280mm !important;
+        padding: 3mm !important;
+        font-size: ${formId === 'aavak-vera-form-a' ? '8pt' : '7.5pt'} !important;
+      `;
     } else {
-      // Declaration, Form 16A, Form 16B - Portrait A4
-      form.style.width = '198mm';
-      form.style.maxWidth = '198mm';
-      form.style.height = 'auto';
-      form.style.maxHeight = '282mm';
-      form.style.padding = '2mm';
-      form.style.fontSize = formId === 'declaration-form' ? '11pt' : '7.5pt';
+      form.style.cssText = baseStyles + `
+        width: 198mm !important;
+        max-width: 198mm !important;
+        height: auto !important;
+        max-height: 282mm !important;
+        padding: 2mm !important;
+        font-size: ${formId === 'declaration-form' ? '11pt' : '7.5pt'} !important;
+      `;
     }
 
     // Style tables within this form
     const tables = form.querySelectorAll('table');
     tables.forEach((table) => {
       const tableEl = table as HTMLElement;
-      tableEl.style.width = '100%';
-      tableEl.style.borderCollapse = 'collapse';
-      tableEl.style.marginBottom = isPagar ? '0.5mm' : '1mm';
-      tableEl.style.background = 'white';
-      tableEl.style.border = '0.5pt solid black';
-      if (isPagar) {
-        tableEl.style.tableLayout = 'fixed';
-      }
+      tableEl.style.cssText = `
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-bottom: ${isPagar ? '0.5mm' : '1mm'} !important;
+        background: white !important;
+        border: 0.5pt solid black !important;
+        display: table !important;
+        visibility: visible !important;
+        ${isPagar ? 'table-layout: fixed !important;' : ''}
+      `;
     });
 
     // Style cells within this form
@@ -86,43 +97,50 @@ const applyPrintStyles = (clone: HTMLElement): void => {
       const cellEl = cell as HTMLElement;
       const isHeader = cell.tagName === 'TH';
       
-      cellEl.style.border = isPagar ? '0.3pt solid black' : '0.5pt solid black';
-      cellEl.style.color = 'black';
-      cellEl.style.background = isHeader ? '#e8e8e8' : 'white';
-      cellEl.style.verticalAlign = 'middle';
-      cellEl.style.fontWeight = isHeader ? 'bold' : 'normal';
-      cellEl.style.lineHeight = '1.2';
-      cellEl.style.overflow = 'hidden';
+      let fontSize = '7.5pt';
+      let padding = '1mm 1.5mm';
       
       if (isPagar) {
-        cellEl.style.fontSize = '10pt';
-        cellEl.style.padding = '0.3mm';
-        cellEl.style.whiteSpace = 'nowrap';
+        fontSize = '10pt';
+        padding = '0.3mm';
       } else if (formId === 'aavak-vera-form-a') {
-        cellEl.style.fontSize = '11pt';
-        cellEl.style.padding = '0.8mm 1.2mm';
+        fontSize = '11pt';
+        padding = '0.8mm 1.2mm';
       } else if (formId === 'aavak-vera-form-b') {
-        cellEl.style.fontSize = '7.5pt';
-        cellEl.style.padding = '0.8mm 1.2mm';
+        fontSize = '7.5pt';
+        padding = '0.8mm 1.2mm';
       } else if (formId === 'declaration-form') {
-        cellEl.style.fontSize = '11pt';
-        cellEl.style.padding = '1mm 1.5mm';
-      } else {
-        cellEl.style.fontSize = '7.5pt';
-        cellEl.style.padding = '1mm 1.5mm';
+        fontSize = '11pt';
+        padding = '1mm 1.5mm';
       }
+      
+      cellEl.style.cssText = `
+        border: ${isPagar ? '0.3pt' : '0.5pt'} solid black !important;
+        color: black !important;
+        background: ${isHeader ? '#e8e8e8' : 'white'} !important;
+        vertical-align: middle !important;
+        font-weight: ${isHeader ? 'bold' : 'normal'} !important;
+        line-height: 1.2 !important;
+        overflow: hidden !important;
+        font-size: ${fontSize} !important;
+        padding: ${padding} !important;
+        ${isPagar ? 'white-space: nowrap !important;' : ''}
+        display: table-cell !important;
+        visibility: visible !important;
+      `;
     });
 
     // Style inputs/spans within this form
     const inputs = form.querySelectorAll('input, span');
     inputs.forEach((input) => {
       const el = input as HTMLElement;
-      el.style.border = 'none';
-      el.style.background = 'transparent';
-      el.style.color = 'black';
-      if (isPagar) {
-        el.style.fontSize = '11pt';
-      }
+      el.style.cssText = `
+        border: none !important;
+        background: transparent !important;
+        color: black !important;
+        ${isPagar ? 'font-size: 11pt !important;' : ''}
+        visibility: visible !important;
+      `;
     });
 
     // Handle Aavak Vera A title - 18pt
@@ -131,25 +149,33 @@ const applyPrintStyles = (clone: HTMLElement): void => {
       if (firstTable) {
         const titleCell = firstTable.querySelector('td');
         if (titleCell) {
-          (titleCell as HTMLElement).style.fontSize = '18pt';
-          (titleCell as HTMLElement).style.fontWeight = 'bold';
-          (titleCell as HTMLElement).style.padding = '2mm';
+          (titleCell as HTMLElement).style.cssText += `
+            font-size: 18pt !important;
+            font-weight: bold !important;
+            padding: 2mm !important;
+          `;
         }
       }
     }
+    
+    console.log(`PDF: Styled form #${formId}`);
   });
 
   // Convert all inputs to spans with their values
   const allInputs = clone.querySelectorAll('input');
+  console.log(`PDF: Converting ${allInputs.length} inputs to spans`);
   allInputs.forEach((input) => {
     const inputEl = input as HTMLInputElement;
     const span = document.createElement('span');
     span.textContent = inputEl.value || '';
-    span.style.color = 'black';
-    span.style.fontSize = 'inherit';
-    span.style.fontFamily = 'inherit';
-    span.style.border = 'none';
-    span.style.background = 'transparent';
+    span.style.cssText = `
+      color: black !important;
+      font-size: inherit !important;
+      font-family: inherit !important;
+      border: none !important;
+      background: transparent !important;
+      visibility: visible !important;
+    `;
     if (inputEl.parentNode) {
       inputEl.parentNode.replaceChild(span, inputEl);
     }
@@ -158,33 +184,70 @@ const applyPrintStyles = (clone: HTMLElement): void => {
   // Hide screen-only elements
   const hideElements = clone.querySelectorAll('.screen-only, .no-print, button');
   hideElements.forEach((el) => {
-    (el as HTMLElement).style.display = 'none';
+    (el as HTMLElement).style.cssText = 'display: none !important;';
   });
 };
 
 // Create a print-styled clone for PDF generation
 const createPrintStyledClone = (printElement: HTMLElement): HTMLElement => {
+  console.log('PDF: Starting clone creation');
+  console.log('PDF: Source element children:', printElement.children.length);
+  
   const clone = printElement.cloneNode(true) as HTMLElement;
   
   // Remove classes that hide content
   clone.classList.remove('print-only-area');
   clone.id = 'pdf-capture-container';
   
-  // Main container styles
-  clone.style.position = 'absolute';
-  clone.style.left = '0';
-  clone.style.top = '0';
-  clone.style.width = '210mm';
-  clone.style.background = 'white';
-  clone.style.visibility = 'visible';
-  clone.style.display = 'block';
-  clone.style.zIndex = '99999';
-  clone.style.padding = '0';
-  clone.style.margin = '0';
-  clone.style.opacity = '1';
+  // Main container styles - MUST be visible
+  clone.style.cssText = `
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 210mm !important;
+    background: white !important;
+    visibility: visible !important;
+    display: block !important;
+    z-index: 99999 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    opacity: 1 !important;
+    overflow: visible !important;
+    height: auto !important;
+  `;
+
+  // Force ALL children to be visible
+  const allElements = clone.querySelectorAll('*');
+  console.log('PDF: Total elements in clone:', allElements.length);
+  
+  allElements.forEach((el) => {
+    const htmlEl = el as HTMLElement;
+    // Remove hidden classes
+    htmlEl.classList.remove('hidden', 'invisible', 'print-only-area');
+    // Ensure visibility
+    if (htmlEl.style.display === 'none' || htmlEl.style.visibility === 'hidden') {
+      htmlEl.style.display = 'block';
+      htmlEl.style.visibility = 'visible';
+    }
+  });
+
+  // Check forms exist
+  let formsFound = 0;
+  FORM_IDS.forEach(id => {
+    const form = clone.querySelector(`#${id}`);
+    if (form) {
+      formsFound++;
+      console.log(`PDF: Found form #${id}`);
+    } else {
+      console.log(`PDF: MISSING form #${id}`);
+    }
+  });
+  console.log('PDF: Total forms found:', formsFound);
 
   // Apply all print styles
   applyPrintStyles(clone);
+  
+  console.log('PDF: Clone innerHTML length:', clone.innerHTML.length);
   
   return clone;
 };
