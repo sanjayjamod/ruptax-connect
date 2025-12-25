@@ -93,14 +93,8 @@
     padding: 0 !important;
   }
 
-  /* Print wrapper - no spacing */
-  .print-wrapper {
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  /* Print area container - Screen: hidden, Print: visible */
-  .print-area-container {
+  /* Print only area - visible in print */
+  .print-only-area {
     display: block !important;
     visibility: visible !important;
     margin: 0 !important;
@@ -112,7 +106,7 @@
   }
 
   /* Force first form to start at top - no blank page */
-  .print-area-container > *:first-child {
+  .print-only-area > *:first-child {
     page-break-before: avoid !important;
     break-before: avoid !important;
     margin-top: 0 !important;
@@ -855,15 +849,44 @@
   }
 }
 
-/* Screen styles - Hide print area on screen */
+/* ========================================
+   SCREEN vs PRINT VISIBILITY
+   ======================================== */
+
+/* Screen: Hide print area completely */
 @media screen {
-  .print-area-container {
+  .print-only-area {
+    position: absolute !important;
+    left: -99999px !important;
+    top: -99999px !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    visibility: hidden !important;
+  }
+  
+  .screen-only {
+    display: flex !important;
+  }
+}
+
+/* Print: Show print area, hide screen content */
+@media print {
+  .print-only-area {
+    position: static !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    visibility: visible !important;
+    display: block !important;
+  }
+  
+  .screen-only {
     display: none !important;
     visibility: hidden !important;
     height: 0 !important;
     width: 0 !important;
-    overflow: hidden !important;
-    position: absolute !important;
-    left: -9999px !important;
   }
 }

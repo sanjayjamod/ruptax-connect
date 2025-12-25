@@ -501,10 +501,10 @@ const TaxFormAdmin = () => {
   };
 
   return (
-    <div className="print-wrapper">
-      {/* Print Area - All Forms for A4 Print - FIRST for proper print order */}
+    <>
+      {/* Print Area - Absolutely positioned off-screen, visible only in print */}
       {client && formData && (
-        <div className="print-area-container" ref={printRef}>
+        <div className="print-only-area" ref={printRef}>
           <PagarForm client={client} formData={formData} onChange={setFormData} readOnly />
           <DeclarationForm client={client} formData={formData} onChange={setFormData} readOnly />
           <AavakVeraFormA client={client} formData={formData} onChange={setFormData} readOnly />
@@ -521,7 +521,7 @@ const TaxFormAdmin = () => {
         </div>
       )}
 
-      <div className="flex min-h-screen flex-col bg-background no-print">
+      <div className="flex min-h-screen flex-col bg-background screen-only">
         <Header />
         
         <main className="flex-1 py-4">
@@ -1013,7 +1013,7 @@ const TaxFormAdmin = () => {
       <SideCalculator />
       <TaxChatbot formData={formData} />
     </div>
-    </div>
+    </>
   );
 };
 
