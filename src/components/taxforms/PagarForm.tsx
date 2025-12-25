@@ -406,7 +406,7 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
       </table>
 
       {/* Signature Section - More space from table */}
-      <div className="flex justify-between items-end mt-18 text-[10px]">
+      <div className="flex justify-between items-end mt-22 text-[10px]">
         <div>
           <p>સ્થળ: {client.schoolNameGujarati || client.schoolName || '_____________'}</p>
           <p>તારીખ: _______________</p>
