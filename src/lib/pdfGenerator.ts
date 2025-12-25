@@ -8,11 +8,96 @@ export interface PDFGenerationResult {
   error?: string;
 }
 
+// Apply print-like styles inline for PDF capture
+const applyPrintStyles = (element: HTMLElement) => {
+  // Base styles for all forms
+  const allForms = element.querySelectorAll('[id$="-form"]');
+  allForms.forEach((form) => {
+    const formEl = form as HTMLElement;
+    formEl.style.cssText = `
+      display: block !important;
+      visibility: visible !important;
+      background: white !important;
+      color: black !important;
+      padding: 5mm !important;
+      margin: 0 !important;
+      box-sizing: border-box !important;
+      page-break-after: always !important;
+      overflow: visible !important;
+      font-size: 10pt !important;
+    `;
+    
+    // Portrait forms (Declaration, Form16A, Form16B, AavakVera A & B)
+    if (formEl.id !== 'pagar-form') {
+      formEl.style.width = '190mm';
+      formEl.style.minHeight = '270mm';
+    } else {
+      // Pagar form - landscape dimensions
+      formEl.style.width = '277mm';
+      formEl.style.minHeight = '190mm';
+    }
+  });
+
+  // Style all tables
+  const tables = element.querySelectorAll('table');
+  tables.forEach((table) => {
+    (table as HTMLElement).style.cssText = `
+      width: 100% !important;
+      border-collapse: collapse !important;
+      margin-bottom: 2mm !important;
+      font-size: inherit !important;
+    `;
+  });
+
+  // Style all table cells
+  const cells = element.querySelectorAll('th, td');
+  cells.forEach((cell) => {
+    (cell as HTMLElement).style.cssText = `
+      border: 0.5pt solid black !important;
+      padding: 1mm 2mm !important;
+      font-size: 9pt !important;
+      color: black !important;
+      background: white !important;
+      vertical-align: middle !important;
+    `;
+  });
+
+  // Style header cells
+  const headerCells = element.querySelectorAll('th');
+  headerCells.forEach((cell) => {
+    (cell as HTMLElement).style.backgroundColor = '#e8e8e8';
+    (cell as HTMLElement).style.fontWeight = 'bold';
+  });
+
+  // Style inputs to look like text
+  const inputs = element.querySelectorAll('input, span');
+  inputs.forEach((input) => {
+    (input as HTMLElement).style.cssText = `
+      border: none !important;
+      background: transparent !important;
+      color: black !important;
+      font-size: inherit !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    `;
+  });
+
+  // Hide any screen-only elements
+  const screenOnly = element.querySelectorAll('.screen-only, .no-print, button, .text-edit-active-indicator');
+  screenOnly.forEach((el) => {
+    (el as HTMLElement).style.display = 'none';
+  });
+};
+
 const prepareElementForPDF = (printElement: HTMLElement): HTMLElement => {
   // Clone the element
   const clone = printElement.cloneNode(true) as HTMLElement;
   
-  // Make it visible and styled for PDF capture
+  // Remove print-only-area class
+  clone.classList.remove('print-only-area');
+  clone.classList.add('pdf-capture-area');
+  
+  // Make container visible
   clone.style.cssText = `
     position: absolute;
     left: 0;
@@ -25,31 +110,11 @@ const prepareElementForPDF = (printElement: HTMLElement): HTMLElement => {
     z-index: 99999;
     overflow: visible;
     pointer-events: none;
+    color: black !important;
   `;
   
-  // Remove print-only-area class that might hide content
-  clone.classList.remove('print-only-area');
-  clone.classList.add('pdf-capture-area');
-  
-  // Make all child elements visible
-  const allElements = clone.querySelectorAll('*');
-  allElements.forEach((el) => {
-    const htmlEl = el as HTMLElement;
-    htmlEl.style.visibility = 'visible';
-    htmlEl.style.display = '';
-  });
-  
-  // Ensure forms have proper styling
-  const forms = clone.querySelectorAll('[id$="-form"]');
-  forms.forEach((form) => {
-    const formEl = form as HTMLElement;
-    formEl.style.display = 'block';
-    formEl.style.visibility = 'visible';
-    formEl.style.pageBreakAfter = 'always';
-    formEl.style.background = 'white';
-    formEl.style.padding = '10mm';
-    formEl.style.boxSizing = 'border-box';
-  });
+  // Apply print styles inline
+  applyPrintStyles(clone);
   
   return clone;
 };
