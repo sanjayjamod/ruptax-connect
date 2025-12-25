@@ -406,11 +406,17 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
       </table>
 
       {/* Signature Section - More space from table */}
-      <div className="flex justify-between mt-18 text-[10px]">
+      <div className="flex justify-between items-end mt-18 text-[10px]">
         <div>
           <p>સ્થળ: {client.schoolNameGujarati || client.schoolName || '_____________'}</p>
           <p>તારીખ: _______________</p>
           <p className="mt-10 border-t border-black pt-1">કર્મચારીની સહી</p>
+        </div>
+        <div className="text-center">
+          <div className="border border-black w-24 h-16 flex items-center justify-center mb-1">
+            <span className="text-[8px] text-gray-400"></span>
+          </div>
+          <p className="text-[9px]">સંસ્થાના મહોર</p>
         </div>
         <div className="text-right flex flex-col justify-end">
           <p className="border-t border-black pt-1">આચાર્યની સહી</p>
