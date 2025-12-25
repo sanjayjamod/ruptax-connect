@@ -8,6 +8,52 @@ export interface PDFGenerationResult {
   error?: string;
 }
 
+const prepareElementForPDF = (printElement: HTMLElement): HTMLElement => {
+  // Clone the element
+  const clone = printElement.cloneNode(true) as HTMLElement;
+  
+  // Make it visible and styled for PDF capture
+  clone.style.cssText = `
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 210mm;
+    background: white;
+    visibility: visible !important;
+    display: block !important;
+    opacity: 1 !important;
+    z-index: 99999;
+    overflow: visible;
+    pointer-events: none;
+  `;
+  
+  // Remove print-only-area class that might hide content
+  clone.classList.remove('print-only-area');
+  clone.classList.add('pdf-capture-area');
+  
+  // Make all child elements visible
+  const allElements = clone.querySelectorAll('*');
+  allElements.forEach((el) => {
+    const htmlEl = el as HTMLElement;
+    htmlEl.style.visibility = 'visible';
+    htmlEl.style.display = '';
+  });
+  
+  // Ensure forms have proper styling
+  const forms = clone.querySelectorAll('[id$="-form"]');
+  forms.forEach((form) => {
+    const formEl = form as HTMLElement;
+    formEl.style.display = 'block';
+    formEl.style.visibility = 'visible';
+    formEl.style.pageBreakAfter = 'always';
+    formEl.style.background = 'white';
+    formEl.style.padding = '10mm';
+    formEl.style.boxSizing = 'border-box';
+  });
+  
+  return clone;
+};
+
 export const generateAndSavePDF = async (
   printElement: HTMLElement,
   clientId: string,
@@ -16,50 +62,41 @@ export const generateAndSavePDF = async (
   userId?: string
 ): Promise<PDFGenerationResult> => {
   try {
-    // Clone the element and make it visible for PDF generation
-    const clone = printElement.cloneNode(true) as HTMLElement;
-    
-    // Style the clone for PDF capture
-    clone.style.cssText = `
-      position: fixed;
-      left: 0;
-      top: 0;
-      width: 210mm;
-      min-height: 297mm;
-      background: white;
-      visibility: visible;
-      display: block;
-      z-index: 99999;
-      overflow: visible;
-    `;
+    // Prepare clone for PDF capture
+    const clone = prepareElementForPDF(printElement);
     
     // Add to body temporarily
     document.body.appendChild(clone);
     
-    // Small delay to ensure DOM is ready
-    await new Promise(resolve => setTimeout(resolve, 100));
+    // Wait for rendering
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Get actual height of content
+    const contentHeight = clone.scrollHeight;
 
     // Generate PDF from the cloned element
     const options = {
-      margin: 5,
+      margin: [5, 5, 5, 5],
       filename: `${clientName}_TaxForms_${financialYear}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
+      image: { type: 'jpeg', quality: 0.95 },
       html2canvas: { 
         scale: 2,
         useCORS: true,
         letterRendering: true,
-        logging: false,
+        logging: true,
         width: 794,
-        height: clone.scrollHeight,
+        height: contentHeight,
+        windowWidth: 794,
         scrollX: 0,
-        scrollY: 0
+        scrollY: 0,
+        backgroundColor: '#ffffff'
       },
       jsPDF: { 
         unit: 'mm', 
         format: 'a4', 
         orientation: 'portrait' as const
       },
-      pagebreak: { mode: ['css', 'legacy'], before: '.page-break' }
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'], before: '.page-break', after: '[id$="-form"]' }
     };
 
     // Generate PDF blob
@@ -133,49 +170,40 @@ export const downloadPDF = async (
   clientName: string,
   financialYear: string
 ): Promise<void> => {
-  // Clone the element and make it visible for PDF generation
-  const clone = printElement.cloneNode(true) as HTMLElement;
-  
-  // Style the clone for PDF capture
-  clone.style.cssText = `
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 210mm;
-    min-height: 297mm;
-    background: white;
-    visibility: visible;
-    display: block;
-    z-index: 99999;
-    overflow: visible;
-  `;
+  // Prepare clone for PDF capture
+  const clone = prepareElementForPDF(printElement);
   
   // Add to body temporarily
   document.body.appendChild(clone);
   
-  // Small delay to ensure DOM is ready
-  await new Promise(resolve => setTimeout(resolve, 100));
+  // Wait for rendering
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  // Get actual height of content
+  const contentHeight = clone.scrollHeight;
 
   const options = {
-    margin: 5,
+    margin: [5, 5, 5, 5],
     filename: `${clientName}_TaxForms_${financialYear}.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
+    image: { type: 'jpeg', quality: 0.95 },
     html2canvas: { 
       scale: 2,
       useCORS: true,
       letterRendering: true,
       logging: true,
       width: 794,
-      height: clone.scrollHeight,
+      height: contentHeight,
+      windowWidth: 794,
       scrollX: 0,
-      scrollY: 0
+      scrollY: 0,
+      backgroundColor: '#ffffff'
     },
     jsPDF: { 
       unit: 'mm', 
       format: 'a4', 
       orientation: 'portrait' as const
     },
-    pagebreak: { mode: ['css', 'legacy'], before: '.page-break' }
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'], before: '.page-break', after: '[id$="-form"]' }
   };
 
   try {
