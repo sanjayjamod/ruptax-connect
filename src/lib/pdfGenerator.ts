@@ -10,109 +10,109 @@ export interface PDFGenerationResult {
 
 // Create a print-styled clone for PDF generation
 const createPrintStyledClone = (printElement: HTMLElement): HTMLElement => {
+  console.log('Creating PDF clone from element:', printElement);
+  console.log('Original element innerHTML length:', printElement.innerHTML.length);
+  console.log('Original element children count:', printElement.children.length);
+  
   const clone = printElement.cloneNode(true) as HTMLElement;
   
   // Remove classes that hide content
   clone.classList.remove('print-only-area');
   clone.id = 'pdf-capture-container';
   
-  // Main container styles
-  clone.style.cssText = `
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 210mm;
-    background: white !important;
-    visibility: visible !important;
-    display: block !important;
-    z-index: 99999;
-    padding: 0;
-    margin: 0;
-  `;
+  // Main container styles - make it visible
+  clone.style.position = 'absolute';
+  clone.style.left = '0';
+  clone.style.top = '0';
+  clone.style.width = '210mm';
+  clone.style.background = 'white';
+  clone.style.visibility = 'visible';
+  clone.style.display = 'block';
+  clone.style.zIndex = '99999';
+  clone.style.padding = '0';
+  clone.style.margin = '0';
+  clone.style.opacity = '1';
 
   // Get all form containers
   const forms = clone.querySelectorAll('[id$="-form"]');
+  console.log('Found forms in clone:', forms.length);
   
   forms.forEach((form, index) => {
     const formEl = form as HTMLElement;
     const isPagarForm = formEl.id === 'pagar-form';
+    console.log(`Form ${index}: ${formEl.id}, isPagar: ${isPagarForm}`);
     
-    // Base form styles
-    formEl.style.cssText = `
-      display: block !important;
-      visibility: visible !important;
-      background: white !important;
-      color: black !important;
-      margin: 0 !important;
-      padding: ${isPagarForm ? '3mm' : '5mm'} !important;
-      box-sizing: border-box !important;
-      page-break-after: ${index < forms.length - 1 ? 'always' : 'avoid'} !important;
-      page-break-inside: avoid !important;
-      overflow: visible !important;
-      width: ${isPagarForm ? '287mm' : '200mm'} !important;
-      min-height: ${isPagarForm ? '200mm' : '280mm'} !important;
-      font-family: Arial, sans-serif !important;
-      font-size: ${isPagarForm ? '9pt' : '10pt'} !important;
-    `;
+    // Make form visible
+    formEl.style.display = 'block';
+    formEl.style.visibility = 'visible';
+    formEl.style.background = 'white';
+    formEl.style.color = 'black';
+    formEl.style.margin = '0';
+    formEl.style.padding = isPagarForm ? '3mm' : '5mm';
+    formEl.style.boxSizing = 'border-box';
+    formEl.style.pageBreakAfter = index < forms.length - 1 ? 'always' : 'avoid';
+    formEl.style.pageBreakInside = 'avoid';
+    formEl.style.overflow = 'visible';
+    formEl.style.width = isPagarForm ? '287mm' : '200mm';
+    formEl.style.minHeight = isPagarForm ? '200mm' : '280mm';
+    formEl.style.fontFamily = 'Arial, sans-serif';
+    formEl.style.fontSize = isPagarForm ? '9pt' : '10pt';
+    formEl.style.position = 'relative';
   });
 
   // Style all tables
   const tables = clone.querySelectorAll('table');
+  console.log('Found tables:', tables.length);
   tables.forEach((table) => {
     const tableEl = table as HTMLElement;
-    tableEl.style.cssText = `
-      width: 100% !important;
-      border-collapse: collapse !important;
-      margin-bottom: 2mm !important;
-      background: white !important;
-    `;
+    tableEl.style.width = '100%';
+    tableEl.style.borderCollapse = 'collapse';
+    tableEl.style.marginBottom = '2mm';
+    tableEl.style.background = 'white';
+    tableEl.style.display = 'table';
+    tableEl.style.visibility = 'visible';
   });
 
   // Style all table cells
   const cells = clone.querySelectorAll('th, td');
+  console.log('Found cells:', cells.length);
   cells.forEach((cell) => {
     const cellEl = cell as HTMLElement;
     const isHeader = cell.tagName === 'TH';
-    cellEl.style.cssText = `
-      border: 0.5pt solid black !important;
-      padding: 1mm 1.5mm !important;
-      font-size: 9pt !important;
-      color: black !important;
-      background: ${isHeader ? '#e8e8e8' : 'white'} !important;
-      vertical-align: middle !important;
-      text-align: ${cellEl.style.textAlign || 'left'} !important;
-      font-weight: ${isHeader ? 'bold' : 'normal'} !important;
-    `;
+    cellEl.style.border = '0.5pt solid black';
+    cellEl.style.padding = '1mm 1.5mm';
+    cellEl.style.fontSize = '9pt';
+    cellEl.style.color = 'black';
+    cellEl.style.background = isHeader ? '#e8e8e8' : 'white';
+    cellEl.style.verticalAlign = 'middle';
+    cellEl.style.fontWeight = isHeader ? 'bold' : 'normal';
+    cellEl.style.visibility = 'visible';
+    cellEl.style.display = 'table-cell';
   });
 
-  // Style inputs and spans to look like plain text
+  // Convert inputs to spans with their values
   const inputs = clone.querySelectorAll('input');
+  console.log('Found inputs to convert:', inputs.length);
   inputs.forEach((input) => {
     const inputEl = input as HTMLInputElement;
     const span = document.createElement('span');
     span.textContent = inputEl.value || '';
-    span.style.cssText = `
-      color: black !important;
-      font-size: inherit !important;
-      font-family: inherit !important;
-    `;
-    inputEl.parentNode?.replaceChild(span, inputEl);
+    span.style.color = 'black';
+    span.style.fontSize = 'inherit';
+    span.style.fontFamily = 'inherit';
+    if (inputEl.parentNode) {
+      inputEl.parentNode.replaceChild(span, inputEl);
+    }
   });
 
   // Hide screen-only elements
-  const hideElements = clone.querySelectorAll('.screen-only, .no-print, button, [class*="edit"]');
+  const hideElements = clone.querySelectorAll('.screen-only, .no-print, button');
   hideElements.forEach((el) => {
     (el as HTMLElement).style.display = 'none';
   });
 
-  // Style title elements
-  const titles = clone.querySelectorAll('.text-center.font-bold, h1, h2, h3');
-  titles.forEach((title) => {
-    const titleEl = title as HTMLElement;
-    titleEl.style.color = 'black';
-    titleEl.style.fontWeight = 'bold';
-  });
-
+  console.log('Clone prepared, innerHTML length:', clone.innerHTML.length);
+  
   return clone;
 };
 
