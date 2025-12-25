@@ -3,26 +3,24 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Key, Eye, EyeOff } from "lucide-react";
+import { Key, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { resetClientPassword } from "@/lib/clientFileStorage";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PasswordResetProps {
-  mobile: string;
   onSuccess?: () => void;
 }
 
-const PasswordReset = ({ mobile, onSuccess }: PasswordResetProps) => {
+const PasswordReset = ({ onSuccess }: PasswordResetProps) => {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleReset = () => {
-    if (!currentPassword || !newPassword || !confirmPassword) {
+  const handleReset = async () => {
+    if (!newPassword || !confirmPassword) {
       toast({
         title: "Error",
         description: "Please fill all fields",
@@ -31,10 +29,10 @@ const PasswordReset = ({ mobile, onSuccess }: PasswordResetProps) => {
       return;
     }
 
-    if (newPassword.length < 4) {
+    if (newPassword.length < 6) {
       toast({
         title: "Error",
-        description: "Password must be at least 4 characters",
+        description: "Password must be at least 6 characters",
         variant: "destructive"
       });
       return;
@@ -51,41 +49,37 @@ const PasswordReset = ({ mobile, onSuccess }: PasswordResetProps) => {
 
     setLoading(true);
     
-    // Verify current password by checking localStorage
-    const STORAGE_KEY = "ruptax_clients";
-    const data = localStorage.getItem(STORAGE_KEY);
-    const clients = data ? JSON.parse(data) : [];
-    const client = clients.find((c: any) => c.mobileNo === mobile);
-    
-    if (!client || client.password !== currentPassword) {
-      toast({
-        title: "Error",
-        description: "Current password is incorrect",
-        variant: "destructive"
+    try {
+      // Use Supabase Auth to update password securely
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
       });
-      setLoading(false);
-      return;
-    }
 
-    const result = resetClientPassword(mobile, newPassword);
-    setLoading(false);
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to reset password",
+          variant: "destructive"
+        });
+        return;
+      }
 
-    if (result.success) {
       toast({
         title: "Success",
         description: "Password changed successfully"
       });
       setOpen(false);
-      setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
       onSuccess?.();
-    } else {
+    } catch (err) {
       toast({
         title: "Error",
-        description: result.error || "Failed to reset password",
+        description: "Failed to reset password",
         variant: "destructive"
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -106,13 +100,13 @@ const PasswordReset = ({ mobile, onSuccess }: PasswordResetProps) => {
         </DialogHeader>
         <div className="space-y-4 pt-4">
           <div className="space-y-2">
-            <Label>Current Password</Label>
+            <Label>New Password</Label>
             <div className="relative">
               <Input
                 type={showPassword ? "text" : "password"}
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                placeholder="Enter current password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Enter new password (min 6 characters)"
               />
               <Button
                 type="button"
@@ -124,16 +118,6 @@ const PasswordReset = ({ mobile, onSuccess }: PasswordResetProps) => {
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </Button>
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>New Password</Label>
-            <Input
-              type={showPassword ? "text" : "password"}
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Enter new password"
-            />
           </div>
 
           <div className="space-y-2">
@@ -151,7 +135,14 @@ const PasswordReset = ({ mobile, onSuccess }: PasswordResetProps) => {
               Cancel
             </Button>
             <Button onClick={handleReset} disabled={loading}>
-              {loading ? "Saving..." : "Update Password"}
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Update Password"
+              )}
             </Button>
           </div>
         </div>

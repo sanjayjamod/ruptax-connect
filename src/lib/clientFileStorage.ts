@@ -88,26 +88,9 @@ export const deleteDocument = (docId: string): boolean => {
 };
 
 // ============ Password Reset ============
-
-export const resetClientPassword = (
-  mobile: string, 
-  newPassword: string
-): { success: boolean; error?: string } => {
-  const STORAGE_KEY = "ruptax_clients";
-  const data = localStorage.getItem(STORAGE_KEY);
-  const clients = data ? JSON.parse(data) : [];
-  
-  const index = clients.findIndex((c: any) => c.mobileNo === mobile);
-  if (index === -1) {
-    return { success: false, error: "Mobile number not registered" };
-  }
-  
-  clients[index].password = newPassword;
-  clients[index].updatedAt = new Date().toISOString();
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(clients));
-  
-  return { success: true };
-};
+// DEPRECATED: Password reset now uses Supabase Auth
+// Use supabase.auth.updateUser({ password: newPassword }) instead
+// This function is kept for backward compatibility but should not be used
 
 // ============ File Utils ============
 
