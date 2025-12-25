@@ -191,8 +191,8 @@ const PrintSettings = ({ client, formData, onChange }: PrintSettingsProps) => {
     };
   };
 
-  const handlePrint = () => {
-    // Generate custom print CSS based on settings
+const handlePrint = () => {
+    // Generate unified print CSS - same as Print All button
     const printStyleSheet = document.createElement("style");
     printStyleSheet.id = "custom-print-styles";
     
@@ -209,48 +209,28 @@ const PrintSettings = ({ client, formData, onChange }: PrintSettingsProps) => {
       form16B: "#form-16b",
     };
 
+    // Unified print styles - uses same layout as Print All
     let customStyles = `
       @media print {
+        @page { size: A4 portrait; margin: 5mm; }
+        @page pagar { size: A4 landscape; margin: 4mm; }
+        .pagar-page { page: pagar; }
+
         /* Hide disabled forms */
         ${Object.entries(settings)
           .filter(([_, s]) => !s.enabled)
-          .map(([key, _]) => {
-            return `${idMap[key]} { display: none !important; }`;
-          })
+          .map(([key, _]) => `${idMap[key]} { display: none !important; }`)
           .join("\n")}
-
-        /* Apply custom settings to each form */
+        
+        /* Page border settings - only apply if enabled */
         ${Object.entries(settings)
-          .filter(([_, s]) => s.enabled)
-          .map(([key, s]) => {
-            // Build page border CSS separately for clarity
-            let pageBorderCSS = '';
-            if (s.pageBorder) {
-              pageBorderCSS = `
-                border-width: ${s.pageBorderWidth}pt !important;
-                border-style: ${s.pageBorderStyle} !important;
-                border-color: ${s.pageBorderColor} !important;
-                box-sizing: border-box !important;
-              `;
-            } else {
-              pageBorderCSS = 'border: none !important;';
+          .filter(([_, s]) => s.enabled && s.pageBorder)
+          .map(([key, s]) => `
+            ${idMap[key]} {
+              border: ${s.pageBorderWidth}pt ${s.pageBorderStyle} ${s.pageBorderColor} !important;
+              box-sizing: border-box !important;
             }
-            
-            return `
-              ${idMap[key]} {
-                padding: ${s.marginTop}mm ${s.marginRight}mm ${s.marginBottom}mm ${s.marginLeft}mm !important;
-                font-size: ${s.fontSize}pt !important;
-                ${pageBorderCSS}
-              }
-              ${idMap[key]} table th,
-              ${idMap[key]} table td {
-                font-size: ${s.fontSize}pt !important;
-                ${!s.showBorders ? "border: none !important;" : ""}
-              }
-              ${!s.showHeader ? `${idMap[key]} > table:first-of-type { display: none !important; }` : ""}
-              ${!s.showFooter ? `${idMap[key]} .form-footer { display: none !important; }` : ""}
-            `;
-          })
+          `)
           .join("\n")}
       }
     `;
@@ -262,8 +242,14 @@ const PrintSettings = ({ client, formData, onChange }: PrintSettingsProps) => {
     printStyleSheet.textContent = customStyles;
     document.head.appendChild(printStyleSheet);
 
-    // Trigger print
+    // Trigger print - uses same hidden print-area as Print All
     window.print();
+    
+    // Clean up after print
+    setTimeout(() => {
+      const style = document.getElementById("custom-print-styles");
+      if (style) style.remove();
+    }, 1000);
 
     toast({ title: "Print", description: `Printing ${enabledForms.length} form(s)` });
   };
