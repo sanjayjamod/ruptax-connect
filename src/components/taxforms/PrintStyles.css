@@ -290,9 +290,11 @@
     vertical-align: middle !important;
   }
 
-  /* Title row - 18pt with higher specificity */
+  /* Title row - 18pt with HIGHEST specificity - MUST override everything */
+  #aavak-vera-form-a > table:first-of-type > tbody > tr:first-child > td,
   #aavak-vera-form-a > table:first-of-type td,
-  #aavak-vera-form-a table:first-of-type td.text-center.font-bold {
+  #aavak-vera-form-a table:first-of-type td.text-center.font-bold,
+  #aavak-vera-form-a table:first-of-type td.text-center {
     font-size: 18pt !important;
     padding: 2mm !important;
     font-weight: bold !important;
@@ -361,8 +363,7 @@
     font-weight: bold !important;
   }
 
-  /* આવકવેરા Form Titles - Compact */
-  #aavak-vera-form-a table:first-of-type td.text-center.font-bold,
+  /* આવકવેરા B Form Title Only - Compact */
   #aavak-vera-form-b table:first-of-type td.text-center.font-bold {
     font-size: 10pt !important;
     padding: 1mm !important;
