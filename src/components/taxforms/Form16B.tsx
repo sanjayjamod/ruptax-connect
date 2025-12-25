@@ -202,39 +202,39 @@ const Form16B = ({ client, formData }: Form16BProps) => {
       </table>
 
       {/* Certification */}
-      <div className="border border-black p-3 mt-3 text-[10px]">
-        <p className="mb-2">
+      <div className="border border-black p-2 mt-2 text-[9px]">
+        <p className="mb-1">
           I <strong>{form16.headMasterName || client.headMaster || client.tdo || '_______________'}</strong> SON OF:- <strong>{form16.headMasterFatherName || client.headMasterFather || '_______________'}</strong>
         </p>
-        <p className="mb-2">
+        <p className="mb-1">
           Working in the capacity of:- <strong>{form16.headMasterDesignation || 'HEAD MASTER'}</strong> (designation) do hereby certify that a sum of
         </p>
-        <p className="mb-2">
+        <p className="mb-1">
           Rs:- <strong>{taxB.totalTaxPaid || 0}</strong> (in words) <strong>{numberToWords(taxB.totalTaxPaid || 0)}</strong>
         </p>
-        <p className="mb-2">
+        <p className="mb-1">
           has been deducted at source and paid to the credit of the Central Government.
         </p>
-        <p className="text-[9px]">
+        <p className="text-[8px]">
           I further certify that the information given above is true and correct based on the books of account, documents and other available records.
         </p>
 
-        <div className="flex justify-between mt-6">
+        <div className="flex justify-between mt-3 text-[9px]">
           <div>
-            <p>DATE:- {form16.certificationDate || '_______________'}</p>
-            <p>PLACE: {form16.certificationPlace || client.headMasterPlace || client.payCenterName || '_______________'}</p>
+            <p className="text-[9px]">DATE:- {form16.certificationDate || '_______________'}</p>
+            <p className="text-[9px]">PLACE: {form16.certificationPlace || client.headMasterPlace || client.payCenterName || '_______________'}</p>
           </div>
-          <div className="text-center">
-            <div className="border-t border-black pt-1 min-w-[150px]">
+          <div className="text-center text-[9px]">
+            <div className="border-t border-black pt-1 min-w-[120px]">
               Signature
             </div>
-            <p className="mt-1">Full Name: {form16.headMasterName || client.headMaster || client.tdo || '_______________'}</p>
-            <p>Designation: {form16.headMasterDesignation || 'HEAD MASTER'}</p>
+            <p className="mt-1 text-[9px]">Full Name: {form16.headMasterName || client.headMaster || client.tdo || '_______________'}</p>
+            <p className="text-[9px]">Designation: {form16.headMasterDesignation || 'HEAD MASTER'}</p>
           </div>
         </div>
       </div>
 
-      <div className="form-footer text-center text-[8px] mt-4 pt-2 border-t border-dashed border-gray-400">
+      <div className="form-footer text-center text-[7px] mt-2 pt-1 border-t border-dashed border-gray-400">
         Created By: Smart Computer Vinchhiya 9924640689, 9574031243
       </div>
     </div>
