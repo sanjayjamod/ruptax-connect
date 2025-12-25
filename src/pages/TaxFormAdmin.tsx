@@ -527,15 +527,6 @@ const TaxFormAdmin = () => {
                 <Button onClick={() => handlePrint()} variant="outline" size="sm">
                   <Printer className="h-4 w-4 mr-1" /> Print All
                 </Button>
-                <Button onClick={handlePrintPagar} variant="secondary" size="sm" title="Print Pagar Form in A4 Landscape">
-                  <Printer className="h-4 w-4 mr-1" /> Pagar (Landscape)
-                </Button>
-                <Button onClick={handleExportPDF} variant="outline" size="sm">
-                  <FileText className="h-4 w-4 mr-1" /> PDF
-                </Button>
-                <Button onClick={handleExportExcel} variant="outline" size="sm">
-                  <FileSpreadsheet className="h-4 w-4 mr-1" /> Excel
-                </Button>
                 <WhatsAppShare client={client} onSharePDF={handleExportPDF} />
                 <EmailShare client={client} formData={formData} />
                 <Button 
