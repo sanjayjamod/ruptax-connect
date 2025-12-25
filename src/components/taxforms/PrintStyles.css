@@ -507,6 +507,11 @@
     margin-top: 40mm !important;
   }
 
+  /* Declaration Form Signature Section - 30mm space from table */
+  #declaration-form > .mt-30 {
+    margin-top: 30mm !important;
+  }
+
   /* Signature sections - Compact */
   .flex.justify-between {
     display: flex !important;
