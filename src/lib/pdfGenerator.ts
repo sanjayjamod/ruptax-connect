@@ -193,30 +193,42 @@ const createPrintStyledClone = (printElement: HTMLElement): HTMLElement => {
   console.log('PDF: Starting clone creation');
   console.log('PDF: Source element children:', printElement.children.length);
   
+  // Create a wrapper div that will be visible
+  const wrapper = document.createElement('div');
+  wrapper.id = 'pdf-capture-wrapper';
+  wrapper.style.cssText = `
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: white !important;
+    z-index: 99999 !important;
+    overflow: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  `;
+  
   const clone = printElement.cloneNode(true) as HTMLElement;
   
   // Remove classes that hide content
   clone.classList.remove('print-only-area');
   clone.id = 'pdf-capture-container';
   
-  // Main container styles - use FIXED position to ensure visibility
+  // Main container styles - static position for proper capture
   clone.style.cssText = `
-    position: fixed !important;
-    left: 0 !important;
-    top: 0 !important;
+    position: static !important;
     width: 210mm !important;
     min-width: 210mm !important;
     background: white !important;
     visibility: visible !important;
     display: block !important;
-    z-index: 99999 !important;
     padding: 0 !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
     opacity: 1 !important;
     overflow: visible !important;
     height: auto !important;
     transform: none !important;
-    pointer-events: none !important;
   `;
 
   // Force ALL children to be visible with inline styles
@@ -255,9 +267,12 @@ const createPrintStyledClone = (printElement: HTMLElement): HTMLElement => {
   // Apply all print styles
   applyPrintStyles(clone);
   
+  // Add clone to wrapper
+  wrapper.appendChild(clone);
+  
   console.log('PDF: Clone innerHTML length:', clone.innerHTML.length);
   
-  return clone;
+  return wrapper;
 };
 
 // Generate PDF and auto-download
@@ -266,12 +281,22 @@ export const downloadPDF = async (
   clientName: string,
   financialYear: string
 ): Promise<void> => {
-  const clone = createPrintStyledClone(printElement);
-  document.body.appendChild(clone);
+  const wrapper = createPrintStyledClone(printElement);
+  document.body.appendChild(wrapper);
   
-  await new Promise(resolve => setTimeout(resolve, 500));
+  // Get the actual content container inside wrapper
+  const contentContainer = wrapper.querySelector('#pdf-capture-container') as HTMLElement;
+  
+  // Scroll wrapper to top to ensure content is visible
+  wrapper.scrollTop = 0;
+  
+  await new Promise(resolve => setTimeout(resolve, 800));
 
   const filename = `${clientName}_TaxForms_${financialYear}.pdf`;
+  
+  // Log dimensions for debugging
+  console.log('PDF: Content container dimensions:', contentContainer?.offsetWidth, contentContainer?.offsetHeight);
+  console.log('PDF: Wrapper dimensions:', wrapper.offsetWidth, wrapper.offsetHeight);
   
   // Generate all forms with proper page breaks
   const options = {
@@ -282,15 +307,14 @@ export const downloadPDF = async (
       scale: 2,
       useCORS: true,
       letterRendering: true,
-      logging: true, // Enable logging to debug
+      logging: true,
       backgroundColor: '#ffffff',
-      windowWidth: 794, // A4 portrait width
+      width: contentContainer?.offsetWidth || 794,
+      height: contentContainer?.offsetHeight || 1123,
       scrollX: 0,
       scrollY: 0,
-      x: 0,
-      y: 0,
-      foreignObjectRendering: false,
-      removeContainer: false,
+      windowWidth: contentContainer?.offsetWidth || 794,
+      windowHeight: contentContainer?.offsetHeight || 1123,
     },
     jsPDF: { 
       unit: 'mm', 
@@ -306,10 +330,10 @@ export const downloadPDF = async (
   try {
     await html2pdf()
       .set(options)
-      .from(clone)
+      .from(contentContainer)
       .save();
   } finally {
-    document.body.removeChild(clone);
+    document.body.removeChild(wrapper);
   }
 };
 
@@ -322,10 +346,16 @@ export const generateAndSavePDF = async (
   userId?: string
 ): Promise<PDFGenerationResult> => {
   try {
-    const clone = createPrintStyledClone(printElement);
-    document.body.appendChild(clone);
+    const wrapper = createPrintStyledClone(printElement);
+    document.body.appendChild(wrapper);
     
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Get the actual content container inside wrapper
+    const contentContainer = wrapper.querySelector('#pdf-capture-container') as HTMLElement;
+    
+    // Scroll wrapper to top
+    wrapper.scrollTop = 0;
+    
+    await new Promise(resolve => setTimeout(resolve, 800));
 
     // Generate all forms with proper page breaks
     const options = {
@@ -338,13 +368,12 @@ export const generateAndSavePDF = async (
         letterRendering: true,
         logging: true,
         backgroundColor: '#ffffff',
-        windowWidth: 794,
+        width: contentContainer?.offsetWidth || 794,
+        height: contentContainer?.offsetHeight || 1123,
         scrollX: 0,
         scrollY: 0,
-        x: 0,
-        y: 0,
-        foreignObjectRendering: false,
-        removeContainer: false,
+        windowWidth: contentContainer?.offsetWidth || 794,
+        windowHeight: contentContainer?.offsetHeight || 1123,
       },
       jsPDF: { 
         unit: 'mm', 
@@ -360,10 +389,10 @@ export const generateAndSavePDF = async (
     // Generate PDF blob
     const pdfBlob = await html2pdf()
       .set(options)
-      .from(clone)
+      .from(contentContainer)
       .outputPdf('blob');
 
-    document.body.removeChild(clone);
+    document.body.removeChild(wrapper);
 
     // Create file path
     const timestamp = Date.now();
