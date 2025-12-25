@@ -29,6 +29,12 @@ export interface Client {
   assessmentYear: string;
   formStatus: 'pending' | 'completed' | 'submitted';
   completedAt?: string; // Date when form was completed
+  // Payment fields
+  paymentAmount?: number; // Amount to be paid
+  paymentPaid?: number; // Amount already paid
+  paymentDate?: string; // Last payment date
+  paymentStatus?: 'pending' | 'partial' | 'paid';
+  paymentNotes?: string;
   password?: string; // For client login
   createdAt: string;
   updatedAt: string;

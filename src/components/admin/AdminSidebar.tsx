@@ -20,6 +20,7 @@ import {
   Trash2,
   FileSpreadsheet,
   FileDown,
+  IndianRupee,
 } from "lucide-react";
 import {
   Sidebar,
@@ -104,6 +105,11 @@ const AdminSidebar = ({
       section: "filled-forms",
     },
     {
+      title: "Payment",
+      icon: IndianRupee,
+      section: "payment",
+    },
+    {
       title: "PDFs",
       icon: FileDown,
       section: "pdfs",
@@ -112,7 +118,6 @@ const AdminSidebar = ({
       title: "Notes",
       icon: StickyNote,
       section: "notes",
-      onClick: onOpenNotes,
     },
     {
       title: "Settings",
@@ -171,9 +176,7 @@ const AdminSidebar = ({
                   <SidebarMenuButton
                     isActive={activeSection === item.section}
                     onClick={() => {
-                      if (item.onClick) {
-                        item.onClick();
-                      } else if (onSectionChange) {
+                      if (onSectionChange) {
                         onSectionChange(item.section);
                       }
                     }}

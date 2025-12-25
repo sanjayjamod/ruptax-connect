@@ -15,6 +15,7 @@ import FilledFormsSection from "@/components/admin/FilledFormsSection";
 import TeachersSection from "@/components/admin/TeachersSection";
 import AdminSettings from "@/components/admin/AdminSettings";
 import ClientPDFManager from "@/components/admin/ClientPDFManager";
+import PaymentSection from "@/components/admin/PaymentSection";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { Client, ClientFormData } from "@/types/client";
 import {
@@ -433,7 +434,8 @@ const AdminDashboard = () => {
                   {activeSection === "profiles" && "Client Profiles"}
                   {activeSection === "fill-form" && "Fill Form"}
                   {activeSection === "filled-forms" && "Filled Forms"}
-                  {activeSection === "calculator" && "Calculator"}
+                  {activeSection === "payment" && "Payment Tracking"}
+                  {activeSection === "pdfs" && "PDFs"}
                   {activeSection === "notes" && "Notes"}
                   {activeSection === "settings" && "Settings"}
                 </h1>
@@ -555,10 +557,24 @@ const AdminDashboard = () => {
                 </div>
               )}
 
+              {/* Payment Section */}
+              {activeSection === "payment" && (
+                <div className="animate-fade-in">
+                  <PaymentSection clients={clients} onRefresh={loadData} />
+                </div>
+              )}
+
               {/* PDFs Section */}
               {activeSection === "pdfs" && (
                 <div className="animate-fade-in">
                   <ClientPDFManager />
+                </div>
+              )}
+
+              {/* Notes Section */}
+              {activeSection === "notes" && (
+                <div className="animate-fade-in">
+                  <AdminNotes />
                 </div>
               )}
 
