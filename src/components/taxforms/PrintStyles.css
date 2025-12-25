@@ -49,6 +49,21 @@
     font-size: 8pt !important;
   }
 
+  /* Hide React root wrapper spacing */
+  #root {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Hide React Fragment spacing - target empty elements */
+  #root > *:empty,
+  body > *:empty {
+    display: none !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
   /* Hide EVERYTHING except print area */
   .no-print,
   .text-edit-active-indicator,
@@ -80,7 +95,8 @@
 
   /* Print area container - NO extra spacing, remove hidden class effects */
   .print-area,
-  .hidden.print-area {
+  .hidden.print-area,
+  .hidden.print\:block.print-area {
     display: block !important;
     visibility: visible !important;
     margin: 0 !important;
@@ -88,6 +104,7 @@
     height: auto !important;
     width: 100% !important;
     position: static !important;
+    overflow: visible !important;
   }
 
   /* Show print area */
@@ -95,6 +112,14 @@
   .hidden.print\:block {
     display: block !important;
     visibility: visible !important;
+  }
+
+  /* Force first form to start at top - no blank page */
+  .print-area > *:first-child {
+    page-break-before: avoid !important;
+    break-before: avoid !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
   }
 
   /* Base form container - each form = 1 page EXACTLY */
