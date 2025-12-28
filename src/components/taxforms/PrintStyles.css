@@ -335,9 +335,9 @@
   #aavak-vera-form-a table th,
   #aavak-vera-form-a table td {
     border: 0.4pt solid #000 !important;
-    font-size: 11pt !important;
-    padding: 0.6mm 1mm !important;
-    line-height: 1.1 !important;
+    font-size: 9pt !important;
+    padding: 0.5mm 0.8mm !important;
+    line-height: 1.0 !important;
     vertical-align: middle !important;
   }
 
@@ -351,17 +351,17 @@
     font-weight: bold !important;
   }
 
-  /* Header Info Table (NAME, INCOME YEAR, VILLAGE, etc.) - 11pt */
+  /* Header Info Table (NAME, INCOME YEAR, VILLAGE, etc.) - 9pt */
   #aavak-vera-form-a table:nth-of-type(2) td {
-    font-size: 11pt !important;
-    padding: 1mm 1.5mm !important;
+    font-size: 9pt !important;
+    padding: 0.5mm 1mm !important;
   }
 
-  /* Section headers - 11pt */
+  /* Section headers - 9pt */
   #aavak-vera-form-a .bg-gray-200 td,
   #aavak-vera-form-a td[style*="13pt"] {
-    font-size: 11pt !important;
-    padding: 1mm 1.5mm !important;
+    font-size: 9pt !important;
+    padding: 0.5mm 1mm !important;
     background: #e0e0e0 !important;
   }
 
@@ -393,9 +393,9 @@
   #aavak-vera-form-b table th,
   #aavak-vera-form-b table td {
     border: 0.4pt solid #000 !important;
-    font-size: 11pt !important;
-    padding: 0.6mm 1mm !important;
-    line-height: 1.1 !important;
+    font-size: 9pt !important;
+    padding: 0.5mm 0.8mm !important;
+    line-height: 1.0 !important;
     vertical-align: middle !important;
   }
 
@@ -460,30 +460,30 @@
   #form-16b table th,
   #form-16b table td {
     border: 0.5pt solid #000 !important;
-    font-size: 11pt !important;
-    padding: 0.8mm 1.2mm !important;
-    line-height: 1.1 !important;
+    font-size: 9pt !important;
+    padding: 0.5mm 0.8mm !important;
+    line-height: 1.0 !important;
     vertical-align: middle !important;
   }
 
   /* Form 16B Certification section - Same size as table */
   #form-16b .border.border-black {
-    font-size: 11pt !important;
-    padding: 1.2mm !important;
+    font-size: 9pt !important;
+    padding: 1mm !important;
     margin-top: 1mm !important;
   }
 
   #form-16b .border.border-black p,
   #form-16b .border.border-black div,
   #form-16b .border.border-black span {
-    font-size: 11pt !important;
-    line-height: 1.1 !important;
-    margin-bottom: 0.4mm !important;
+    font-size: 9pt !important;
+    line-height: 1.0 !important;
+    margin-bottom: 0.3mm !important;
   }
 
   #form-16b .flex.justify-between {
-    margin-top: 15mm !important;
-    font-size: 11pt !important;
+    margin-top: 10mm !important;
+    font-size: 9pt !important;
   }
 
   /* આવકવેરા A footer - Compact */
