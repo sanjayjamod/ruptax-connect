@@ -261,23 +261,38 @@ export const calculateTax = (formData: TaxFormData): TaxFormData => {
     totalTax += slab7Tax;
   }
   
-  // Legacy slab fields (for backward compatibility)
+  // Individual slab values
   const taxSlab1 = 0; // 0-4L @ 0%
   const taxSlab2 = taxSlabs[1]?.tax || 0; // 4-8L @ 5%
-  const taxSlab3 = (taxSlabs[2]?.tax || 0) + (taxSlabs[3]?.tax || 0) + 
-                   (taxSlabs[4]?.tax || 0) + (taxSlabs[5]?.tax || 0) + (taxSlabs[6]?.tax || 0);
+  const taxSlab3 = taxSlabs[2]?.tax || 0; // 8-12L @ 10%
+  const taxSlab4 = taxSlabs[3]?.tax || 0; // 12-16L @ 15%
+  const taxSlab5 = taxSlabs[4]?.tax || 0; // 16-20L @ 20%
+  const taxSlab6 = taxSlabs[5]?.tax || 0; // 20-24L @ 25%
+  const taxSlab7 = taxSlabs[6]?.tax || 0; // 24L+ @ 30%
   
-  // Tax Rebate under Section 87A (NEW REGIME)
-  // If taxable income <= 7,00,000, full rebate up to Rs. 25,000
-  const taxRebate87A = roundedTaxableIncome <= 700000 ? Math.min(totalTax, 25000) : 0;
+  // Tax Rebate under Section 87A (NEW REGIME 2025-26)
+  // If taxable income <= 12,75,000, full rebate up to Rs. 60,000
+  const taxRebate87A = roundedTaxableIncome <= 1275000 ? Math.min(totalTax, 60000) : 0;
   
   const taxAfterRebate = Math.max(0, totalTax - taxRebate87A);
   
-  // Education Cess @ 4%
-  const educationCess = Math.round(taxAfterRebate * 0.04);
+  // Marginal Relief for income between 12,75,000 and 13,35,000
+  // If income is just above 12.75L, tax should not exceed the incremental income over 12.75L
+  let marginalRelief = 0;
+  if (roundedTaxableIncome > 1275000 && roundedTaxableIncome <= 1335000) {
+    const excessIncome = roundedTaxableIncome - 1275000;
+    if (taxAfterRebate > excessIncome) {
+      marginalRelief = taxAfterRebate - excessIncome;
+    }
+  }
   
-  // Total Tax Payable = Tax After Rebate + Education Cess
-  const totalTaxPayable = taxAfterRebate + educationCess;
+  const taxAfterMarginalRelief = Math.max(0, taxAfterRebate - marginalRelief);
+  
+  // Education Cess @ 4%
+  const educationCess = Math.round(taxAfterMarginalRelief * 0.04);
+  
+  // Total Tax Payable = Tax After Marginal Relief + Education Cess
+  const totalTaxPayable = taxAfterMarginalRelief + educationCess;
   
   // Relief under Section 89 (for arrears)
   const relief89 = withTotals.taxCalculationB.relief89 || 0;
@@ -339,9 +354,15 @@ export const calculateTax = (formData: TaxFormData): TaxFormData => {
       taxSlab1,
       taxSlab2,
       taxSlab3,
+      taxSlab4,
+      taxSlab5,
+      taxSlab6,
+      taxSlab7,
       totalTax,
       taxRebate87A,
       taxAfterRebate,
+      marginalRelief,
+      taxAfterMarginalRelief,
       educationCess,
       totalTaxPayable,
       relief89,

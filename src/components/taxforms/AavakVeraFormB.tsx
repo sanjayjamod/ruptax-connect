@@ -319,7 +319,7 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false, isManual
           </tr>
           <tr>
             <td className="border border-black px-2 py-1"></td>
-            <td colSpan={4} className="border border-black px-2 py-1">Amount elligible for Tax rebate Secation 87 A Up To Rs .60000</td>
+            <td colSpan={4} className="border border-black px-2 py-1">Amount elligible for Tax rebate Section 87 A Up To Rs .60000</td>
             <td className="border border-black px-2 py-1 text-right">Rs.</td>
             <td colSpan={2} className="border border-black px-2 py-1 text-right">{renderAutoField(taxB.taxRebate87A)}</td>
           </tr>
@@ -328,6 +328,18 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false, isManual
             <td colSpan={4} className="border border-black px-2 py-1">ટેક્ષ રિબેટ બાદ ભરવા પાત્ર ઇન્કમટેક્ષ</td>
             <td className="border border-black px-2 py-1 text-right">Rs.</td>
             <td colSpan={2} className="border border-black px-2 py-1 text-right font-bold">{renderAutoField(taxB.taxAfterRebate)}</td>
+          </tr>
+          <tr>
+            <td className="border border-black px-2 py-1"></td>
+            <td colSpan={4} className="border border-black px-2 py-1">Marginal relief 1275000 To 1335000 સુધીની આવક માટે</td>
+            <td className="border border-black px-2 py-1 text-right">Rs.</td>
+            <td colSpan={2} className="border border-black px-2 py-1 text-right">{renderAutoField(taxB.marginalRelief || 0)}</td>
+          </tr>
+          <tr>
+            <td className="border border-black px-2 py-1"></td>
+            <td colSpan={4} className="border border-black px-2 py-1">Marginal relief બાદ કરતા ભરવા પાત્ર ઈન્કમટેક્ષ</td>
+            <td className="border border-black px-2 py-1 text-right">Rs.</td>
+            <td colSpan={2} className="border border-black px-2 py-1 text-right font-bold">{renderAutoField(taxB.taxAfterMarginalRelief || taxB.taxAfterRebate)}</td>
           </tr>
           <tr>
             <td className="border border-black px-2 py-1"></td>
@@ -343,9 +355,7 @@ const AavakVeraFormB = ({ client, formData, onChange, readOnly = false, isManual
           </tr>
           <tr>
             <td className="border border-black px-2 py-1"></td>
-            <td colSpan={4} className="border border-black px-2 py-1 bg-yellow-50 print:bg-transparent">RELIEF UNDER SECTION 89</td>
-            <td className="border border-black px-2 py-1 text-right">Rs.</td>
-            <td colSpan={2} className="border border-black px-2 py-1 text-right bg-yellow-100 print:bg-transparent">{renderManualInputField("relief89", taxB.relief89)}</td>
+            <td colSpan={7} className="border border-black px-2 py-1"></td>
           </tr>
           <tr>
             <td className="border border-black px-2 py-1"></td>

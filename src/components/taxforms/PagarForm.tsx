@@ -14,46 +14,46 @@ const months = ['apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec', '
 const monthNames = ['એપ્રિલ', 'મે', 'જુન', 'જુલાઇ', 'ઑગસ્ટ', 'સપ્ટેમ્બર', 'ઓક્ટોબર', 'નવેમ્બર', 'ડિસેમ્બર', 'જાન્યુઆરી', 'ફેબ્રુઆરી', 'માર્ચ'];
 
 // Excel column mapping: C=apr, D=may, E=jun, F=jul, G=aug, H=sep, I=oct, J=nov, K=dec, L=jan, M=feb, N=mar
-// Yellow cells (manual input) - specific cells from Excel 2025-26
-// DA rates: Apr=53%, May=55%, Aug=55%, Nov=58%
+// Based on Excel 2025-26 structure - Yellow cells are manual input, rest are formula
+// DA rates per Excel: Apr=53%, May-Jul=55%, Aug-Oct=55%, Nov-Mar=58%
 const yellowCells: { [key: string]: { field: keyof MonthlySalary; months: (typeof months[number])[] } } = {
-  // Row 1 - Basic: C (apr), G (aug) are yellow, rest are formula
+  // Row 1 - Basic: C7 (apr), G7 (aug) are yellow input, D-F copy from C, H-N copy from G
   basic: { field: 'basic', months: ['apr', 'aug'] },
-  // Row 2 - Grade Pay: C (apr), G (aug) are yellow
-  gradePay: { field: 'gradePay', months: ['apr', 'aug'] },
-  // Row 3 - DA: ALL FORMULA! Based on Basic with varying percentages
-  da: { field: 'da', months: [] }, // All formula - calculated from Basic
+  // Row 2 - Grade Pay: ALL empty in Excel (not used in 7th pay)
+  gradePay: { field: 'gradePay', months: [] },
+  // Row 3 - DA: ALL FORMULA! Calculated from Basic with varying DA rates
+  da: { field: 'da', months: [] },
   // Row 4 - HRA: ALL FORMULA! =Basic*8% for each month
-  hra: { field: 'hra', months: [] }, // All formula
-  // Row 6 - Medical: C (apr) yellow, rest formula =C
+  hra: { field: 'hra', months: [] },
+  // Row 6 - Medical: C6 (apr) yellow, rest copy from April
   medical: { field: 'medical', months: ['apr'] },
-  // Row 7 - Disability Allowance: all manual
+  // Row 7 - Disability Allowance (અપંગ એલા.): ALL manual input
   disabilityAllowance: { field: 'disabilityAllowance', months: months.slice() },
-  // Row 8 - Principal Allowance: all manual
+  // Row 8 - Principal Allowance (આચાર્ય એલા.): ALL manual input
   principalAllowance: { field: 'principalAllowance', months: months.slice() },
-  // Row 9 - DA Arrears: D, L (may, jan) yellow per Excel
+  // Row 9 - DA Arrears: D9 (may), L9 (jan) yellow per Excel
   daArrears: { field: 'daArrears', months: ['may', 'jan'] },
-  // Row 10 - Salary Arrears: all manual
+  // Row 10 - Salary Arrears: ALL manual input
   salaryArrears: { field: 'salaryArrears', months: months.slice() },
-  // Row 11 - Other Income 1: all manual
+  // Row 11 - Other 1: Not used (empty rows in Excel)
   otherIncome1: { field: 'otherIncome1', months: months.slice() },
-  // Row 12 - Other Income 2: all manual
+  // Row 12 - Other 2: Not used
   otherIncome2: { field: 'otherIncome2', months: months.slice() },
-  // Row 14 - GPF: C (apr) yellow, rest formula =C
+  // Row 14 - GPF: C14 (apr) yellow, rest formula =C (copy from Apr)
   gpf: { field: 'gpf', months: ['apr'] },
-  // Row 15 - CPF: all formula based on total salary percentage
+  // Row 15 - CPF: ALL formula based on (Basic+DA)*10%
   cpf: { field: 'cpf', months: [] },
-  // Row 16 - Profession Tax: C (apr) yellow, rest formula =C
+  // Row 16 - Profession Tax: C16 (apr) yellow, rest formula =C
   professionTax: { field: 'professionTax', months: ['apr'] },
-  // Row 17 - Mandali Loan: C (apr) yellow, rest formula =C
+  // Row 17 - Mandali Loan: C17 (apr) yellow, rest formula =C
   mandaliLoan: { field: 'mandaliLoan', months: ['apr'] },
-  // Row 18 - Mandali Bachat: C (apr) yellow, rest formula =C
+  // Row 18 - Mandali Bachat: C18 (apr) yellow, rest formula =C
   mandaliBachat: { field: 'mandaliBachat', months: ['apr'] },
-  // Row 19 - Other Deduction: all manual
+  // Row 19 - Other Deduction (અન્ય): ALL manual input
   otherDeduction: { field: 'otherDeduction', months: months.slice() },
-  // Row 20 - Group Insurance: C (apr) yellow, rest formula =C
+  // Row 20 - Group Insurance: C20 (apr) yellow, rest formula =C
   groupInsurance: { field: 'groupInsurance', months: ['apr'] },
-  // Row 21 - Income Tax: C, N (apr, mar) yellow, rest formula =C
+  // Row 21 - Income Tax: C21 (apr), N21 (mar) yellow, D-M formula =C
   incomeTax: { field: 'incomeTax', months: ['apr', 'mar'] },
 };
 
@@ -90,35 +90,22 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
     });
     
     // DA rates per Excel 2025-26:
-    // April = Basic * 53%, May-Jul = Basic * 55% (different DA increase in May)
-    // Aug-Oct = Basic * 55%, Nov-Dec = Basic * 58%, Jan-Mar = Basic * 58%
-    const daApr = Math.round((updated.apr.basic || 0) * 0.53);
-    updated.apr.da = daApr;
+    // April = Basic * 53%
+    // May, Jun, Jul = Basic * 55%  
+    // Aug, Sep, Oct = Basic * 55%
+    // Nov, Dec, Jan, Feb, Mar = Basic * 58%
+    updated.apr.da = Math.round((updated.apr.basic || 0) * 0.53);
     
-    // May uses its own formula - 55% of basic
-    const daMay = Math.round((updated.may.basic || 0) * 0.55);
-    updated.may.da = daMay;
-    ['jun', 'jul'].forEach(m => {
-      updated[m as typeof months[number]].da = daMay;
+    ['may', 'jun', 'jul'].forEach(m => {
+      updated[m as typeof months[number]].da = Math.round((updated[m as typeof months[number]].basic || 0) * 0.55);
     });
     
-    // August = 55% of August Basic
-    const daAug = Math.round((updated.aug.basic || 0) * 0.55);
-    updated.aug.da = daAug;
-    ['sep', 'oct'].forEach(m => {
-      updated[m as typeof months[number]].da = daAug;
+    ['aug', 'sep', 'oct'].forEach(m => {
+      updated[m as typeof months[number]].da = Math.round((updated[m as typeof months[number]].basic || 0) * 0.55);
     });
     
-    // November = 58% of Basic
-    const daNov = Math.round((updated.nov.basic || 0) * 0.58);
-    updated.nov.da = daNov;
-    updated.dec.da = daNov;
-    
-    // January onwards = 58% of Basic  
-    const daJan = Math.round((updated.jan.basic || 0) * 0.58);
-    updated.jan.da = daJan;
-    ['feb', 'mar'].forEach(m => {
-      updated[m as typeof months[number]].da = daJan;
+    ['nov', 'dec', 'jan', 'feb', 'mar'].forEach(m => {
+      updated[m as typeof months[number]].da = Math.round((updated[m as typeof months[number]].basic || 0) * 0.58);
     });
     
     // HRA: 8% of Basic for each month
@@ -138,10 +125,11 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
       updated[m as typeof months[number]].gpf = gpfApr;
     });
     
-    // CPF: calculated as percentage of (Basic + DA) - approximately 10%
+    // CPF: calculated as ~10% of (Basic + DA) per Excel formula
     months.forEach(m => {
-      const basicDA = (updated[m].basic || 0) + (updated[m].da || 0);
-      updated[m].cpf = Math.round(basicDA * 0.10);
+      const basicPlusDA = (updated[m].basic || 0) + (updated[m].da || 0);
+      // CPF rate formula: approximately 10% of (Basic + DA)
+      updated[m].cpf = Math.round(basicPlusDA * 0.10);
     });
     
     // Profession Tax: copy from April
