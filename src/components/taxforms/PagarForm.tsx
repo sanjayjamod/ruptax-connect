@@ -31,8 +31,8 @@ const yellowCells: { [key: string]: { field: keyof MonthlySalary; months: (typeo
   disabilityAllowance: { field: 'disabilityAllowance', months: ['apr'] },
   // Row 8 - Principal Allowance (આચાર્ય એલા.): ONLY Apr yellow, rest copy from Apr
   principalAllowance: { field: 'principalAllowance', months: ['apr'] },
-  // Row 9 - DA Arrears (મોંઘવારી એરિ.): D9 (may), L9 (jan) are green/formula - rest empty
-  daArrears: { field: 'daArrears', months: ['may', 'jan'] },
+  // Row 9 - DA Arrears (મોંઘવારી એરિ.): ALL auto-calculated (green/formula cells)
+  daArrears: { field: 'daArrears', months: [] },
   // Row 10 - Salary Arrears: ALL manual input
   salaryArrears: { field: 'salaryArrears', months: months.slice() },
   // Row 11 - Other 1: Not used (empty rows in Excel)
@@ -130,6 +130,14 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
     ['may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec', 'jan', 'feb', 'mar'].forEach(m => {
       updated[m as typeof months[number]].principalAllowance = principalApr;
     });
+    
+    // DA Arrears (મોંઘવારી એરિ.): Auto calculate formulas
+    // D14 (May) = April DA * 3% * 2
+    // K14 (Jan) = August DA * 3% * 3
+    const aprDA = updated.apr.da || 0;
+    const augDA = updated.aug.da || 0;
+    updated.may.daArrears = Math.round(aprDA * 0.03 * 2);
+    updated.jan.daArrears = Math.round(augDA * 0.03 * 3);
     
     // GPF: copy from April
     const gpfApr = updated.apr.gpf || 0;
