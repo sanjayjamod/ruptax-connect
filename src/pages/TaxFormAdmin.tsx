@@ -360,15 +360,15 @@ const TaxFormAdmin = () => {
     csv += `Financial Year,${salaryData.financialYear}\n`;
     csv += `Accounting Year,${salaryData.accountingYear}\n\n`;
     
-    csv += `Month,Basic,Grade Pay,DA,HRA,Medical,Disability Allow,Principal Allow,DA Arrears,Salary Arrears,Total Salary,GPF,CPF,Prof Tax,Society,Group Ins,Income Tax,Total Deduction,Net Pay\n`;
+    csv += `Month,Basic,Grade Pay,DA,HRA,Medical,Disability Allow,Principal Allow,DA Arrears,Salary Arrears,Total Salary,GPF,CPF,Prof Tax,Mandali Loan,Mandali Bachat,Other Deduction,Group Ins,Income Tax,Total Deduction,Net Pay\n`;
     
     months.forEach((m, i) => {
       const s = salaryData.months[m];
-      csv += `${monthNames[i]},${s.basic},${s.gradePay},${s.da},${s.hra},${s.medical},${s.disabilityAllowance},${s.principalAllowance},${s.daArrears},${s.salaryArrears},${s.totalSalary},${s.gpf},${s.cpf},${s.professionTax},${s.society},${s.groupInsurance},${s.incomeTax},${s.totalDeduction},${s.netPay}\n`;
+      csv += `${monthNames[i]},${s.basic},${s.gradePay},${s.da},${s.hra},${s.medical},${s.disabilityAllowance},${s.principalAllowance},${s.daArrears},${s.salaryArrears},${s.totalSalary},${s.gpf},${s.cpf},${s.professionTax},${s.mandaliLoan},${s.mandaliBachat},${s.otherDeduction},${s.groupInsurance},${s.incomeTax},${s.totalDeduction},${s.netPay}\n`;
     });
     
     const t = salaryData.totals;
-    csv += `TOTAL,${t.basic},${t.gradePay},${t.da},${t.hra},${t.medical},${t.disabilityAllowance},${t.principalAllowance},${t.daArrears},${t.salaryArrears},${t.totalSalary},${t.gpf},${t.cpf},${t.professionTax},${t.society},${t.groupInsurance},${t.incomeTax},${t.totalDeduction},${t.netPay}\n\n`;
+    csv += `TOTAL,${t.basic},${t.gradePay},${t.da},${t.hra},${t.medical},${t.disabilityAllowance},${t.principalAllowance},${t.daArrears},${t.salaryArrears},${t.totalSalary},${t.gpf},${t.cpf},${t.professionTax},${t.mandaliLoan},${t.mandaliBachat},${t.otherDeduction},${t.groupInsurance},${t.incomeTax},${t.totalDeduction},${t.netPay}\n\n`;
     
     // Declaration Form
     const decl = formData.declarationData;
