@@ -132,12 +132,12 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
     });
     
     // DA Arrears (મોંઘવારી એરિ.): Auto calculate formulas
-    // D14 (May) = April DA * 3% * 2
-    // K14 (Jan) = August DA * 3% * 3
-    const aprDA = updated.apr.da || 0;
-    const augDA = updated.aug.da || 0;
-    updated.may.daArrears = Math.round(aprDA * 0.03 * 2);
-    updated.jan.daArrears = Math.round(augDA * 0.03 * 3);
+    // May = April Basic × 2% × 3 (for 2% DA increase)
+    // December = August Basic × 3% × 3 (for 3% DA increase)
+    const aprBasic = updated.apr.basic || 0;
+    const augBasic = updated.aug.basic || 0;
+    updated.may.daArrears = Math.round(aprBasic * 0.02 * 3);
+    updated.dec.daArrears = Math.round(augBasic * 0.03 * 3);
     
     // GPF: copy from April
     const gpfApr = updated.apr.gpf || 0;
