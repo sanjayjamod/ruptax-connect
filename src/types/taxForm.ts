@@ -9,14 +9,16 @@ export interface MonthlySalary {
   principalAllowance: number;
   daArrears: number;
   salaryArrears: number;
-  otherIncome1: number; // Row 11 - અન્ય આવક 1
-  otherIncome2: number; // Row 12 - અન્ય આવક 2
+  otherIncome1: number; // Row 11 - blank
+  otherIncome2: number; // Row 12 - blank
   totalSalary: number;
   // Deductions
   gpf: number;
   cpf: number;
   professionTax: number;
-  society: number;
+  mandaliLoan: number; // મંડળી લોન (Row 17)
+  mandaliBachat: number; // મંડળી બચત (Row 18)
+  otherDeduction: number; // અન્ય (Row 19)
   groupInsurance: number;
   incomeTax: number;
   totalDeduction: number;
@@ -198,7 +200,9 @@ export const emptyMonthlySalary: MonthlySalary = {
   gpf: 0,
   cpf: 0,
   professionTax: 0,
-  society: 0,
+  mandaliLoan: 0,
+  mandaliBachat: 0,
+  otherDeduction: 0,
   groupInsurance: 0,
   incomeTax: 0,
   totalDeduction: 0,
