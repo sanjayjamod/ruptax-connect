@@ -123,12 +123,18 @@ export interface TaxCalculationB {
   taxableIncome: number;
   roundedTaxableIncome: number;
   // Tax calculation
-  taxSlab1: number; // 0-2.5L at 0%
-  taxSlab2: number; // 2.5L-5L at 5%
-  taxSlab3: number; // 5L-10L at 20%
+  taxSlab1: number; // 0-4L at 0%
+  taxSlab2: number; // 4L-8L at 5%
+  taxSlab3: number; // 8L-12L at 10%
+  taxSlab4: number; // 12L-16L at 15%
+  taxSlab5: number; // 16L-20L at 20%
+  taxSlab6: number; // 20L-24L at 25%
+  taxSlab7: number; // 24L+ at 30%
   totalTax: number;
   taxRebate87A: number;
   taxAfterRebate: number;
+  marginalRelief: number; // Marginal relief for income 12.75L to 13.35L
+  taxAfterMarginalRelief: number;
   educationCess: number;
   totalTaxPayable: number;
   relief89: number;
@@ -302,9 +308,15 @@ export const getEmptyTaxFormData = (clientId: string): TaxFormData => ({
     taxSlab1: 0,
     taxSlab2: 0,
     taxSlab3: 0,
+    taxSlab4: 0,
+    taxSlab5: 0,
+    taxSlab6: 0,
+    taxSlab7: 0,
     totalTax: 0,
     taxRebate87A: 0,
     taxAfterRebate: 0,
+    marginalRelief: 0,
+    taxAfterMarginalRelief: 0,
     educationCess: 0,
     totalTaxPayable: 0,
     relief89: 0,
