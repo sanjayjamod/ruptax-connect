@@ -14,42 +14,46 @@ const months = ['apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec', '
 const monthNames = ['એપ્રિલ', 'મે', 'જુન', 'જુલાઇ', 'ઑગસ્ટ', 'સપ્ટેમ્બર', 'ઓક્ટોબર', 'નવેમ્બર', 'ડિસેમ્બર', 'જાન્યુઆરી', 'ફેબ્રુઆરી', 'માર્ચ'];
 
 // Excel column mapping: C=apr, D=may, E=jun, F=jul, G=aug, H=sep, I=oct, J=nov, K=dec, L=jan, M=feb, N=mar
-// Yellow cells (manual input) - specific cells from Excel
-// IMPORTANT: DA (Row 9) = Basic * 46%, HRA (Row 10) = Basic * 8% - these are FORMULAS not manual!
+// Yellow cells (manual input) - specific cells from Excel 2025-26
+// DA rates: Apr=53%, May=55%, Aug=55%, Nov=58%
 const yellowCells: { [key: string]: { field: keyof MonthlySalary; months: (typeof months[number])[] } } = {
-  // Row 7 - Basic: C7 (apr), G7 (aug) are yellow, rest are formula =C7 or =G7
+  // Row 1 - Basic: C (apr), G (aug) are yellow, rest are formula
   basic: { field: 'basic', months: ['apr', 'aug'] },
-  // Row 8 - Grade Pay: C8 (apr), G8 (aug) are yellow
+  // Row 2 - Grade Pay: C (apr), G (aug) are yellow
   gradePay: { field: 'gradePay', months: ['apr', 'aug'] },
-  // Row 9 - DA: ALL FORMULA! C9=C7*46%, D9=C9, E9=C9, F9=C9, G9=G7*50%, H9-K9=G9, L9=L7*53%, M9-N9=L9
+  // Row 3 - DA: ALL FORMULA! Based on Basic with varying percentages
   da: { field: 'da', months: [] }, // All formula - calculated from Basic
-  // Row 10 - HRA: ALL FORMULA! =Basic*8% for each month
+  // Row 4 - HRA: ALL FORMULA! =Basic*8% for each month
   hra: { field: 'hra', months: [] }, // All formula
-  // Row 11 - Medical: C11 (apr) yellow, rest formula =C11
+  // Row 6 - Medical: C (apr) yellow, rest formula =C
   medical: { field: 'medical', months: ['apr'] },
-  // Row 12 - Disability Allowance: all manual
+  // Row 7 - Disability Allowance: all manual
   disabilityAllowance: { field: 'disabilityAllowance', months: months.slice() },
-  // Row 13 - Principal Allowance: all manual
+  // Row 8 - Principal Allowance: all manual
   principalAllowance: { field: 'principalAllowance', months: months.slice() },
-  // Row 14 - DA Arrears: all manual (varies each month)
-  daArrears: { field: 'daArrears', months: months.slice() },
-  // Row 15 - Salary Arrears: all manual
+  // Row 9 - DA Arrears: D, L (may, jan) yellow per Excel
+  daArrears: { field: 'daArrears', months: ['may', 'jan'] },
+  // Row 10 - Salary Arrears: all manual
   salaryArrears: { field: 'salaryArrears', months: months.slice() },
-  // Row 16 - Other Income 1: all manual
+  // Row 11 - Other Income 1: all manual
   otherIncome1: { field: 'otherIncome1', months: months.slice() },
-  // Row 17 - Other Income 2: all manual
+  // Row 12 - Other Income 2: all manual
   otherIncome2: { field: 'otherIncome2', months: months.slice() },
-  // Row 20 - GPF: C20 (apr) yellow, rest formula =C20
+  // Row 14 - GPF: C (apr) yellow, rest formula =C
   gpf: { field: 'gpf', months: ['apr'] },
-  // Row 21 - CPF: C21 (apr) yellow, rest formula =C21
-  cpf: { field: 'cpf', months: ['apr'] },
-  // Row 22 - Profession Tax: C22 (apr) yellow, rest formula =C22
+  // Row 15 - CPF: all formula based on total salary percentage
+  cpf: { field: 'cpf', months: [] },
+  // Row 16 - Profession Tax: C (apr) yellow, rest formula =C
   professionTax: { field: 'professionTax', months: ['apr'] },
-  // Row 23 - Society: C23, E23, G23 yellow (varies)
-  society: { field: 'society', months: ['apr', 'jun', 'aug'] },
-  // Row 24 - Group Insurance: C24 (apr) yellow, rest formula =C24
+  // Row 17 - Mandali Loan: C (apr) yellow, rest formula =C
+  mandaliLoan: { field: 'mandaliLoan', months: ['apr'] },
+  // Row 18 - Mandali Bachat: C (apr) yellow, rest formula =C
+  mandaliBachat: { field: 'mandaliBachat', months: ['apr'] },
+  // Row 19 - Other Deduction: all manual
+  otherDeduction: { field: 'otherDeduction', months: months.slice() },
+  // Row 20 - Group Insurance: C (apr) yellow, rest formula =C
   groupInsurance: { field: 'groupInsurance', months: ['apr'] },
-  // Row 25 - Income Tax: C25, N25 (apr, mar) yellow, rest formula =C25
+  // Row 21 - Income Tax: C, N (apr, mar) yellow, rest formula =C
   incomeTax: { field: 'incomeTax', months: ['apr', 'mar'] },
 };
 
@@ -85,31 +89,36 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
       updated[m as typeof months[number]].gradePay = gradePayAug;
     });
     
-    // DA: C9=C7*46%, D9-F9=C9, G9=G7*50%, H9-K9=G9, L9=L7*53%, M9-N9=L9
-    // April DA = April Basic * 46%
-    const daApr = Math.round((updated.apr.basic || 0) * 0.46);
+    // DA rates per Excel 2025-26:
+    // April = Basic * 53%, May-Jul = Basic * 55% (different DA increase in May)
+    // Aug-Oct = Basic * 55%, Nov-Dec = Basic * 58%, Jan-Mar = Basic * 58%
+    const daApr = Math.round((updated.apr.basic || 0) * 0.53);
     updated.apr.da = daApr;
-    ['may', 'jun', 'jul'].forEach(m => {
-      updated[m as typeof months[number]].da = daApr;
+    
+    // May uses its own formula - 55% of basic
+    const daMay = Math.round((updated.may.basic || 0) * 0.55);
+    updated.may.da = daMay;
+    ['jun', 'jul'].forEach(m => {
+      updated[m as typeof months[number]].da = daMay;
     });
     
-    // August DA = August Basic * 50%
-    const daAug = Math.round((updated.aug.basic || 0) * 0.50);
+    // August = 55% of August Basic
+    const daAug = Math.round((updated.aug.basic || 0) * 0.55);
     updated.aug.da = daAug;
-    ['sep', 'oct', 'nov', 'dec'].forEach(m => {
+    ['sep', 'oct'].forEach(m => {
       updated[m as typeof months[number]].da = daAug;
     });
     
-    // January DA = January Basic * 53%
-    const daJan = Math.round((updated.jan.basic || 0) * 0.53);
+    // November = 58% of Basic
+    const daNov = Math.round((updated.nov.basic || 0) * 0.58);
+    updated.nov.da = daNov;
+    updated.dec.da = daNov;
+    
+    // January onwards = 58% of Basic  
+    const daJan = Math.round((updated.jan.basic || 0) * 0.58);
     updated.jan.da = daJan;
     ['feb', 'mar'].forEach(m => {
       updated[m as typeof months[number]].da = daJan;
-    });
-    
-    // HRA: 8% of Basic for each month
-    months.forEach(m => {
-      updated[m].hra = Math.round((updated[m].basic || 0) * 0.08);
     });
     
     // HRA: 8% of Basic for each month
@@ -129,10 +138,10 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
       updated[m as typeof months[number]].gpf = gpfApr;
     });
     
-    // CPF: copy from April
-    const cpfApr = updated.apr.cpf || 0;
-    ['may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec', 'jan', 'feb', 'mar'].forEach(m => {
-      updated[m as typeof months[number]].cpf = cpfApr;
+    // CPF: calculated as percentage of (Basic + DA) - approximately 10%
+    months.forEach(m => {
+      const basicDA = (updated[m].basic || 0) + (updated[m].da || 0);
+      updated[m].cpf = Math.round(basicDA * 0.10);
     });
     
     // Profession Tax: copy from April
@@ -141,14 +150,16 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
       updated[m as typeof months[number]].professionTax = ptApr;
     });
     
-    // Society: D23 = C23, F23 = E23, H23-N23 = G23
-    const societyApr = updated.apr.society || 0;
-    const societyJun = updated.jun.society || 0;
-    const societyAug = updated.aug.society || 0;
-    updated.may.society = societyApr;
-    updated.jul.society = societyJun;
-    ['sep', 'oct', 'nov', 'dec', 'jan', 'feb', 'mar'].forEach(m => {
-      updated[m as typeof months[number]].society = societyAug;
+    // Mandali Loan: copy from April
+    const mandaliLoanApr = updated.apr.mandaliLoan || 0;
+    ['may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec', 'jan', 'feb', 'mar'].forEach(m => {
+      updated[m as typeof months[number]].mandaliLoan = mandaliLoanApr;
+    });
+    
+    // Mandali Bachat: copy from April
+    const mandaliBachatApr = updated.apr.mandaliBachat || 0;
+    ['may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec', 'jan', 'feb', 'mar'].forEach(m => {
+      updated[m as typeof months[number]].mandaliBachat = mandaliBachatApr;
     });
     
     // Group Insurance: copy from April
@@ -157,7 +168,7 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
       updated[m as typeof months[number]].groupInsurance = giApr;
     });
     
-    // Income Tax: D25-M25 = C25, N25 is yellow (manual)
+    // Income Tax: D-M = C, N is yellow (manual)
     const itApr = updated.apr.incomeTax || 0;
     ['may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec', 'jan', 'feb'].forEach(m => {
       updated[m as typeof months[number]].incomeTax = itApr;
@@ -170,7 +181,8 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
                               (updated[m].principalAllowance || 0) + (updated[m].daArrears || 0) + 
                               (updated[m].salaryArrears || 0) + (updated[m].otherIncome1 || 0) + (updated[m].otherIncome2 || 0);
       updated[m].totalDeduction = (updated[m].gpf || 0) + (updated[m].cpf || 0) + (updated[m].professionTax || 0) + 
-                                  (updated[m].society || 0) + (updated[m].groupInsurance || 0) + (updated[m].incomeTax || 0);
+                                  (updated[m].mandaliLoan || 0) + (updated[m].mandaliBachat || 0) + 
+                                  (updated[m].otherDeduction || 0) + (updated[m].groupInsurance || 0) + (updated[m].incomeTax || 0);
       updated[m].netPay = updated[m].totalSalary - updated[m].totalDeduction;
     });
     
@@ -393,15 +405,17 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
           {renderMappedRow(14, "G.P.F.", "gpf")}
           {renderMappedRow(15, "C.P.F.", "cpf")}
           {renderMappedRow(16, "વ્યવસાય વેરો", "professionTax")}
-          {renderMappedRow(17, "મંડળી", "society")}
-          {renderMappedRow(18, "જૂથ વિમા પ્રિમિયમ", "groupInsurance")}
-          {renderMappedRow(19, "ઇન્કમટેક્ષ કપાત", "incomeTax")}
+          {renderMappedRow(17, "મંડળી લોન", "mandaliLoan")}
+          {renderMappedRow(18, "મંડળી બચત", "mandaliBachat")}
+          {renderMappedRow(19, "અન્ય", "otherDeduction")}
+          {renderMappedRow(20, "જૂથ વિમા પ્રિમિયમ", "groupInsurance")}
+          {renderMappedRow(21, "ઇન્કમટેક્ષ કપાત", "incomeTax")}
           
           {/* Total Deduction Row */}
-          {renderAutoRow(20, "કુલ કપાત", "totalDeduction")}
+          {renderAutoRow(22, "કુલ કપાત", "totalDeduction")}
           
           {/* Net Pay Row */}
-          {renderAutoRow(21, "ચુકવેલ રકમ", "netPay")}
+          {renderAutoRow(23, "ચુકવેલ રકમ", "netPay")}
         </tbody>
       </table>
 

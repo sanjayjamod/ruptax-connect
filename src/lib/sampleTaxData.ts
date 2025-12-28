@@ -6,7 +6,7 @@ import { saveTaxForm, calculateTax } from "./taxFormStorage";
 const createMonthlySalary = (
   basic: number, da: number, hra: number, medical: number, 
   daArrears: number, otherIncome1: number, gpf: number, 
-  society: number, incomeTax: number
+  mandaliLoan: number, mandaliBachat: number, incomeTax: number
 ): MonthlySalary => ({
   basic,
   gradePay: 0,
@@ -23,28 +23,30 @@ const createMonthlySalary = (
   gpf,
   cpf: 0,
   professionTax: 200,
-  society,
+  mandaliLoan,
+  mandaliBachat,
+  otherDeduction: 0,
   groupInsurance: 800,
   incomeTax,
-  totalDeduction: gpf + 200 + society + 800 + incomeTax,
+  totalDeduction: gpf + 200 + mandaliLoan + mandaliBachat + 800 + incomeTax,
   netPay: 0, // Will be calculated
 });
 
 // Sample data for Client 2026354 (from RUPSANGBHAI_NAMUNO Excel)
 export const getSampleTaxFormData = (clientId: string): TaxFormData => {
   const months = {
-    apr: createMonthlySalary(56900, 26174, 4552, 1000, 6828, 0, 15000, 0, 5000),
-    may: createMonthlySalary(56900, 26174, 4552, 1000, 6828, 0, 15000, 0, 5000),
-    jun: createMonthlySalary(56900, 26174, 4552, 1000, 4552, 0, 15000, 2000, 5000),
-    jul: createMonthlySalary(56900, 26174, 4552, 1000, 0, 0, 15000, 2000, 5000),
-    aug: createMonthlySalary(58600, 29300, 4688, 1000, 4552, 0, 15000, 1000, 5000),
-    sep: createMonthlySalary(58600, 29300, 4688, 1000, 4552, 0, 15000, 1000, 5000),
-    oct: createMonthlySalary(58600, 29300, 4688, 1000, 4552, 0, 15000, 1000, 5000),
-    nov: createMonthlySalary(58600, 29300, 4688, 1000, 0, 1500000, 15000, 1000, 5000),
-    dec: createMonthlySalary(58600, 29300, 4688, 1000, 0, 25000, 15000, 1000, 5000),
-    jan: createMonthlySalary(58600, 31058, 4688, 1000, 8790, 0, 15000, 1000, 5000),
-    feb: createMonthlySalary(58600, 31058, 4688, 1000, 0, 0, 15000, 1000, 5000),
-    mar: createMonthlySalary(58600, 31058, 4688, 1000, 0, 0, 15000, 1000, 339932),
+    apr: createMonthlySalary(56900, 26174, 4552, 1000, 6828, 0, 15000, 0, 0, 5000),
+    may: createMonthlySalary(56900, 26174, 4552, 1000, 6828, 0, 15000, 0, 0, 5000),
+    jun: createMonthlySalary(56900, 26174, 4552, 1000, 4552, 0, 15000, 2000, 0, 5000),
+    jul: createMonthlySalary(56900, 26174, 4552, 1000, 0, 0, 15000, 2000, 0, 5000),
+    aug: createMonthlySalary(58600, 29300, 4688, 1000, 4552, 0, 15000, 1000, 0, 5000),
+    sep: createMonthlySalary(58600, 29300, 4688, 1000, 4552, 0, 15000, 1000, 0, 5000),
+    oct: createMonthlySalary(58600, 29300, 4688, 1000, 4552, 0, 15000, 1000, 0, 5000),
+    nov: createMonthlySalary(58600, 29300, 4688, 1000, 0, 1500000, 15000, 1000, 0, 5000),
+    dec: createMonthlySalary(58600, 29300, 4688, 1000, 0, 25000, 15000, 1000, 0, 5000),
+    jan: createMonthlySalary(58600, 31058, 4688, 1000, 8790, 0, 15000, 1000, 0, 5000),
+    feb: createMonthlySalary(58600, 31058, 4688, 1000, 0, 0, 15000, 1000, 0, 5000),
+    mar: createMonthlySalary(58600, 31058, 4688, 1000, 0, 0, 15000, 1000, 0, 339932),
   };
 
   // Calculate net pay for each month
