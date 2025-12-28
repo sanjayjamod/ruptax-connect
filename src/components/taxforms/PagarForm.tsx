@@ -27,11 +27,11 @@ const yellowCells: { [key: string]: { field: keyof MonthlySalary; months: (typeo
   hra: { field: 'hra', months: [] },
   // Row 6 - Medical: C6 (apr) yellow, rest copy from April
   medical: { field: 'medical', months: ['apr'] },
-  // Row 7 - Disability Allowance (અપંગ એલા.): ALL manual input
-  disabilityAllowance: { field: 'disabilityAllowance', months: months.slice() },
-  // Row 8 - Principal Allowance (આચાર્ય એલા.): ALL manual input
-  principalAllowance: { field: 'principalAllowance', months: months.slice() },
-  // Row 9 - DA Arrears: D9 (may), L9 (jan) yellow per Excel
+  // Row 7 - Disability Allowance (અપંગ એલા.): ONLY Apr yellow, rest copy from Apr
+  disabilityAllowance: { field: 'disabilityAllowance', months: ['apr'] },
+  // Row 8 - Principal Allowance (આચાર્ય એલા.): ONLY Apr yellow, rest copy from Apr
+  principalAllowance: { field: 'principalAllowance', months: ['apr'] },
+  // Row 9 - DA Arrears (મોંઘવારી એરિ.): D9 (may), L9 (jan) are green/formula - rest empty
   daArrears: { field: 'daArrears', months: ['may', 'jan'] },
   // Row 10 - Salary Arrears: ALL manual input
   salaryArrears: { field: 'salaryArrears', months: months.slice() },
@@ -117,6 +117,18 @@ const PagarForm = ({ client, formData, onChange, readOnly = false, isManualMode 
     const medicalApr = updated.apr.medical || 0;
     ['may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec', 'jan', 'feb', 'mar'].forEach(m => {
       updated[m as typeof months[number]].medical = medicalApr;
+    });
+    
+    // Disability Allowance (અપંગ એલા.): copy from April
+    const disabilityApr = updated.apr.disabilityAllowance || 0;
+    ['may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec', 'jan', 'feb', 'mar'].forEach(m => {
+      updated[m as typeof months[number]].disabilityAllowance = disabilityApr;
+    });
+    
+    // Principal Allowance (આચાર્ય એલા.): copy from April
+    const principalApr = updated.apr.principalAllowance || 0;
+    ['may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec', 'jan', 'feb', 'mar'].forEach(m => {
+      updated[m as typeof months[number]].principalAllowance = principalApr;
     });
     
     // GPF: copy from April
